@@ -11,31 +11,116 @@
 ZLoginPart::ZLoginPart(QWidget *parent):QFrame(parent)
 {
     this->setStyleSheet("QFrame{background-color:white;}");
-    this->m_llLogo=new QLabel;
+    if(!this->ZDoInit())
+    {
+        QMessageBox::critical(this,tr("Error"),tr("Initial failed due to low memory!"));
+        qApp->exit(-1);
+    }
+}
+bool ZLoginPart::ZDoInit()
+{
+    try{
+        this->m_llLogo=new QLabel;
+    }catch(...)
+    {
+        qDebug()<<"new Logo label failed!";
+        return false;
+    }
     this->m_llLogo->setPixmap(QPixmap(":/LoginManager/images/LoginManager/Logo.png"));
 
-    this->m_llUserIcon=new QLabel;
+    try{
+        this->m_llUserIcon=new QLabel;
+    }catch(...)
+    {
+        qDebug()<<"new UserIcon label failed!";
+        return false;
+    }
     this->m_llUserIcon->setPixmap(QPixmap(":/LoginManager/images/LoginManager/User.png"));
-    this->m_llUserName=new QLabel(tr("用户名:"));
-    this->m_cbUserName=new QComboBox;
+
+
+    try{
+        this->m_llUserName=new QLabel(tr("用户名:"));
+    }catch(...)
+    {
+        qDebug()<<"new UserName label failed!";
+        return false;
+    }
+
+    try{
+        this->m_cbUserName=new QComboBox;
+    }catch(...)
+    {
+        qDebug()<<"new UserName comboBox failed!";
+        return false;
+    }
     this->m_cbUserName->setEditable(true);
     this->m_cbUserName->setFixedWidth(150);
 
-    this->m_llPasswordIcon=new QLabel;
+    try{
+        this->m_llPasswordIcon=new QLabel;
+    }catch(...)
+    {
+        qDebug()<<"new PasswordIcon label failed!";
+        return false;
+    }
     this->m_llPasswordIcon->setPixmap(QPixmap(":/LoginManager/images/LoginManager/Lock.png"));
-    this->m_llPassword=new QLabel(tr("密码:"));
 
-    this->m_lePassword=new QLineEdit;
+    try{
+        this->m_llPassword=new QLabel(tr("密码:"));
+    }catch(...)
+    {
+        qDebug()<<"new Password label failed!";
+        return false;
+    }
+
+    try{
+        this->m_lePassword=new QLineEdit;
+    }catch(...)
+    {
+        qDebug()<<"new Password lineedit failed!";
+        return false;
+    }
     this->m_lePassword->setFixedWidth(150);
     this->m_lePassword->setMaxLength(45);
     this->m_lePassword->setEchoMode(QLineEdit::Password);
 
-    this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("登录"));
-    this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("退出"));
+    try{
+        this->m_tbOkay=new QToolButton;
+    }catch(...)
+    {
+        qDebug()<<"new okay button failed!";
+        return false;
+    }
+    this->m_tbOkay->setText(tr(" 登录"));
 
-    this->m_gridLayout=new QGridLayout;
+    try{
+        this->m_tbCancel=new QToolButton;
+    }catch(...)
+    {
+        qDebug()<<"new cancel button failed!";
+        return false;
+    }
+    this->m_tbCancel->setText(tr(" 退出"));
+
+    try{
+        this->m_hLayoutBtn=new QHBoxLayout;
+        this->m_hLayoutBtn->setSpacing(10);
+        this->m_hLayoutBtn->addStretch(1);
+        this->m_hLayoutBtn->addWidget(this->m_tbOkay);
+        this->m_hLayoutBtn->addWidget(this->m_tbCancel);
+    }catch(...)
+    {
+        qDebug()<<"new hlayout failed!";
+        return false;
+    }
+
+    try{
+        this->m_gridLayout=new QGridLayout;
+    }catch(...)
+    {
+        qDebug()<<"new grid layout failed!";
+        return false;
+    }
     this->m_gridLayout->addWidget(this->m_llLogo,0,0,3,1);
     this->m_gridLayout->addWidget(this->m_llUserIcon,0,1,1,1);
     this->m_gridLayout->addWidget(this->m_llUserName,0,2,1,1);
@@ -43,8 +128,7 @@ ZLoginPart::ZLoginPart(QWidget *parent):QFrame(parent)
     this->m_gridLayout->addWidget(this->m_llPasswordIcon,1,1,1,1);
     this->m_gridLayout->addWidget(this->m_llPassword,1,2,1,1);
     this->m_gridLayout->addWidget(this->m_lePassword,1,3,1,1);
-    this->m_gridLayout->addWidget(this->m_tbOkay,2,2,1,1,Qt::AlignCenter);
-    this->m_gridLayout->addWidget(this->m_tbCancel,2,3,1,1,Qt::AlignCenter);
+    this->m_gridLayout->addLayout(this->m_hLayoutBtn,2,2,1,2);
     this->m_gridLayout->setColumnStretch(0,6);
     this->m_gridLayout->setColumnStretch(1,1);
     this->m_gridLayout->setColumnStretch(2,1);
@@ -54,6 +138,7 @@ ZLoginPart::ZLoginPart(QWidget *parent):QFrame(parent)
 
     connect(this->m_tbOkay,SIGNAL(clicked(bool)),this,SLOT(ZSlotOkay()));
     connect(this->m_tbCancel,SIGNAL(clicked(bool)),this,SLOT(ZSlotCancel()));
+    return true;
 }
 ZLoginPart::~ZLoginPart()
 {
@@ -66,6 +151,7 @@ ZLoginPart::~ZLoginPart()
     delete this->m_lePassword;
     delete this->m_tbOkay;
     delete this->m_tbCancel;
+    delete this->m_hLayoutBtn;
     delete this->m_gridLayout;
 }
 void ZLoginPart::ZSlotOkay()
@@ -153,7 +239,7 @@ PLoginManager::PLoginManager(QWidget *parent):ZBaseInfoDia(ZBaseInfoDia::Dialog_
     this->m_llInfo=new QLabel;
     this->m_llInfo->setMargin(8);
     this->m_llInfo->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-    this->m_llInfo->setText(tr("捷温汽车系统(中国)有限公司  柘园生物"));
+    this->m_llInfo->setText(tr("捷温汽车系统(中国)有限公司      柘园生物提供技术支持"));
 
     this->m_stackedWidget=new QStackedWidget;
     this->m_stackedWidget->addWidget(this->m_loginPart);
@@ -210,7 +296,7 @@ void PLoginManager::ZSlotLoginOpFinished(qint32 retCode)
 {
     if(retCode<0)
     {
-        this->m_loginFailPart->ZSetFailMsg(tr("登录超时，服务器:%1:%2!\n请检测网络连接状态!").arg(MyUserInfo::ZGetInstance()->m_PMSIp).arg(MyUserInfo::ZGetInstance()->m_PMSPort));
+        this->m_loginFailPart->ZSetFailMsg(tr("登录超时!\n无法连接到服务器:%1:%2!\n请检测网络连接状态!").arg(MyUserInfo::ZGetInstance()->m_PMSIp).arg(MyUserInfo::ZGetInstance()->m_PMSPort));
         this->m_stackedWidget->setCurrentWidget(this->m_loginFailPart);
     }
 }

@@ -18,8 +18,8 @@ class ZLoginPart:public QFrame
     Q_OBJECT
 public:
     ZLoginPart(QWidget *parent=0);
+    bool ZDoInit();
     ~ZLoginPart();
-
 signals:
     void ZSignalDoLogin();
     void ZSignalDoExit();
@@ -39,6 +39,7 @@ public:
 
     QToolButton *m_tbOkay;
     QToolButton *m_tbCancel;
+    QHBoxLayout *m_hLayoutBtn;
 
     QGridLayout *m_gridLayout;
 };

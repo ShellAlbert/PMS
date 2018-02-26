@@ -28,17 +28,21 @@ int main(int argc, char *argv[])
         file.close();
     }
 
-
+    //load config file.
+    //server ip & port.
     MyUserInfo::ZGetInstance()->ZLoadIniFile();
 
+    //used to process network communication protocols.
     PNetProcessor netProcess;
 
+    //the main windows.
     PMainWin mainWin;
     QObject::connect(&netProcess,SIGNAL(ZSignalTxNetFrmFinish(qint32,qint32)),&mainWin,SLOT(ZSlotCloseWaitingDialog(qint32,qint32)));
 
+    //login manager.
     PLoginManager loginM;
     //if(loginM.exec()==QDialog::Accepted)
-    if(loginM.exec()==QDialog::Rejected)
+    if(loginM.exec()==QDialog::Rejected) //for debug,bypass login.
     {
         mainWin.ZUpdateUserInfo();
         mainWin.showMaximized();

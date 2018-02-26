@@ -466,61 +466,61 @@ PMainWin::PMainWin(QWidget *parent)
                                            "");
     //task bar.
     this->m_lblLogo=new QLabel;
-    this->m_lblLogo->setPixmap(QPixmap(":/TaskBar/images/PMS.png").scaled(80,70));
+    this->m_lblLogo->setPixmap(QPixmap(":/TaskBar/images/PMS.png").scaled(TOPBAR_ICON_W*2,TOPBAR_ICON_H));
     this->m_btnUserManager=new QToolButton;
     this->m_btnUserManager->setText(tr("用户管理"));
     this->m_btnUserManager->setIcon(QIcon(":/TaskBar/images/UserManager.png"));
-    this->m_btnUserManager->setIconSize(QSize(48,48));
+    this->m_btnUserManager->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnUserManager->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_btnTemplateEditor=new QToolButton;
     this->m_btnTemplateEditor->setText(tr("模板设计"));
     this->m_btnTemplateEditor->setIcon(QIcon(":/TaskBar/images/TemplateEditor.png"));
-    this->m_btnTemplateEditor->setIconSize(QSize(48,48));
+    this->m_btnTemplateEditor->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnTemplateEditor->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_btnFileManager=new QToolButton;
     this->m_btnFileManager->setText(tr("工艺文件"));
     this->m_btnFileManager->setIcon(QIcon(":/TaskBar/images/FileManager.png"));
-    this->m_btnFileManager->setIconSize(QSize(48,48));
+    this->m_btnFileManager->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnFileManager->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_btnProcessEditor=new QToolButton;
     this->m_btnProcessEditor->setText(tr("工序编辑"));
     this->m_btnProcessEditor->setIcon(QIcon(":/TaskBar/images/ProcessEditor.png"));
-    this->m_btnProcessEditor->setIconSize(QSize(48,48));
+    this->m_btnProcessEditor->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnProcessEditor->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_btnTaskManager=new QToolButton;
     this->m_btnTaskManager->setText(tr("任务管理"));
     this->m_btnTaskManager->setIcon(QIcon(":/TaskBar/images/TaskManager.png"));
-    this->m_btnTaskManager->setIconSize(QSize(48,48));
+    this->m_btnTaskManager->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnTaskManager->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_btnReportDesigner=new QToolButton;
     this->m_btnReportDesigner->setText(tr("报表生成"));
     this->m_btnReportDesigner->setIcon(QIcon(":/TaskBar/images/ReportDesigner.png"));
-    this->m_btnReportDesigner->setIconSize(QSize(48,48));
+    this->m_btnReportDesigner->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnReportDesigner->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_btnSysLog=new QToolButton;
     this->m_btnSysLog->setText(tr("系统日志"));
     this->m_btnSysLog->setIcon(QIcon(":/TaskBar/images/SysLog.png"));
-    this->m_btnSysLog->setIconSize(QSize(48,48));
+    this->m_btnSysLog->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnSysLog->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_btnSysSetup=new QToolButton;
     this->m_btnSysSetup->setText(tr("系统设置"));
     this->m_btnSysSetup->setIcon(QIcon(":/TaskBar/images/SystemSetup.png"));
-    this->m_btnSysSetup->setIconSize(QSize(48,48));
+    this->m_btnSysSetup->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnSysSetup->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_btnDataBackup=new QToolButton;
     this->m_btnDataBackup->setText(tr("备份还原"));
     this->m_btnDataBackup->setIcon(QIcon(":/TaskBar/images/BackupRestore.png"));
-    this->m_btnDataBackup->setIconSize(QSize(48,48));
+    this->m_btnDataBackup->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnDataBackup->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_btnUpgrade=new QToolButton;
     this->m_btnUpgrade->setText(tr("远程升级"));
     this->m_btnUpgrade->setIcon(QIcon(":/TaskBar/images/Upgrade.png"));
-    this->m_btnUpgrade->setIconSize(QSize(48,48));
+    this->m_btnUpgrade->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnUpgrade->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_btnSoftInfo=new QToolButton;
     this->m_btnSoftInfo->setText(tr("软件信息"));
     this->m_btnSoftInfo->setIcon(QIcon(":/TaskBar/images/SoftInfo.png"));
-    this->m_btnSoftInfo->setIconSize(QSize(48,48));
+    this->m_btnSoftInfo->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnSoftInfo->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
     this->m_taskInfo=new ZTaskInfoWidget;
@@ -533,20 +533,20 @@ PMainWin::PMainWin(QWidget *parent)
     }else{
         this->m_btnUserInfo->setIcon(QIcon(":/TaskBar/images/Female.png"));
     }
-    this->m_btnUserInfo->setIconSize(QSize(48,48));
+    this->m_btnUserInfo->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnUserInfo->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
 
     this->m_btnLockScreen=new QToolButton;
     this->m_btnLockScreen->setText(tr("锁定屏幕"));
     this->m_btnLockScreen->setIcon(QIcon(":/TaskBar/images/Logout.png"));
-    this->m_btnLockScreen->setIconSize(QSize(48,48));
+    this->m_btnLockScreen->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnLockScreen->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
     this->m_btnExitSys=new QToolButton;
     this->m_btnExitSys->setText(tr("退出系统"));
     this->m_btnExitSys->setIcon(QIcon(":/TaskBar/images/ExitSys.png"));
-    this->m_btnExitSys->setIconSize(QSize(48,48));
+    this->m_btnExitSys->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnExitSys->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_hLayoutTaskBar=new QHBoxLayout;
     this->m_hLayoutTaskBar->addWidget(this->m_lblLogo);
@@ -679,7 +679,7 @@ PMainWin::~PMainWin()
     delete this->m_hLayoutStatusBar;
     //main.
     delete this->m_taskBarWidget;
-    delete this->m_centerWidget;\
+    delete this->m_centerWidget;
     delete this->m_statusBarWidget;
     delete this->m_vLayoutMain;
 

@@ -7,6 +7,11 @@
 #include <QDialog>
 #include <QKeyEvent>
 #include <QTableWidget>
+
+//icon size of main window top bar.
+#define TOPBAR_ICON_W   32
+#define TOPBAR_ICON_H   32
+
 //UserManager permBits.
 #define PermBits_UserManager_AddGrp (0x1<<0)
 #define PermBits_UserManager_MdyGrp (0x1<<1)
