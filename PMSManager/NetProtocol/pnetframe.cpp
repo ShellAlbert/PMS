@@ -80,6 +80,7 @@ void PNetFrame_Login::ZLogin(QString userName,QString password)
     tXmlWriter.writeStartElement(QString("Login"));
     tXmlWriter.writeAttribute(QString("cmd"),QString("login"));
     tXmlWriter.writeAttribute(QString("password"),QString(password.toUtf8().toBase64()));
+    qDebug()<<"Password:"<<password.toUtf8().toBase64();
     tXmlWriter.writeCharacters(userName);
     tXmlWriter.writeEndElement();//Login.
     tXmlWriter.writeEndElement();//NetPro

@@ -21,6 +21,7 @@
 #include <QDateTimeEdit>
 #include <QPrinter>
 #include <QTextDocument>
+#include <QDebug>
 PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
 {
     this->setWindowTitle(tr("模板设计器-Template Designer"));

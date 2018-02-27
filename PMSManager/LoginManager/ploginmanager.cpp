@@ -187,6 +187,7 @@ ZWaitingPart::ZWaitingPart(QWidget *parent):QFrame(parent)
 }
 ZWaitingPart::~ZWaitingPart()
 {
+    this->m_movie->stop();
     delete this->m_movie;
     delete this->m_llWaitingGif;
     delete this->m_vLayout;

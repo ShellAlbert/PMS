@@ -14,12 +14,14 @@
 #include <NetPro/pnetfrmbackup.h>
 #include <QFile>
 #include <QDir>
+#include <QDebug>
 PNetPro::PNetPro(QObject *parent) : QObject(parent)
 {
     this->m_proType=ProType_Unknown;
 }
 QString PNetPro::ZParseNetFrmXmlData(QString xmlData,QSqlDatabase db)
 {
+    qDebug()<<xmlData;
     QString ackNetFrmXmlData;
     QXmlStreamReader tXmlReader(xmlData);
     while(!tXmlReader.atEnd())

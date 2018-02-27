@@ -41,8 +41,7 @@ int main(int argc, char *argv[])
 
     //login manager.
     PLoginManager loginM;
-    //if(loginM.exec()==QDialog::Accepted)
-    if(loginM.exec()==QDialog::Rejected) //for debug,bypass login.
+    if(loginM.exec()==QDialog::Accepted)
     {
         mainWin.ZUpdateUserInfo();
         mainWin.showMaximized();

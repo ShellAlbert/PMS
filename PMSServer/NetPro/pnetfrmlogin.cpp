@@ -1,6 +1,7 @@
 #include "pnetfrmlogin.h"
 #include <QXmlStreamWriter>
 #include <AES/TAesClass.h>
+#include <QDebug>
 PNetFrmLogin::PNetFrmLogin(QSqlDatabase db):PNetFrm(db)
 {
 
@@ -73,6 +74,7 @@ qint32 PNetFrmLogin::ZLogin(QString userName,QString password)
     tXmlWriter.writeEndElement();//Login.
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
+    qDebug()<<this->m_ackNetFrmXmlData;
     return retCode;
 }
 qint32 PNetFrmLogin::ZLogout(QString userName)
