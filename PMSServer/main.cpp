@@ -4,32 +4,10 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QSqlError>
+#include <QTextCodec>
 #include <QDir>
 #include <AES/TAesClass.h>
 #include "pgblpara.h"
-
-//RoleInfo:RoleName,PermBits,RoleMemo,CreateTime.
-//UserInfo:UserName,RealName,RoleName,Password,Sex,Mobile,Creator,CreateTime.
-
-
-
-/*Table structure for table `roleinfo` */
-
-//DROP TABLE IF EXISTS `roleinfo`;
-
-//CREATE TABLE `roleinfo` (
-//  `RoleName` varchar(64) NOT NULL,
-//  `PermBits` int(11) DEFAULT NULL,
-//  `RoleMemo` varchar(512) DEFAULT NULL,
-//  `Creator` varchar(64) NOT NULL,
-//  `CreateTime` datetime NOT NULL,
-//  PRIMARY KEY (`RoleName`)
-//) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-/*Data for the table `roleinfo` */
-
-//insert  into `roleinfo`(`RoleName`,`PermBits`,`RoleMemo`,`Creator`,`CreateTime`) values ('admin',65536,'nothing','admin','2018-02-26 20:32:11');
-
 
 //type:0,encrypt,1:decrypt.
 QString AesEncryptBase64(int type,char *inData,int inDataSize)
@@ -77,6 +55,7 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
+    //QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 #if 0
     QSqlDatabase db=QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("127.0.0.1");

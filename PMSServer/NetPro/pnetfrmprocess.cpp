@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QFile>
 #include <QXmlStreamWriter>
+#include <QDebug>
 PNetFrmProcess::PNetFrmProcess(QSqlDatabase db):PNetFrm(db)
 {
 
@@ -231,6 +232,7 @@ void PNetFrmProcess::ZSaveProcess(QString processName,qint32 stepNum,QString xml
 
     //write to StepInfo table.
     QString stepXmlData(QByteArray::fromBase64(xmlData.toUtf8()));
+    //qDebug()<<stepXmlData;
     QXmlStreamReader tXmlReader(stepXmlData);
     while(!tXmlReader.atEnd())
     {
@@ -260,7 +262,10 @@ void PNetFrmProcess::ZSaveProcess(QString processName,qint32 stepNum,QString xml
                         query.bindValue(":StepName",stepName);
                         query.bindValue(":ProcessName",processName);
                         query.bindValue(":LinkTemplates",linkTemplateName);
-                        query.exec();
+                        if(!query.exec())
+                        {
+                            qDebug()<<"Add LinkTemplates to StepInfo failed:"<<query.lastError().text();
+                        }
                     }
                 }
                 //save link files.
@@ -275,7 +280,10 @@ void PNetFrmProcess::ZSaveProcess(QString processName,qint32 stepNum,QString xml
                         query.bindValue(":StepName",stepName);
                         query.bindValue(":ProcessName",processName);
                         query.bindValue(":LinkFiles",linkFileName);
-                        query.exec();
+                        if(!query.exec())
+                        {
+                            qDebug()<<"Add LinkFiles to StepInfo failed:"<<query.lastError().text();
+                        }
                     }
                 }
                 //save link roles.
@@ -290,7 +298,10 @@ void PNetFrmProcess::ZSaveProcess(QString processName,qint32 stepNum,QString xml
                         query.bindValue(":StepName",stepName);
                         query.bindValue(":ProcessName",processName);
                         query.bindValue(":LinkRoles",linkRoleName);
-                        query.exec();
+                        if(!query.exec())
+                        {
+                            qDebug()<<"Add LinkFiles to StepInfo failed:"<<query.lastError().text();
+                        }
                     }
                 }
             }//Step.
