@@ -80,15 +80,23 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
     this->m_menuImExport=new QMenu;
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_templateEditPerm&PermBits_TemplateEditor_Import)
     {
-        this->m_actImportTemplate=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Import.png"),tr("导入..."),0);
+        this->m_actImportTemplate=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Import.png"),tr("导入XML..."),0);
         this->m_menuImExport->addAction(this->m_actImportTemplate);
         connect(this->m_actImportTemplate,SIGNAL(triggered(bool)),this,SLOT(ZSlotImportTemplate()));
+
+        this->m_actImportExcel=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Import.png"),tr("导入Excel..."),0);
+        this->m_menuImExport->addAction(this->m_actImportExcel);
+        connect(this->m_actImportExcel,SIGNAL(triggered(bool)),this,SLOT(ZSlotImportExcel()));
     }
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_templateEditPerm&PermBits_TemplateEditor_Export)
     {
-        this->m_actExportTemplate=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Export.png"),tr("导出..."),0);
+        this->m_actExportTemplate=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Export.png"),tr("导出XML..."),0);
         this->m_menuImExport->addAction(this->m_actExportTemplate);
         connect(this->m_actExportTemplate,SIGNAL(triggered(bool)),this,SLOT(ZSlotExportTemplate()));
+
+        this->m_actExportExcel=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Export.png"),tr("导出Excel..."),0);
+        this->m_menuImExport->addAction(this->m_actExportExcel);
+        connect(this->m_actExportExcel,SIGNAL(triggered(bool)),this,SLOT(ZSlotExportExcel()));
     }
     this->m_btnImExport->setMenu(this->m_menuImExport);
     this->m_btnImExport->setPopupMode(QToolButton::MenuButtonPopup);
@@ -872,7 +880,16 @@ void PTemplateEditor::ZSlotExportTemplate()
     file.close();
     QMessageBox::information(this,tr("成功提示"),tr("导出模板文件%1成功!").arg(fileName));
 }
+void PTemplateEditor::ZSlotImportExcel()
+{
 
+}
+void PTemplateEditor::ZSlotExportExcel()
+{
+//    QXlsx::Document xlsx;
+//    xlsx.write("A1","hello,PMS!");
+//    xlsx.saveAs("C://a.xlsx");
+}
 void PTemplateEditor::ZSlotInsertPic()
 {
     if(this->m_tabWidget->currentIndex()==0)

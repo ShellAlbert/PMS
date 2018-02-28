@@ -11,6 +11,7 @@
 #include <QTabWidget>
 #include "Sheet/zsheet.h"
 #include "pgblpara.h"
+//#include <QtXlsx/QtXlsx>
 class ZTabWidget:public QFrame
 {
     Q_OBJECT
@@ -89,6 +90,8 @@ public slots:
 
     void ZSlotImportTemplate();
     void ZSlotExportTemplate();
+    void ZSlotImportExcel();
+    void ZSlotExportExcel();
 
     void ZSlotInsertPic();
     void ZSlotRemovePic();
@@ -149,6 +152,8 @@ private:
     QMenu *m_menuImExport;
     QAction *m_actImportTemplate;
     QAction *m_actExportTemplate;
+    QAction *m_actImportExcel;
+    QAction *m_actExportExcel;
 
     QToolButton *m_btnCell;
     QMenu *m_menuCell;
