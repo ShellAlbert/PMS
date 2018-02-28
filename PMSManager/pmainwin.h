@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QTimer>
+#include <QPoint>
 #include <QMdiArea>
 #include <QSplitter>
 #include "UserManager/pusermanagerwin.h"
@@ -137,6 +138,8 @@ protected:
     QSize sizeHint() const;
 public slots:
     void ZSlotCloseWaitingDialog(qint32 netFrmSerialNo,qint32 retCode);
+    void ZSlotShowTaskBar(bool bShow);
+    void ZSlotShowLogBar(bool bShow);
 private slots:
     void ZSlotUpdateStatusBarTime();
     void ZSlotShowUserManager();
@@ -219,4 +222,23 @@ private:
     ZUpdateNotifyDialog *m_updateNotifyDia;
 };
 
+class PGuideWin:public QWidget
+{
+    Q_OBJECT
+public:
+    PGuideWin(QWidget *parent=0);
+    ~PGuideWin();
+signals:
+    void ZSignalShowTaskBar(bool bShow);
+    void ZSignalShowLogBar(bool bShow);
+protected:
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+private:
+    QVBoxLayout *m_vLayout;
+    QLabel *m_lblGuide;
+    QPoint m_relativePos;
+    bool m_bShowTaskBar;
+    bool m_bShowLogBar;
+};
 #endif // PMAINWIN_H

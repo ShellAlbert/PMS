@@ -289,15 +289,20 @@ void PNetFrmTask::ZOpenTask(QString taskName,QString refTemplate)
     QString varSrcCreator;
 
     qint32 taskState=0;
+
+    QString refProcess,refStep;
+
     //SELECT `TaskState` FROM pms.TaskInfo WHERE `TaskName`='abc';
     QSqlQuery queryTaskState(this->m_db);
-    queryTaskState.prepare("SELECT `TaskState` FROM pms.TaskInfo WHERE `TaskName`=:TaskName");
+    queryTaskState.prepare("SELECT `RefProcess`,`RefStep`,`TaskState` FROM pms.TaskInfo WHERE `TaskName`=:TaskName");
     queryTaskState.bindValue(":TaskName",taskName);
     if(queryTaskState.exec())
     {
         while(queryTaskState.next())
         {
-            taskState=queryTaskState.value(0).toInt();
+            refProcess=queryTaskState.value(0).toString();
+            refStep=queryTaskState.value(1).toString();
+            taskState=queryTaskState.value(2).toInt();
         }
         retCode=0;
     }else{
@@ -450,6 +455,8 @@ void PNetFrmTask::ZOpenTask(QString taskName,QString refTemplate)
     tXmlWriter.writeStartElement(QString("Task"));
     tXmlWriter.writeAttribute(QString("cmd"),QString("get"));
     tXmlWriter.writeAttribute(QString("refTemplate"),refTemplate);
+    tXmlWriter.writeAttribute(QString("refProcess"),refProcess);
+    tXmlWriter.writeAttribute(QString("refStep"),refStep);
     tXmlWriter.writeAttribute(QString("templatedata"),QString(templateXmlData.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("varsrcdata"),QString(varSrcXmlData.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("vardata"),QString(varValXmlData.toUtf8().toBase64()));

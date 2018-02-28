@@ -66,6 +66,23 @@ QString ZTaskSheet::ZGetRefTemplateName()
 {
     return this->m_RefTemplate;
 }
+void ZTaskSheet::ZSetProcessName(QString processName)
+{
+    this->m_ProcessName=processName;
+}
+QString ZTaskSheet::ZGetProcessName()
+{
+    return this->m_ProcessName;
+}
+void ZTaskSheet::ZSetStepName(QString stepName)
+{
+    this->m_StepName=stepName;
+}
+QString ZTaskSheet::ZGetStepName()
+{
+    return this->m_StepName;
+}
+
 void ZTaskSheet::ZSetTemplateXmlDataAndVarSourceXmlData(QString templateXmlData,QString varSourceXmlData)
 {
     //parse out template xml data.

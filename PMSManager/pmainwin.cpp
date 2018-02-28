@@ -465,8 +465,8 @@ PMainWin::PMainWin(QWidget *parent)
                                            "QLabel{color:#386487;}"
                                            "");
     //task bar.
-    this->m_lblLogo=new QLabel;
-    this->m_lblLogo->setPixmap(QPixmap(":/TaskBar/images/PMS.png").scaled(TOPBAR_ICON_W*2,TOPBAR_ICON_H));
+//    this->m_lblLogo=new QLabel;
+//    this->m_lblLogo->setPixmap(QPixmap(":/TaskBar/images/PMS.png").scaled(TOPBAR_ICON_W*2,TOPBAR_ICON_H));
     this->m_btnUserManager=new QToolButton;
     this->m_btnUserManager->setText(tr("用户管理"));
     this->m_btnUserManager->setIcon(QIcon(":/TaskBar/images/UserManager.png"));
@@ -549,7 +549,7 @@ PMainWin::PMainWin(QWidget *parent)
     this->m_btnExitSys->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnExitSys->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_hLayoutTaskBar=new QHBoxLayout;
-    this->m_hLayoutTaskBar->addWidget(this->m_lblLogo);
+//    this->m_hLayoutTaskBar->addWidget(this->m_lblLogo);
     this->m_hLayoutTaskBar->addWidget(this->m_btnUserManager);
     this->m_hLayoutTaskBar->addWidget(this->m_btnTemplateEditor);
     this->m_hLayoutTaskBar->addWidget(this->m_btnFileManager);
@@ -797,6 +797,14 @@ void PMainWin::ZSlotCloseWaitingDialog(qint32 netFrmSerialNo,qint32 retCode)
             }
         }
     }
+}
+void PMainWin::ZSlotShowTaskBar(bool bShow)
+{
+    this->m_taskBarWidget->setVisible(bShow);
+}
+void PMainWin::ZSlotShowLogBar(bool bShow)
+{
+    this->m_statusBarWidget->setVisible(bShow);
 }
 void PMainWin::ZSlotUpdateStatusBarTime()
 {
@@ -1046,4 +1054,47 @@ void PMainWin::ZUpdateUserInfo()
     }else{
         this->m_btnUserInfo->setIcon(QIcon(":/TaskBar/images/Female.png"));
     }
+}
+PGuideWin::PGuideWin(QWidget *parent):QWidget(parent)
+{
+    this->setWindowFlags(this->windowFlags()|Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
+    this->setWindowOpacity(1.0);
+    this->m_lblGuide=new QLabel;
+    this->m_lblGuide->setPixmap(QPixmap(":/GuideWin/images/GuideWin/Guide1.png"));
+    this->m_vLayout=new QVBoxLayout;
+    this->m_vLayout->setContentsMargins(0,0,0,0);
+    this->m_vLayout->addWidget(this->m_lblGuide);
+    this->setLayout(this->m_vLayout);
+
+    this->m_bShowTaskBar=false;
+    this->m_bShowLogBar=false;
+    this->resize(48,48);
+}
+PGuideWin::~PGuideWin()
+{
+    delete this->m_lblGuide;
+    delete this->m_vLayout;
+}
+void PGuideWin::mousePressEvent(QMouseEvent *event)
+{
+    switch(event->button())
+    {
+    case Qt::LeftButton:
+        this->m_relativePos=this->pos()-event->globalPos();
+        this->m_bShowLogBar=!this->m_bShowLogBar;
+        emit this->ZSignalShowLogBar(this->m_bShowLogBar);
+        break;
+    case Qt::MidButton:
+        break;
+    case Qt::RightButton:
+        this->m_bShowTaskBar=!this->m_bShowTaskBar;
+        emit this->ZSignalShowTaskBar(this->m_bShowTaskBar);
+        break;
+    default:
+        break;
+    }
+}
+void PGuideWin::mouseMoveEvent(QMouseEvent *event)
+{
+    this->move(event->globalPos()+this->m_relativePos);
 }

@@ -236,4 +236,7 @@
         <file>images/BackupManager/Close.png</file>
         <file>images/BackupManager/Restore.png</file>
     </qresource>
+    <qresource prefix="/GuideWin">
+        <file>images/GuideWin/Guide1.png</file>
+    </qresource>
 </RCC>

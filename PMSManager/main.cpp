@@ -35,9 +35,17 @@ int main(int argc, char *argv[])
     //used to process network communication protocols.
     PNetProcessor netProcess;
 
+
+
     //the main windows.
     PMainWin mainWin;
+
+    //show guide window.
+    PGuideWin guideWin(&mainWin);
+
     QObject::connect(&netProcess,SIGNAL(ZSignalTxNetFrmFinish(qint32,qint32)),&mainWin,SLOT(ZSlotCloseWaitingDialog(qint32,qint32)));
+    QObject::connect(&guideWin,SIGNAL(ZSignalShowTaskBar(bool)),&mainWin,SLOT(ZSlotShowTaskBar(bool)));
+    QObject::connect(&guideWin,SIGNAL(ZSignalShowLogBar(bool)),&mainWin,SLOT(ZSlotShowLogBar(bool)));
 
     //login manager.
     PLoginManager loginM;
@@ -45,6 +53,8 @@ int main(int argc, char *argv[])
     {
         mainWin.ZUpdateUserInfo();
         mainWin.showMaximized();
+        guideWin.show();
+        guideWin.move(mainWin.width()-guideWin.width()*2,(mainWin.height()-guideWin.height())/2);
         return a.exec();
     }
     return 0;

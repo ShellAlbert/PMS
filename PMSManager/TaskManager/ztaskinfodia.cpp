@@ -147,6 +147,8 @@ void ZTaskInfoDia::ZParseAckNetFrmXmlData()
                 }else if(cmd=="get")
                 {
                     QString refTemplate=attr.value(QString("refTemplate")).toString();
+                    QString refProcess=attr.value(QString("refProcess")).toString();
+                    QString refStep=attr.value(QString("refStep")).toString();
                     QString templatedata=attr.value(QString("templatedata")).toString();
                     QString varsrcdata=attr.value(QString("varsrcdata")).toString();
                     QString vardata=attr.value(QString("vardata")).toString();
@@ -155,6 +157,8 @@ void ZTaskInfoDia::ZParseAckNetFrmXmlData()
                     QStringList paraList;
                     paraList.append(taskName);
                     paraList.append(refTemplate);
+                    paraList.append(refProcess);
+                    paraList.append(refStep);
                     paraList.append(templatedata);
                     paraList.append(varsrcdata);
                     paraList.append(vardata);

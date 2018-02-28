@@ -857,7 +857,7 @@ void PTemplateEditor::ZSlotExportTemplate()
     {
         return;
     }
-    QString fileName=QFileDialog::getSaveFileName(this,tr("导出模板"),".",tr("Template(*.xml)"));
+    QString fileName=QFileDialog::getSaveFileName(this,tr("导出模板"),sheet->m_sheet->ZGetSheetName(),tr("Template(*.xml)"));
     if(fileName.isEmpty())
     {
         return;

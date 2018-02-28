@@ -21,6 +21,12 @@ public:
     void ZSetRefTemplateName(QString name);
     QString ZGetRefTemplateName();
 
+    void ZSetProcessName(QString processName);
+    QString ZGetProcessName();
+
+    void ZSetStepName(QString stepName);
+    QString ZGetStepName();
+
     void ZSetTemplateXmlDataAndVarSourceXmlData(QString templateXmlData,QString varSourceXmlData);
 
     void ZExecuteLoadActionBeforeShow();
@@ -41,6 +47,8 @@ public:
 private:
     QString m_RefTemplate;
     QString m_TaskName;
+    QString m_ProcessName;
+    QString m_StepName;
 
     QTreeWidget *m_varTree;
     class VarInfo

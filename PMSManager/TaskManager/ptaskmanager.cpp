@@ -293,13 +293,17 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
         {
             QString taskName=paraList.at(0);
             QString refTemplate=paraList.at(1);
-            QString templatedata=paraList.at(2);
-            QString varsrcdata=paraList.at(3);
-            QString vardata=paraList.at(4);
-            qint32 taskState=paraList.at(5).toInt();
+            QString refProcess=paraList.at(2);
+            QString refStep=paraList.at(3);
+            QString templatedata=paraList.at(4);
+            QString varsrcdata=paraList.at(5);
+            QString vardata=paraList.at(6);
+            qint32 taskState=paraList.at(7).toInt();
             ZTaskWidget *task=new ZTaskWidget;
             task->m_sheet->ZSetTaskName(taskName);
             task->m_sheet->ZSetRefTemplateName(refTemplate);
+            task->m_sheet->ZSetProcessName(refProcess);
+            task->m_sheet->ZSetStepName(refStep);
             QString templateXmlData=QString(QByteArray::fromBase64(templatedata.toUtf8()));
             QString varSrcData=QString(QByteArray::fromBase64(varsrcdata.toUtf8()));
             task->m_sheet->ZSetTemplateXmlDataAndVarSourceXmlData(templateXmlData,varSrcData);
@@ -693,6 +697,8 @@ void PTaskManager::ZSlotSubmitTask()
         dia->ZSetAckNetFrmProcessWidget(this);
         dia->ZSetTaskName(task->m_sheet->ZGetTaskName());
         dia->ZSetRefTemplateName(task->m_sheet->ZGetRefTemplateName());
+        dia->ZSetProcessName(task->m_sheet->ZGetProcessName());
+        dia->ZSetStepName(task->m_sheet->ZGetStepName());
         if(dia->exec()==QDialog::Accepted)
         {
             dia->ZShowWaitingDialog();
@@ -722,6 +728,8 @@ void PTaskManager::ZSlotWithdrawTask()
         dia->ZSetAckNetFrmProcessWidget(this);
         dia->ZSetTaskName(task->m_sheet->ZGetTaskName());
         dia->ZSetRefTemplateName(task->m_sheet->ZGetRefTemplateName());
+        dia->ZSetProcessName(task->m_sheet->ZGetProcessName());
+        dia->ZSetStepName(task->m_sheet->ZGetStepName());
         if(dia->exec()==QDialog::Accepted)
         {
             dia->ZShowWaitingDialog();
@@ -751,6 +759,8 @@ void PTaskManager::ZSlotCheckOkay()
         dia->ZSetAckNetFrmProcessWidget(this);
         dia->ZSetTaskName(task->m_sheet->ZGetTaskName());
         dia->ZSetRefTemplateName(task->m_sheet->ZGetRefTemplateName());
+        dia->ZSetProcessName(task->m_sheet->ZGetProcessName());
+        dia->ZSetStepName(task->m_sheet->ZGetStepName());
         if(dia->exec()==QDialog::Accepted)
         {
             dia->ZShowWaitingDialog();
@@ -781,6 +791,8 @@ void PTaskManager::ZSlotCheckFailed()
         dia->ZSetAckNetFrmProcessWidget(this);
         dia->ZSetTaskName(task->m_sheet->ZGetTaskName());
         dia->ZSetRefTemplateName(task->m_sheet->ZGetRefTemplateName());
+        dia->ZSetProcessName(task->m_sheet->ZGetProcessName());
+        dia->ZSetStepName(task->m_sheet->ZGetStepName());
         if(dia->exec()==QDialog::Accepted)
         {
             dia->ZShowWaitingDialog();
@@ -811,6 +823,8 @@ void PTaskManager::ZSlotArchieve()
         dia->ZSetAckNetFrmProcessWidget(this);
         dia->ZSetTaskName(task->m_sheet->ZGetTaskName());
         dia->ZSetRefTemplateName(task->m_sheet->ZGetRefTemplateName());
+        dia->ZSetProcessName(task->m_sheet->ZGetProcessName());
+        dia->ZSetStepName(task->m_sheet->ZGetStepName());
         if(dia->exec()==QDialog::Accepted)
         {
             dia->ZShowWaitingDialog();
