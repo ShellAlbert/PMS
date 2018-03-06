@@ -64,6 +64,7 @@ public:
     QTreeWidgetItem *m_generalVarItem;
     QTreeWidgetItem *m_autoVarItem;
 };
+
 class PTemplateEditor : public QFrame,public ZAckNetFrmWidget
 {
     Q_OBJECT
@@ -123,6 +124,8 @@ public slots:
     void ZSlotDelVarSource();
     void ZSlotOpenVarSource();
     void ZSlotOpenVarSource(QString varSourceName);
+    void ZSlotExportVarSourceTemplate();
+    void ZSlotImportVarSource();
 
     void ZSlotRemoveTab(qint32 index);
     void ZSlotSheetDataChanged(QString templateName);
@@ -196,6 +199,8 @@ private:
     QAction *m_actOpenVarSource;
     QAction *m_actAddVarSource;
     QAction *m_actDelVarSource;
+    QAction *m_actExportVarSourceTemplate;
+    QAction *m_actImportVarSource;
 
     QToolButton *m_tbPrintHtml;
     QToolButton *m_tbPrintPdf;

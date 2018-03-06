@@ -25,5 +25,7 @@ void PGblPara::ZLoadCfgFile()
         this->m_blockSize=0;
         this->m_remainBytes=0;
     }
-    qDebug()<<"newVersion:"<<this->m_newVersionNo<<this->m_totalBlock<<this->m_blockSize<<this->m_remainBytes;
+    qDebug()<<"PMSManager version file:"<<versionFileName;
+    qDebug()<<"PMSManager binary file:"<<appFileName;
+    qDebug()<<"PMSManager new version:"<<this->m_newVersionNo<<"totalBlock:"<<this->m_totalBlock<<"blockSize:"<<this->m_blockSize<<"remainSize:"<<this->m_remainBytes;
 }

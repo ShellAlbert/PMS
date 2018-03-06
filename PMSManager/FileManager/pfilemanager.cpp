@@ -146,8 +146,9 @@ PFileManager::PFileManager()
     {
         this->m_tbNewFolder=new QToolButton;
         this->m_tbNewFolder->setToolTip(tr("新建文件夹"));
+        this->m_tbNewFolder->setText(tr("新建"));
         this->m_tbNewFolder->setIcon(QIcon(":/FileManager/images/FileManager/NewFolder.png"));
-        this->m_tbNewFolder->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbNewFolder->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutTb->addWidget(this->m_tbNewFolder);
         connect(this->m_tbNewFolder,SIGNAL(clicked(bool)),this,SLOT(ZSlotNewFolder()));
     }
@@ -156,8 +157,9 @@ PFileManager::PFileManager()
     {
         this->m_tbDelFolder=new QToolButton;
         this->m_tbDelFolder->setToolTip(tr("删除文件夹"));
+        this->m_tbDelFolder->setText(tr("删除"));
         this->m_tbDelFolder->setIcon(QIcon(":/FileManager/images/FileManager/DelFolder.png"));
-        this->m_tbDelFolder->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbDelFolder->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutTb->addWidget(this->m_tbDelFolder);
         connect(this->m_tbDelFolder,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelFolder()));
     }
@@ -166,15 +168,17 @@ PFileManager::PFileManager()
     {
         this->m_tbUploadFile=new QToolButton;
         this->m_tbUploadFile->setToolTip(tr("上传文件"));
+        this->m_tbUploadFile->setText(tr("文件"));
         this->m_tbUploadFile->setIcon(QIcon(":/FileManager/images/FileManager/UpFile.png"));
-        this->m_tbUploadFile->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbUploadFile->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutTb->addWidget(this->m_tbUploadFile);
         connect(this->m_tbUploadFile,SIGNAL(clicked(bool)),this,SLOT(ZSlotUploadFile()));
 
         this->m_tbUploadPic=new QToolButton;
         this->m_tbUploadPic->setToolTip(tr("上传图片"));
+        this->m_tbUploadPic->setText(tr("图片"));
         this->m_tbUploadPic->setIcon(QIcon(":/FileManager/images/FileManager/UpPic.png"));
-        this->m_tbUploadPic->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbUploadPic->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutTb->addWidget(this->m_tbUploadPic);
         connect(this->m_tbUploadPic,SIGNAL(clicked(bool)),this,SLOT(ZSlotUploadPic()));
     }
@@ -183,8 +187,9 @@ PFileManager::PFileManager()
     {
         this->m_tbOpenFile=new QToolButton;
         this->m_tbOpenFile->setToolTip(tr("下载文件"));
+        this->m_tbOpenFile->setText(tr("下载"));
         this->m_tbOpenFile->setIcon(QIcon(":/FileManager/images/FileManager/DwnFile.png"));
-        this->m_tbOpenFile->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbOpenFile->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutTb->addWidget(this->m_tbOpenFile);
         connect(this->m_tbOpenFile,SIGNAL(clicked(bool)),this,SLOT(ZSlotOpenFile()));
     }
@@ -193,16 +198,18 @@ PFileManager::PFileManager()
     {
         this->m_tbDelFile=new QToolButton;
         this->m_tbDelFile->setToolTip(tr("删除文件"));
+        this->m_tbDelFile->setText(tr("删除"));
         this->m_tbDelFile->setIcon(QIcon(":/FileManager/images/FileManager/DelFile.png"));
-        this->m_tbDelFile->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbDelFile->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutTb->addWidget(this->m_tbDelFile);
         connect(this->m_tbDelFile,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelFile()));
     }
 
     this->m_tbExpandAll=new QToolButton;
     this->m_tbExpandAll->setToolTip(tr("全部展开"));
+    this->m_tbExpandAll->setText(tr("展开"));
     this->m_tbExpandAll->setIcon(QIcon(":/FileManager/images/FileManager/Expand.png"));
-    this->m_tbExpandAll->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    this->m_tbExpandAll->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     connect(this->m_tbExpandAll,SIGNAL(clicked(bool)),this,SLOT(ZSlotExpandAll()));
     this->m_vLayoutTb->addStretch(1);
     this->m_vLayoutTb->addWidget(this->m_tbExpandAll);

@@ -53,26 +53,13 @@ int main(int argc, char *argv[])
 //    qDebug()<<ff.size()<<ff;
 //    return 0;
 
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
 
+    qDebug()<<"PMS Server "<<PMSSERVER_VERSION<<" build on "<<QString(__DATE__)<<QString(__TIME__);
     //QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-#if 0
-    QSqlDatabase db=QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("127.0.0.1");
-    db.setPort(3306);
-    db.setUserName("root");
-    db.setPassword("123456");
-    db.setDatabaseName("pms");
-    if(db.open())
-    {
-        qDebug()<<"open ok!";
-    }else{
-        qDebug()<<"open failed";
-        qDebug()<<db.lastError();
-    }
-#endif
 
     //check its ftp base dir is exist or not.
+    qDebug()<<"Working Dir:"<<QDir::currentPath();
     QString dataDir=QDir::currentPath()+"/data";
     QString updateDir=QDir::currentPath()+"/update";
     QDir dir;
@@ -85,16 +72,35 @@ int main(int argc, char *argv[])
         dir.mkpath(updateDir);
     }
 
+    //mysql info.
+    qDebug()<<"MySQL Server ["<<MYSQL_IP<<":"<<MYSQL_PORT<<"],DB:"<<MYSQL_DB<<",USER:"<<MYSQL_USER;
+    //try to connect mysql.
+    QSqlDatabase testDB=QSqlDatabase::addDatabase("QMYSQL");
+    testDB.setHostName(MYSQL_IP);
+    testDB.setPort(MYSQL_PORT);
+    testDB.setUserName(MYSQL_USER);
+    testDB.setPassword(MYSQL_PASS);
+    testDB.setDatabaseName("mysql");
+    if(testDB.open())
+    {
+        qDebug()<<"test connection to MySQL okay.";
+    }else{
+        qDebug()<<"failed to connect to MySQL:"<<testDB.lastError();
+        return -1;
+    }
+
     //load config file.
+    qDebug()<<"loading config file...";
     PGblPara::ZGetInstance()->ZLoadCfgFile();
 
     //start TCP Server.
     PTcpServer tcpServer;
-    if(tcpServer.listen(QHostAddress::Any,6800))
+    if(tcpServer.listen(QHostAddress::Any,TCP_PORT))
     {
-        qDebug()<<"PMSServer listen on 6800...\n";
+        qDebug()<<"listening on "<<TCP_PORT<<"...";
     }else{
-        qDebug()<<"PMSServer start failed:"<<tcpServer.errorString();
+        qDebug()<<"start failed:"<<tcpServer.errorString();
+        return -1;
     }
-    return a.exec();
+    return app.exec();
 }

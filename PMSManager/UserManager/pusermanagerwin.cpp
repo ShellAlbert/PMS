@@ -24,6 +24,7 @@ PUserManagerWin::PUserManagerWin()
     this->m_treeWidget=new QTreeWidget;
     this->m_treeWidget->setIconSize(QSize(24,24));
     this->m_treeWidget->setColumnCount(7);
+    //this->m_treeWidget->header()->setDefaultAlignment(Qt::AlignCenter);
     QStringList headerList;
     headerList<<tr("用户名");
     headerList<<tr("真实姓名");
@@ -41,8 +42,9 @@ PUserManagerWin::PUserManagerWin()
     {
         this->m_btnAddGrp=new QToolButton;
         this->m_btnAddGrp->setToolTip(tr("创建角色"));
+        this->m_btnAddGrp->setText(tr("创建"));
         this->m_btnAddGrp->setIcon(QIcon(":/UserManager/images/UserManager/AddGrp.png"));
-        this->m_btnAddGrp->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnAddGrp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutBtn->addWidget(this->m_btnAddGrp);
         connect(this->m_btnAddGrp,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddGrp()));
     }
@@ -50,8 +52,9 @@ PUserManagerWin::PUserManagerWin()
     {
         this->m_btnMdyGrp=new QToolButton;
         this->m_btnMdyGrp->setToolTip(tr("编辑角色"));
+        this->m_btnMdyGrp->setText(tr("编辑"));
         this->m_btnMdyGrp->setIcon(QIcon(":/UserManager/images/UserManager/MdyGrp.png"));
-        this->m_btnMdyGrp->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnMdyGrp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutBtn->addWidget(this->m_btnMdyGrp);
         connect(this->m_btnMdyGrp,SIGNAL(clicked(bool)),this,SLOT(ZSlotMdyGrp()));
     }
@@ -60,8 +63,9 @@ PUserManagerWin::PUserManagerWin()
     {
         this->m_btnDelGrp=new QToolButton;
         this->m_btnDelGrp->setToolTip(tr("删除角色"));
+        this->m_btnDelGrp->setText(tr("删除"));
         this->m_btnDelGrp->setIcon(QIcon(":/UserManager/images/UserManager/DelGrp.png"));
-        this->m_btnDelGrp->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnDelGrp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutBtn->addWidget(this->m_btnDelGrp);
         connect(this->m_btnDelGrp,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelGrp()));
     }
@@ -70,8 +74,9 @@ PUserManagerWin::PUserManagerWin()
     {
         this->m_btnAddUser=new QToolButton;
         this->m_btnAddUser->setToolTip(tr("创建用户"));
+        this->m_btnAddUser->setText(tr("创建"));
         this->m_btnAddUser->setIcon(QIcon(":/UserManager/images/UserManager/AddUser.png"));
-        this->m_btnAddUser->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnAddUser->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutBtn->addWidget(this->m_btnAddUser);
         connect(this->m_btnAddUser,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddUser()));
     }
@@ -80,8 +85,9 @@ PUserManagerWin::PUserManagerWin()
     {
         this->m_btnMdyUser=new QToolButton;
         this->m_btnMdyUser->setToolTip(tr("编辑用户"));
+        this->m_btnMdyUser->setText(tr("编辑"));
         this->m_btnMdyUser->setIcon(QIcon(":/UserManager/images/UserManager/MdyUser.png"));
-        this->m_btnMdyUser->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnMdyUser->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutBtn->addWidget(this->m_btnMdyUser);
         connect(this->m_btnMdyUser,SIGNAL(clicked(bool)),this,SLOT(ZSlotMdyUser()));
         connect(this->m_treeWidget,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(ZSlotTreeDblClicked(QModelIndex)));
@@ -91,16 +97,18 @@ PUserManagerWin::PUserManagerWin()
     {
         this->m_btnDelUser=new QToolButton;
         this->m_btnDelUser->setToolTip(tr("删除用户"));
+        this->m_btnDelUser->setText(tr("删除"));
         this->m_btnDelUser->setIcon(QIcon(":/UserManager/images/UserManager/DelUser.png"));
-        this->m_btnDelUser->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnDelUser->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutBtn->addWidget(this->m_btnDelUser);
         connect(this->m_btnDelUser,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelUser()));
     }
 
     this->m_btnExpand=new QToolButton;
     this->m_btnExpand->setToolTip(tr("全部展开"));
+    this->m_btnExpand->setText(tr("展开"));
     this->m_btnExpand->setIcon(QIcon(":/UserManager/images/UserManager/Expand.png"));
-    this->m_btnExpand->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    this->m_btnExpand->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     connect(this->m_btnExpand,SIGNAL(clicked(bool)),this,SLOT(ZSlotExpand()));
     this->m_vLayoutBtn->addStretch(1);
     this->m_vLayoutBtn->addWidget(this->m_btnExpand);
@@ -109,8 +117,9 @@ PUserManagerWin::PUserManagerWin()
     {
         this->m_btnImport=new QToolButton;
         this->m_btnImport->setToolTip(tr("导入..."));
+        this->m_btnImport->setText(tr("导入"));
         this->m_btnImport->setIcon(QIcon(":/UserManager/images/UserManager/Import.png"));
-        this->m_btnImport->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutBtn->addWidget(this->m_btnImport);
         connect(this->m_btnImport,SIGNAL(clicked(bool)),this,SLOT(ZSlotImport()));
     }
@@ -119,8 +128,9 @@ PUserManagerWin::PUserManagerWin()
     {
         this->m_btnExport=new QToolButton;
         this->m_btnExport->setToolTip(tr("导出..."));
+        this->m_btnExport->setText(tr("导出"));
         this->m_btnExport->setIcon(QIcon(":/UserManager/images/UserManager/Export.png"));
-        this->m_btnExport->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnExport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutBtn->addWidget(this->m_btnExport);
         connect(this->m_btnExport,SIGNAL(clicked(bool)),this,SLOT(ZSlotExport()));
     }

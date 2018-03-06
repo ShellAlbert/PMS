@@ -19,19 +19,20 @@ QToolButton:pressed{
 }
 
 QTreeWidget{
-    background-color: #5B677A;
-    color: white;
+    background-color: #CCE5F1;
+    color: black;
 }
 QTreeWidget::item{
     margin:4px;
-    background: #5B677A;
+    color: black;
+    background: #CCE5F1;
     background-clip: margin;
 }
 QTreeView::item:hover {
     background: rgb(69, 187, 217);;
 }
 QTreeView::item:selected:active{
-    background: rgb(63, 147, 168);
+    background: rgb(69, 187, 200);
 }
 QTreeView::item:selected:!active {
     background: rgb(63, 147, 168);

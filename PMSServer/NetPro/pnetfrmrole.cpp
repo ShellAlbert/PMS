@@ -135,7 +135,7 @@ void PNetFrmRole::ZListRole(QString creator)
     tXmlWriter.writeAttribute(QString("dest"),QString("Role"));
 
     QSqlQuery roleQuery(this->m_db);
-    roleQuery.prepare("SELECT `RoleName`,`PermBits`,`RoleMemo`,`Creator`,`CreateTime` FROM pms.RoleInfo WHERE `Creator`= :creator AND `RoleName`!='root'");
+    roleQuery.prepare("SELECT `RoleName`,`PermBits`,`RoleMemo`,`Creator`,`CreateTime` FROM pms.RoleInfo WHERE `Creator`= :creator AND `RoleName`!='admin'");
     roleQuery.bindValue(":creator",creator);
     if(!roleQuery.exec())
     {

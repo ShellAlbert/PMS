@@ -469,12 +469,15 @@ PFormDesigner::PFormDesigner()
 {
     this->setWindowTitle(tr("报表生成器-Form Designer"));
     this->setWindowIcon(QIcon(":/TaskBar/images/FormDesigner.png"));
-    this->setStyleSheet("QToolButton{background-color:#cce5f9;font:color #eaf7ff;padding: 6px 12px 6px 12p}"
+//    this->setStyleSheet("QToolButton{background-color:#cce5f9;font:color #eaf7ff;padding: 6px 12px 6px 12p}"
+//                        "QToolButton::hover{background-color:#eaf7ff;}"
+//                        "");
+    this->setStyleSheet("QToolButton{background-color:#cce5f9;border:none;font:color #eaf7ff;}"
                         "QToolButton::hover{background-color:#eaf7ff;}"
                         "");
-
     this->m_tbFormOp=new QToolButton;
-    this->m_tbFormOp->setText(tr("报表操作"));
+    this->m_tbFormOp->setToolTip(tr("报表操作"));
+    this->m_tbFormOp->setText(tr("报表"));
     this->m_tbFormOp->setIcon(QIcon(":/FormDesigner/images/FormDesigner/FormOp.png"));
     this->m_tbFormOp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_actNewForm=new QAction(QIcon(":/FormDesigner/images/FormDesigner/NewForm.png"),tr("新建报表"),0);
@@ -491,10 +494,11 @@ PFormDesigner::PFormDesigner()
     this->m_menuFormOp->addAction(this->m_actSaveForm);
     this->m_menuFormOp->addAction(this->m_actDelForm);
     this->m_tbFormOp->setMenu(this->m_menuFormOp);
-    this->m_tbFormOp->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_tbFormOp->setPopupMode(QToolButton::InstantPopup);
 
     this->m_tbFormComponent=new QToolButton;
-    this->m_tbFormComponent->setText(tr("系统组件"));
+    this->m_tbFormComponent->setToolTip(tr("系统组件"));
+    this->m_tbFormComponent->setText(tr("组件"));
     this->m_tbFormComponent->setIcon(QIcon(":/FormDesigner/images/FormDesigner/ComponentOp.png"));
     this->m_tbFormComponent->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_actAddLine=new QAction(QIcon(":/FormDesigner/images/FormDesigner/LineItem.png"),tr("插入直线"),0);
@@ -521,11 +525,12 @@ PFormDesigner::PFormDesigner()
     this->m_menuFormComp->addAction(this->m_actAddDateTime);
     this->m_menuFormComp->addAction(this->m_actAddTable);
     this->m_tbFormComponent->setMenu(this->m_menuFormComp);
-    this->m_tbFormComponent->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_tbFormComponent->setPopupMode(QToolButton::InstantPopup);
 
 
     this->m_tbSelect=new QToolButton;
-    this->m_tbSelect->setText(tr("选择操作"));
+    this->m_tbSelect->setToolTip(tr("选择操作"));
+    this->m_tbSelect->setText(tr("选择"));
     this->m_tbSelect->setIcon(QIcon(":/FormDesigner/images/FormDesigner/SelectOp.png"));
     this->m_tbSelect->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_actSelectAll=new QAction(QIcon(":/FormDesigner/images/FormDesigner/SelectAll.png"),tr("全部选择"),0);
@@ -536,15 +541,17 @@ PFormDesigner::PFormDesigner()
     this->m_menuSelect->addAction(this->m_actSelectAll);
     this->m_menuSelect->addAction(this->m_actDeSelectAll);
     this->m_tbSelect->setMenu(this->m_menuSelect);
-    this->m_tbSelect->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_tbSelect->setPopupMode(QToolButton::InstantPopup);
 
     this->m_tbPrintView=new QToolButton;
-    this->m_tbPrintView->setText(tr("打印预览"));
+    this->m_tbPrintView->setToolTip(tr("打印预览"));
+    this->m_tbPrintView->setText(tr("预览"));
     this->m_tbPrintView->setIcon(QIcon(":/FormDesigner/images/FormDesigner/PrintPreview.png"));
     this->m_tbPrintView->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     this->m_tbPrint=new QToolButton;
-    this->m_tbPrint->setText(tr("打印..."));
+    this->m_tbPrint->setToolTip(tr("打印..."));
+    this->m_tbPrint->setText(tr("打印"));
     this->m_tbPrint->setIcon(QIcon(":/FormDesigner/images/FormDesigner/Print.png"));
     this->m_tbPrint->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     connect(this->m_tbPrintView,SIGNAL(clicked(bool)),this,SLOT(ZSlotPrintView()));

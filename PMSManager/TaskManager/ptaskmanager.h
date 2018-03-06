@@ -19,9 +19,16 @@ class PTaskList:public QFrame
 public:
     PTaskList(QWidget *parent=0);
     ~PTaskList();
+signals:
+    void ZSignalFilterChanged(qint32 index);
 public:
     QTreeWidget *m_tree;
     QVBoxLayout *m_vLayout;
+
+private:
+    QHBoxLayout *m_hLayoutFilter;
+    QLabel *m_llTaskFilter;
+    QComboBox *m_cbTaskFilter;
 };
 class PTaskManager : public QFrame,public ZAckNetFrmWidget
 {
@@ -63,16 +70,12 @@ private:
     QToolButton *m_btnDelTask;
     QToolButton *m_btnArchieve;
 
-    QLabel *m_llTaskFilter;
-    QComboBox *m_cbTaskFilter;
-
     QToolButton *m_tbTaskManage;
     QMenu *m_menuTaskManage;
     QAction *m_actSubmitTask;
     QAction *m_actWithdrawTask;
     QAction *m_actCheckOkay;
     QAction *m_actCheckFailed;
-
 
     QToolButton *m_btnPrint;
     QMenu *m_menuPrint;

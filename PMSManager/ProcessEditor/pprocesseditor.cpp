@@ -245,8 +245,9 @@ PProcessEditor::PProcessEditor()
     {
         this->m_tbNewProcess=new QToolButton;
         this->m_tbNewProcess->setToolTip(tr("新建工序"));
+        this->m_tbNewProcess->setText(tr("新建"));
         this->m_tbNewProcess->setIcon(QIcon(":/ProcessEditor/images/ProcessEditor/AddProcess.png"));
-        this->m_tbNewProcess->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbNewProcess->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutTb->addWidget(this->m_tbNewProcess);
         connect(this->m_tbNewProcess,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddProcess()));
     }
@@ -255,23 +256,27 @@ PProcessEditor::PProcessEditor()
     {
         this->m_tbOpenProcess=new QToolButton;
         this->m_tbOpenProcess->setToolTip(tr("打开工序"));
+        this->m_tbOpenProcess->setText(tr("打开"));
         this->m_tbOpenProcess->setIcon(QIcon(":/ProcessEditor/images/ProcessEditor/OpenProcess.png"));
-        this->m_tbOpenProcess->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbOpenProcess->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
         this->m_tbSaveProcess=new QToolButton;
         this->m_tbSaveProcess->setToolTip(tr("保存工序"));
+        this->m_tbSaveProcess->setText(tr("保存"));
         this->m_tbSaveProcess->setIcon(QIcon(":/ProcessEditor/images/ProcessEditor/SaveProcess.png"));
-        this->m_tbSaveProcess->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbSaveProcess->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
         this->m_tbSaveAsProcess=new QToolButton;
         this->m_tbSaveAsProcess->setToolTip(tr("另存为..."));
+        this->m_tbSaveAsProcess->setText(tr("另存"));
         this->m_tbSaveAsProcess->setIcon(QIcon(":/ProcessEditor/images/ProcessEditor/SaveAsProcess.png"));
-        this->m_tbSaveAsProcess->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbSaveAsProcess->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
         this->m_tbNewStep=new QToolButton;
         this->m_tbNewStep->setToolTip(tr("添加步序"));
+        this->m_tbNewStep->setText(tr("步序"));
         this->m_tbNewStep->setIcon(QIcon(":/ProcessEditor/images/ProcessEditor/AddStep.png"));
-        this->m_tbNewStep->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbNewStep->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutTb->addWidget(this->m_tbOpenProcess);
         this->m_vLayoutTb->addWidget(this->m_tbSaveProcess);
         this->m_vLayoutTb->addWidget(this->m_tbSaveAsProcess);
@@ -287,8 +292,9 @@ PProcessEditor::PProcessEditor()
     {
         this->m_tbDelProcess=new QToolButton;
         this->m_tbDelProcess->setToolTip(tr("删除工序"));
+        this->m_tbDelProcess->setText(tr("删除"));
         this->m_tbDelProcess->setIcon(QIcon(":/ProcessEditor/images/ProcessEditor/DelProcess.png"));
-        this->m_tbDelProcess->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_tbDelProcess->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutTb->addWidget(this->m_tbDelProcess);
         connect(this->m_tbDelProcess,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelProcess()));
     }

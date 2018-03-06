@@ -4,17 +4,20 @@
 #include <QMessageBox>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
+#include <QtXlsx/QtXlsx>
+#include <QInputDialog>
+#include <QFileDialog>
 ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
 {
-    this->setMinimumSize(500,300);
+    this->setMinimumSize(400,300);
     this->setWindowTitle(tr("正在编辑变量源[%1]").arg(varSourceName));
     this->m_varSourceName=varSourceName;
 
     this->m_llGeneralVar=new QLabel(tr("普通变量列表"));
     this->m_tbAddGeVar=new QToolButton;
-    this->m_tbAddGeVar->setText(tr("Add"));
+    this->m_tbAddGeVar->setText(tr("新增"));
     this->m_tbDelGeVar=new QToolButton;
-    this->m_tbDelGeVar->setText("Del");
+    this->m_tbDelGeVar->setText("移除");
 
     this->m_tbAddGeVar->setIcon(QIcon(":/common/images/common/add.png"));
     this->m_tbAddGeVar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -32,9 +35,9 @@ ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
 
     this->m_llAutoVar=new QLabel(tr("自动变量列表"));
     this->m_tbAddAutoVar=new QToolButton;
-    this->m_tbAddAutoVar->setText(tr("Add"));
+    this->m_tbAddAutoVar->setText(tr("新增"));
     this->m_tbDelAutoVar=new QToolButton;
-    this->m_tbDelAutoVar->setText(tr("Del"));
+    this->m_tbDelAutoVar->setText(tr("移除"));
     this->m_tbAddAutoVar->setIcon(QIcon(":/common/images/common/add.png"));
     this->m_tbAddAutoVar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_tbDelAutoVar->setIcon(QIcon(":/common/images/common/del.png"));
@@ -48,6 +51,11 @@ ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
     autoVarHeaders<<tr("触发动作");
     autoVarHeaders<<tr("预定义值");
     this->m_treeAutoVar->setHeaderLabels(autoVarHeaders);
+
+    this->m_tbImport=new QToolButton;
+    this->m_tbImport->setText(tr("导入..."));
+    this->m_tbImport->setIcon(QIcon(":/common/images/common/okay.png"));
+    this->m_tbImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     this->m_tbOkay=new QToolButton;
     this->m_tbOkay->setText(tr("Okay"));
@@ -69,6 +77,7 @@ ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
     this->m_gridLayout->addWidget(this->m_tbDelAutoVar,2,2,1,1);
     this->m_gridLayout->addWidget(this->m_treeAutoVar,3,0,1,3);
 
+    this->m_gridLayout->addWidget(this->m_tbImport,4,0,1,1);
     this->m_gridLayout->addWidget(this->m_tbOkay,4,1,1,1);
     this->m_gridLayout->addWidget(this->m_tbCancel,4,2,1,1);
 
@@ -81,6 +90,7 @@ ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
     connect(this->m_tbAddAutoVar,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddAutoVar()));
     connect(this->m_tbDelAutoVar,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelAutoVar()));
 
+    connect(this->m_tbImport,SIGNAL(clicked(bool)),this,SLOT(ZSlotImport()));
     connect(this->m_tbOkay,SIGNAL(clicked(bool)),this,SLOT(ZSlotOkay()));
     connect(this->m_tbCancel,SIGNAL(clicked(bool)),this,SLOT(ZSlotCancel()));
 }
@@ -96,6 +106,7 @@ ZVarInfoDia::~ZVarInfoDia()
     delete this->m_tbDelAutoVar;
     delete this->m_treeAutoVar;
 
+    delete this->m_tbImport;
     delete this->m_tbOkay;
     delete this->m_tbCancel;
     delete this->m_gridLayout;
@@ -174,6 +185,45 @@ void ZVarInfoDia::ZSlotDelAutoVar()
     this->m_treeAutoVar->takeTopLevelItem(item->indexOfChild(item));
     delete item;
     item=NULL;
+}
+void ZVarInfoDia::ZSlotImport()
+{
+    QString fileName=QFileDialog::getOpenFileName(this,tr("导入Excel"),".",tr("Microsoft Excel(*.xlsx)"));
+    if(fileName.isEmpty())
+    {
+        return;
+    }
+
+    //read excel.
+    QList<ZVarSourceInfo> varList;
+    QXlsx::Document xlsx(fileName);
+    qint32 nRowCnt=xlsx.read(1,5).toInt();
+    if(nRowCnt<=0)
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("读取Excel行数出错!"));
+        return;
+    }
+    qint32 nRowNo=1;
+    //bypass the Examples(1)+Example Data(5)+Data(2).
+    nRowNo+=8;
+    //start to read data.
+    for(qint32 i=1;i<=nRowCnt;i++)
+    {
+        ZVarSourceInfo varInfo;
+        varInfo.m_varName=xlsx.read(nRowCnt+i,1).toString();
+        varInfo.m_varType=xlsx.read(nRowCnt+i,2).toString();
+        varInfo.m_rule=xlsx.read(nRowCnt+i,3).toString();
+        varInfo.m_refValue=xlsx.read(nRowCnt+i,4).toString();
+        varInfo.m_cell=xlsx.read(nRowCnt+i,5).toString();
+        varList.append(varInfo);
+    }
+    QMessageBox::information(this,tr("成功提示"),tr("Excel变量源模板导入成功!\n共导入变量%1个.").arg(QString::number(varList.size(),10)));
+    for(qint32 i=0;i<varList.size();i++)
+    {
+        ZVarSourceInfo varInfo;
+        varInfo=varList.at(i);
+        qDebug()<<varInfo.m_varName<<","<<varInfo.m_varType<<","<<varInfo.m_rule<<","<<varInfo.m_refValue<<","<<varInfo.m_cell;
+    }
 }
 void ZVarInfoDia::ZSlotOkay()
 {

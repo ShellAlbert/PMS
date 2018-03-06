@@ -6,6 +6,15 @@
 #include <QTreeWidget>
 #include <QToolButton>
 #include <QGridLayout>
+class ZVarSourceInfo
+{
+public:
+    QString m_varName;
+    QString m_varType;
+    QString m_rule;
+    QString m_refValue;
+    QString m_cell;
+};
 class ZVarInfoDia : public QDialog
 {
     Q_OBJECT
@@ -23,6 +32,7 @@ private slots:
     void ZSlotAddAutoVar();
     void ZSlotDelAutoVar();
 
+    void ZSlotImport();
     void ZSlotOkay();
     void ZSlotCancel();
 private:
@@ -36,6 +46,7 @@ private:
     QToolButton *m_tbDelAutoVar;
     QTreeWidget *m_treeAutoVar;
 
+    QToolButton *m_tbImport;
     QToolButton *m_tbOkay;
     QToolButton *m_tbCancel;
     QGridLayout *m_gridLayout;

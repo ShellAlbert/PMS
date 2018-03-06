@@ -16,6 +16,24 @@
 #include <QFileDialog>
 PTaskList::PTaskList(QWidget *parent):QFrame(parent)
 {
+    this->m_llTaskFilter=new QLabel(tr("过滤条件"));
+    this->m_cbTaskFilter=new QComboBox;
+    this->m_cbTaskFilter->setEditable(false);
+    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_blue.png"),tr("所有任务"));
+    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_orange.png"),tr("未提交任务"));
+    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_pink.png"),tr("未审核任务"));
+    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_green.png"),tr("审核通过任务"));
+    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_red.png"),tr("审核失败任务"));
+    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_yellow.png"),tr("已归档任务"));
+    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_yellow.png"),tr("需要我审核的任务"));
+    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_yellow.png"),tr("我审核通过的任务"));
+    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_yellow.png"),tr("我审核驳回的任务"));
+    connect(this->m_cbTaskFilter,SIGNAL(currentIndexChanged(int)),this,SIGNAL(ZSignalFilterChanged(qint32)));
+    this->m_hLayoutFilter=new QHBoxLayout;
+    this->m_hLayoutFilter->addStretch(1);
+    this->m_hLayoutFilter->addWidget(this->m_llTaskFilter);
+    this->m_hLayoutFilter->addWidget(this->m_cbTaskFilter);
+
     this->m_tree=new QTreeWidget;
     this->m_tree->setColumnCount(9);
     QStringList headerList;
@@ -30,11 +48,15 @@ PTaskList::PTaskList(QWidget *parent):QFrame(parent)
     headerList<<tr("审核时间");
     this->m_tree->setHeaderLabels(headerList);
     this->m_vLayout=new QVBoxLayout;
+    this->m_vLayout->addLayout(this->m_hLayoutFilter);
     this->m_vLayout->addWidget(this->m_tree);
     this->setLayout(this->m_vLayout);
 }
 PTaskList::~PTaskList()
 {
+    delete this->m_llTaskFilter;
+    delete this->m_cbTaskFilter;
+    delete this->m_hLayoutFilter;
     delete this->m_tree;
     delete this->m_vLayout;
 }
@@ -52,8 +74,9 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     {
         this->m_btnAddTask=new QToolButton;
         this->m_btnAddTask->setToolTip(tr("创建任务"));
+        this->m_btnAddTask->setText(tr("创建"));
         this->m_btnAddTask->setIcon(QIcon(":/TaskManager/images/TaskManager/AddTask.png"));
-        this->m_btnAddTask->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnAddTask->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         this->m_vLayoutBtn->addWidget(this->m_btnAddTask);
         connect(this->m_btnAddTask,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddTask()));
     }
@@ -62,13 +85,15 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     {
         this->m_btnMdyTask=new QToolButton;
         this->m_btnMdyTask->setToolTip(tr("打开任务"));
+        this->m_btnMdyTask->setText(tr("打开"));
         this->m_btnMdyTask->setIcon(QIcon(":/TaskManager/images/TaskManager/MdyTask.png"));
-        this->m_btnMdyTask->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnMdyTask->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
         this->m_btnSaveTask=new QToolButton;
         this->m_btnSaveTask->setToolTip(tr("保存任务"));
+        this->m_btnSaveTask->setText(tr("保存"));
         this->m_btnSaveTask->setIcon(QIcon(":/TaskManager/images/TaskManager/SaveTask.png"));
-        this->m_btnSaveTask->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnSaveTask->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
         this->m_vLayoutBtn->addWidget(this->m_btnMdyTask);
         this->m_vLayoutBtn->addWidget(this->m_btnSaveTask);
@@ -81,8 +106,9 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     {
         this->m_btnDelTask=new QToolButton;
         this->m_btnDelTask->setToolTip(tr("删除任务"));
+        this->m_btnDelTask->setText(tr("删除"));
         this->m_btnDelTask->setIcon(QIcon(":/TaskManager/images/TaskManager/DelTask.png"));
-        this->m_btnDelTask->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        this->m_btnDelTask->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
         this->m_vLayoutBtn->addWidget(this->m_btnDelTask);
         connect(this->m_btnDelTask,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelTask()));
@@ -90,29 +116,16 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
 
     this->m_btnArchieve=new QToolButton;
     this->m_btnArchieve->setToolTip(tr("归档任务"));
+    this->m_btnArchieve->setText(tr("归档"));
     this->m_btnArchieve->setIcon(QIcon(":/TaskManager/images/TaskManager/WithdrawTask.png"));
-    this->m_btnArchieve->setToolButtonStyle(Qt::ToolButtonIconOnly);
-
-
-    this->m_llTaskFilter=new QLabel(tr("过滤条件"));
-    this->m_cbTaskFilter=new QComboBox;
-    this->m_cbTaskFilter->setEditable(false);
-    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_blue.png"),tr("所有任务"));
-    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_orange.png"),tr("未提交任务"));
-    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_pink.png"),tr("未审核任务"));
-    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_green.png"),tr("审核通过任务"));
-    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_red.png"),tr("审核失败任务"));
-    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_yellow.png"),tr("已归档任务"));
-    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_yellow.png"),tr("需要我审核的任务"));
-    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_yellow.png"),tr("我审核通过的任务"));
-    this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_yellow.png"),tr("我审核驳回的任务"));
-    connect(this->m_cbTaskFilter,SIGNAL(currentIndexChanged(int)),this,SLOT(ZSlotRefreshTaskList(qint32)));
+    this->m_btnArchieve->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
 
     this->m_tbTaskManage=new QToolButton;
     this->m_tbTaskManage->setToolTip((tr("审核管理")));
+    this->m_tbTaskManage->setText((tr("审核")));
     this->m_tbTaskManage->setIcon(QIcon(":/TaskManager/images/TaskManager/SubmitTask.png"));
-    this->m_tbTaskManage->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    this->m_tbTaskManage->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_actSubmitTask=new QAction(QIcon(":/TaskManager/images/TaskManager/SubmitTask.png"),tr("提交审核"),0);
     this->m_actWithdrawTask=new QAction(QIcon(":/TaskManager/images/TaskManager/WithdrawTask.png"),tr("撤回审核"),0);
     this->m_actCheckOkay=new QAction(QIcon(":/TaskManager/images/TaskManager/SubmitTask.png"),tr("审核通过"),0);
@@ -123,12 +136,13 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_menuTaskManage->addAction(this->m_actCheckOkay);
     this->m_menuTaskManage->addAction(this->m_actCheckFailed);
     this->m_tbTaskManage->setMenu(this->m_menuTaskManage);
-    this->m_tbTaskManage->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_tbTaskManage->setPopupMode(QToolButton::InstantPopup);
 
     this->m_btnPrint=new QToolButton;
     this->m_btnPrint->setToolTip(tr("打印..."));
+    this->m_btnPrint->setText(tr("打印"));
     this->m_btnPrint->setIcon(QIcon(":/TaskManager/images/TaskManager/Print.png"));
-    this->m_btnPrint->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    this->m_btnPrint->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_actPrintHtml=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/PrintHtml.png"),tr("打印Html"),0);
     connect(this->m_actPrintHtml,SIGNAL(triggered(bool)),this,SLOT(ZSlotPrintHtml()));
     this->m_actPrintPdf=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/PrintPdf.png"),tr("打印Pdf"),0);
@@ -137,10 +151,8 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_menuPrint->addAction(this->m_actPrintHtml);
     this->m_menuPrint->addAction(this->m_actPrintPdf);
     this->m_btnPrint->setMenu(this->m_menuPrint);
-    this->m_btnPrint->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_btnPrint->setPopupMode(QToolButton::InstantPopup);
 
-    this->m_vLayoutBtn->addWidget(this->m_llTaskFilter);
-    this->m_vLayoutBtn->addWidget(this->m_cbTaskFilter);
     this->m_vLayoutBtn->addWidget(this->m_btnArchieve);
     this->m_vLayoutBtn->addWidget(this->m_tbTaskManage);
     this->m_vLayoutBtn->addStretch(1);
@@ -150,6 +162,7 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_tabWidget=new QTabWidget;
     this->m_tabWidget->setTabsClosable(true);
     this->m_taskList=new PTaskList;
+    connect(this->m_taskList,SIGNAL(ZSignalFilterChanged(qint32)),this,SLOT(ZSlotRefreshTaskList(qint32)));
     this->m_tabWidget->addTab(this->m_taskList,QIcon(":/TaskBar/images/TaskManager.png"),tr("任务管理 "));
 
     //main.
@@ -190,8 +203,6 @@ PTaskManager::~PTaskManager()
     {
         delete this->m_btnDelTask;
     }
-    delete this->m_llTaskFilter;
-    delete this->m_cbTaskFilter;
     delete this->m_actSubmitTask;
     delete this->m_actWithdrawTask;
     delete this->m_actCheckOkay;
@@ -205,6 +216,7 @@ PTaskManager::~PTaskManager()
     delete this->m_btnPrint;
     delete this->m_vLayoutBtn;
 
+    //right.
     for(qint32 i=1;i<this->m_tabWidget->count();i++)
     {
         QWidget *widget=this->m_tabWidget->widget(i);
