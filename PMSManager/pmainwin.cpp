@@ -1058,7 +1058,7 @@ void PMainWin::ZUpdateUserInfo()
 PGuideWin::PGuideWin(QWidget *parent):QWidget(parent)
 {
     this->setWindowFlags(this->windowFlags()|Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
-    this->setWindowOpacity(1.0);
+    this->setWindowOpacity(0);
     this->m_lblGuide=new QLabel;
     this->m_lblGuide->setPixmap(QPixmap(":/GuideWin/images/GuideWin/Guide1.png"));
     this->m_vLayout=new QVBoxLayout;
@@ -1069,11 +1069,40 @@ PGuideWin::PGuideWin(QWidget *parent):QWidget(parent)
     this->m_bShowTaskBar=false;
     this->m_bShowLogBar=false;
     this->resize(48,48);
+
+    //icon cartoon.
+    this->m_iconIndex=0;
+    this->m_timer=new QTimer;
+    connect(this->m_timer,SIGNAL(timeout()),this,SLOT(ZSlotTimeout()));
+    this->m_timer->start(1000);
 }
 PGuideWin::~PGuideWin()
 {
+    this->m_timer->stop();
+    delete this->m_timer;
     delete this->m_lblGuide;
     delete this->m_vLayout;
+}
+void PGuideWin::ZSlotTimeout()
+{
+    if(this->m_iconIndex++>=3)
+    {
+        this->m_iconIndex=0;
+    }
+    switch(this->m_iconIndex)
+    {
+    case 0:
+        this->m_lblGuide->setPixmap(QPixmap(":/GuideWin/images/GuideWin/Guide1.png"));
+        break;
+    case 1:
+        this->m_lblGuide->setPixmap(QPixmap(":/GuideWin/images/GuideWin/Guide2.png"));
+        break;
+    case 2:
+        this->m_lblGuide->setPixmap(QPixmap(":/GuideWin/images/GuideWin/Guide3.png"));
+        break;
+    default:
+        break;
+    }
 }
 void PGuideWin::mousePressEvent(QMouseEvent *event)
 {

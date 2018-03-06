@@ -22,6 +22,8 @@
 #include <QPrinter>
 #include <QTextDocument>
 #include <QDebug>
+#include <QtXlsx/QtXlsx>
+#include <QInputDialog>
 PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
 {
     this->setWindowTitle(tr("模板设计器-Template Designer"));
@@ -32,12 +34,14 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
                         "QToolButton::menu-indicator{image: none;}"
                         "");
 #endif
-
+    this->setStyleSheet("QToolButton{background-color:#cce5f9;border:none;font:color #eaf7ff;}"
+                        "QToolButton::hover{background-color:#eaf7ff;}"
+                        "");
     //left.
     this->m_btnTemplate=new QToolButton;
-    this->m_btnTemplate->setText(tr("模板操作"));
+    this->m_btnTemplate->setToolTip(tr("模板操作"));
     this->m_btnTemplate->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/Template.png"));
-    this->m_btnTemplate->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnTemplate->setToolButtonStyle(Qt::ToolButtonIconOnly);
     this->m_menuTemplate=new QMenu;
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_templateEditPerm&PermBits_TemplateEditor_AddTemplate)
     {
@@ -71,12 +75,12 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
         connect(this->m_actDelTemplate,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelTemplate()));
     }
     this->m_btnTemplate->setMenu(this->m_menuTemplate);
-    this->m_btnTemplate->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_btnTemplate->setPopupMode(QToolButton::InstantPopup);
 
     this->m_btnImExport=new QToolButton;
-    this->m_btnImExport->setText(tr("导入导出"));
+    this->m_btnImExport->setToolTip(tr("导入导出"));
     this->m_btnImExport->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/ImExport.png"));
-    this->m_btnImExport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnImExport->setToolButtonStyle(Qt::ToolButtonIconOnly);
     this->m_menuImExport=new QMenu;
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_templateEditPerm&PermBits_TemplateEditor_Import)
     {
@@ -99,13 +103,13 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
         connect(this->m_actExportExcel,SIGNAL(triggered(bool)),this,SLOT(ZSlotExportExcel()));
     }
     this->m_btnImExport->setMenu(this->m_menuImExport);
-    this->m_btnImExport->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_btnImExport->setPopupMode(QToolButton::InstantPopup);
 
 
     this->m_btnCell=new QToolButton;
-    this->m_btnCell->setText(tr("  单元格"));
+    this->m_btnCell->setToolTip(tr("单元格"));
     this->m_btnCell->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/CellOp.png"));
-    this->m_btnCell->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnCell->setToolButtonStyle(Qt::ToolButtonIconOnly);
     this->m_actInsertPic=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/InsertPic.png"),tr("插入图片"),0);
     this->m_actRemovePic=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/RemovePic.png"),tr("移除图片"),0);
     this->m_actMergeCell=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Merge.png"),tr("合并单元格"),0);
@@ -126,12 +130,12 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
     this->m_menuCell->addAction(this->m_actCellBindVar);
     this->m_menuCell->addAction(this->m_actCellUnbindVar);
     this->m_btnCell->setMenu(this->m_menuCell);
-    this->m_btnCell->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_btnCell->setPopupMode(QToolButton::InstantPopup);
 
     this->m_btnAlign=new QToolButton;
-    this->m_btnAlign->setText(tr("对齐方式"));
+    this->m_btnAlign->setToolTip(tr("对齐方式"));
     this->m_btnAlign->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/Alignment.png"));
-    this->m_btnAlign->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnAlign->setToolButtonStyle(Qt::ToolButtonIconOnly);
     this->m_actHLeftAlign=new QAction(QIcon(":/alignment/images/alignment/HAlignLeft.png"),tr("左对齐"),0);
     this->m_actHCenterAlign=new QAction(QIcon(":/alignment/images/alignment/HAlignCenter.png"),tr("居中"),0);
     this->m_actHRightAlign=new QAction(QIcon(":/alignment/images/alignment/HAlignRight.png"),tr("右对齐"),0);
@@ -155,13 +159,13 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
     this->m_menuAlign->addMenu(this->m_menuHAlign);
     this->m_menuAlign->addMenu(this->m_menuVAlign);
     this->m_btnAlign->setMenu(this->m_menuAlign);
-    this->m_btnAlign->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_btnAlign->setPopupMode(QToolButton::InstantPopup);
 
 
     this->m_btnSysPic=new QToolButton;
-    this->m_btnSysPic->setText(tr("系统图库"));
+    this->m_btnSysPic->setToolTip(tr("系统图库"));
     this->m_btnSysPic->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/SysPic.png"));
-    this->m_btnSysPic->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnSysPic->setToolButtonStyle(Qt::ToolButtonIconOnly);
     this->m_actSysPic1=new QAction(tr("常用图库1"),0);
     this->m_actSysPic2=new QAction(tr("常用图库2"),0);
     this->m_actSysPic3=new QAction(tr("常用图库3"),0);
@@ -174,9 +178,9 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
 
 
     this->m_btnSysComponent=new QToolButton;
-    this->m_btnSysComponent->setText(tr("系统组件"));
+    this->m_btnSysComponent->setToolTip(tr("系统组件"));
     this->m_btnSysComponent->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/SysComponent.png"));
-    this->m_btnSysComponent->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnSysComponent->setToolButtonStyle(Qt::ToolButtonIconOnly);
     this->m_actInsertCheckBox=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/CheckBox.png"),tr("插入复选框"),0);
     this->m_actInsertComboBox=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/ComboBox.png"),tr("插入下拉列表"),0);
     this->m_actInsertSpinBox=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/SpinBox.png"),tr("插入选值框"),0);
@@ -187,13 +191,13 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
     this->m_menuSysComponent->addAction(this->m_actInsertSpinBox);
     this->m_menuSysComponent->addAction(this->m_actInsertDateTimeEdit);
     this->m_btnSysComponent->setMenu(this->m_menuSysComponent);
-    this->m_btnSysComponent->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_btnSysComponent->setPopupMode(QToolButton::InstantPopup);
 
 
     this->m_btnVarSourceOp=new QToolButton;
-    this->m_btnVarSourceOp->setText(tr("  变量源"));
+    this->m_btnVarSourceOp->setToolTip(tr("变量源"));
     this->m_btnVarSourceOp->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/VarSource.png"));
-    this->m_btnVarSourceOp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnVarSourceOp->setToolButtonStyle(Qt::ToolButtonIconOnly);
     this->m_menuVarSourceOp=new QMenu;
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_templateEditPerm&PermBits_TemplateEditor_AddVarSrc)
     {
@@ -214,25 +218,25 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
         connect(this->m_actOpenVarSource,SIGNAL(triggered(bool)),this,SLOT(ZSlotOpenVarSource()));
     }
     this->m_btnVarSourceOp->setMenu(this->m_menuVarSourceOp);
-    this->m_btnVarSourceOp->setPopupMode(QToolButton::MenuButtonPopup);
+    this->m_btnVarSourceOp->setPopupMode(QToolButton::InstantPopup);
 
     this->m_tbPrintHtml=new QToolButton;
-    this->m_tbPrintHtml->setText(tr("打印Html"));
+    this->m_tbPrintHtml->setToolTip(tr("打印Html"));
     connect(this->m_tbPrintHtml,SIGNAL(clicked(bool)),this,SLOT(ZSlotPrintHtml()));
     this->m_tbPrintHtml->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/PrintHtml.png"));
-    this->m_tbPrintHtml->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_tbPrintHtml->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     this->m_tbPrintPdf=new QToolButton;
-    this->m_tbPrintPdf->setText(tr("打印Pdf"));
+    this->m_tbPrintPdf->setToolTip(tr("打印Pdf"));
     connect(this->m_tbPrintPdf,SIGNAL(clicked(bool)),this,SLOT(ZSlotPrintPdf()));
     this->m_tbPrintPdf->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/PrintPdf.png"));
-    this->m_tbPrintPdf->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_tbPrintPdf->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     this->m_tbPrint=new QToolButton;
-    this->m_tbPrint->setText(tr("打印..."));
+    this->m_tbPrint->setToolTip(tr("打印..."));
     connect(this->m_tbPrint,SIGNAL(clicked(bool)),this,SLOT(ZSlotPrint()));
     this->m_tbPrint->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/Print.png"));
-    this->m_tbPrint->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_tbPrint->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     this->m_vLayoutBtns=new QVBoxLayout;
     this->m_vLayoutBtns->addWidget(this->m_btnTemplate);
@@ -284,8 +288,6 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
     connect(this->m_actInsertComboBox,SIGNAL(triggered(bool)),this,SLOT(ZSlotInsertComboBox()));
     connect(this->m_actInsertSpinBox,SIGNAL(triggered(bool)),this,SLOT(ZSlotInsertSpinBox()));
     connect(this->m_actInsertDateTimeEdit,SIGNAL(triggered(bool)),this,SLOT(ZSlotInsertDateTimeEdit()));
-
-
 
     connect(this->m_tabWidget,SIGNAL(tabCloseRequested(int)),this,SLOT(ZSlotRemoveTab(qint32)));
 
@@ -880,15 +882,169 @@ void PTemplateEditor::ZSlotExportTemplate()
     file.close();
     QMessageBox::information(this,tr("成功提示"),tr("导出模板文件%1成功!").arg(fileName));
 }
+
 void PTemplateEditor::ZSlotImportExcel()
 {
+    QString fileName=QFileDialog::getOpenFileName(this,tr("导入Excel"),".",tr("Microsoft Excel(*.xlsx)"));
+    if(fileName.isEmpty())
+    {
+        return;
+    }
+    //add template in tab.
+    QString templateName=QInputDialog::getText(this,tr("新建模板名称"),tr("请输出模板名称"));
+    if(templateName.isEmpty())
+    {
+        return;
+    }
+    ZSheetWidget *sheetWidget=new ZSheetWidget;
+    sheetWidget->m_sheet->ZSetTemplateName(templateName);
+    this->m_tabWidget->addTab(sheetWidget,QIcon(":/TaskBar/images/Sheet.png"),"<*>"+templateName);
+    this->m_tabWidget->setCurrentWidget(sheetWidget);
+    connect(sheetWidget,SIGNAL(ZSignalDataChanged(QString)),this,SLOT(ZSlotSheetDataChanged(QString)));
 
+    QXlsx::Document xlsx(fileName);
+    for(qint32 x=1;x<=100;x++)
+    {
+        for(qint32 y=1;y<=50;y++)
+        {
+            QString inData=xlsx.read(x,y).toString();
+            if(!inData.isEmpty())
+            {
+                QTableWidgetItem *item=new QTableWidgetItem;
+                item->setTextAlignment(Qt::AlignCenter);
+                item->setBackgroundColor(Qt::white);
+                item->setText(inData);
+                sheetWidget->m_sheet->setItem(x-1,y-1,item);
+            }
+        }
+    }
+    this->ZAddLogMsg(tr("import excel [%1] success.").arg(fileName));
+    QMessageBox::information(this,tr("成功提示"),tr("模板导入Excel文件成功!\n%1").arg(fileName));
 }
+
 void PTemplateEditor::ZSlotExportExcel()
 {
-//    QXlsx::Document xlsx;
-//    xlsx.write("A1","hello,PMS!");
-//    xlsx.saveAs("C://a.xlsx");
+    if(this->m_tabWidget->currentIndex()==0)
+    {
+        //bypass template editor tab page.
+        return;
+    }
+    ZSheetWidget *sheet=qobject_cast<ZSheetWidget*>(this->m_tabWidget->currentWidget());
+    if(sheet==NULL)
+    {
+        return;
+    }
+    QString fileName=QFileDialog::getSaveFileName(this,tr("导出Excel"),sheet->m_sheet->ZGetSheetName(),tr("Microsoft Excel(*.xlsx)"));
+    if(fileName.isEmpty())
+    {
+        return;
+    }
+    qint32 rowCount=sheet->m_sheet->rowCount();
+    qint32 colCount=sheet->m_sheet->columnCount();
+    QXlsx::Document xlsx;
+    QXlsx::Format fmt;
+    fmt.setBorderColor(Qt::green);
+    fmt.setBorderStyle(QXlsx::Format::BorderThin);
+    fmt.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
+    fmt.setVerticalAlignment(QXlsx::Format::AlignVCenter);
+
+    //cell data export.
+    for(qint32 x=0;x<rowCount;x++)
+    {
+        for(qint32 y=0;y<colCount;y++)
+        {
+            QString text=sheet->m_sheet->item(x,y)->text();
+            qint32 rowSpan=sheet->m_sheet->rowSpan(x,y);
+            qint32 colSpan=sheet->m_sheet->columnSpan(x,y);
+
+            //because QTableWidget start from (0,0).
+            //but Excel start from (1,1)
+            //so here we add 1 to x&y.
+            xlsx.write(x+1,y+1,text,fmt);
+        }
+    }
+    //merge cell features support.
+#if 0
+    QList<QXlsx::CellRange> rowColSpanRangeList;
+    for(qint32 x=0;x<rowCount;x++)
+    {
+        for(qint32 y=0;y<colCount;y++)
+        {
+            QString text=sheet->m_sheet->item(x,y)->text();
+            qint32 rowSpan=sheet->m_sheet->rowSpan(x,y);
+            qint32 colSpan=sheet->m_sheet->columnSpan(x,y);
+
+            if(rowSpan>1 || colSpan>1)
+            {
+                for(qint32 i=0;i<rowColSpanRangeList.size();i++)
+                {
+
+                }
+            }
+
+            if(rowSpan>1 || colSpan>1)
+            {
+                //because QTableWidget start from (0,0).
+                //but Excel start from (1,1)
+                //so here we add 1 to x&y.
+                bool bBypass=false;
+                QXlsx::CellRange cellRange(x+1,y+1,x+1,y+1+colSpan);
+                //check if it's merged yet.
+                for(qint32 i=0;i<rowColSpanRangeList.size();i++)
+                {
+                    qint32 rangeX1=rowColSpanRangeList.at(i).topLeft().row();
+                    qint32 rangeY1=rowColSpanRangeList.at(i).topLeft().column();
+                    qint32 rangeX2=rowColSpanRangeList.at(i).bottomRight().row();
+                    qint32 rangeY2=rowColSpanRangeList.at(i).bottomRight().column();
+
+                    qint32 cellX1=x+1;
+                    qint32 cellY1=y+1;
+                    qint32 cellX2=x+1;
+                    qint32 cellY2=y+1+colSpan;
+                    if(cellX1<=rangeX1+(rangeX2-rangeX1))
+                    {
+
+                    }
+
+                    if(cellRange.topLeft().row()>=leftTopX && cellRange.topLeft().column()>=leftTopY &&
+                            cellRange.topRight().row()<=rightBottomX && cellRange.topRight().column()<=rightBottomY)
+                    {
+                        qDebug()<<"Bypass:("<<x+1<<","<<y+1<<"),("<<x+1<<","<<y+1+colSpan+")";
+                        bBypass=true;
+                        break;
+                    }
+                }
+                if(!bBypass)
+                {
+                    rowColSpanRangeList.append(cellRange);
+                    xlsx.mergeCells(cellRange);
+                    qDebug()<<"mergeCell:("<<x+1<<","<<y+1<<"),("<<x+1<<","<<y+1+colSpan+")";
+                }
+            }
+            //qDebug()<<x<<","<<y<<":rowSpan:"<<rowSpan<<",colSpan:"<<colSpan;
+            xlsx.write(x+1,y+1,text,fmt);
+        }
+    }
+#endif
+    //add the bottom information.
+    QXlsx::Format fmtBottomInfo;
+    fmtBottomInfo.setHorizontalAlignment(QXlsx::Format::AlignLeft);
+    fmtBottomInfo.setVerticalAlignment(QXlsx::Format::AlignVCenter);
+    fmtBottomInfo.setBorderColor(Qt::green);
+    fmtBottomInfo.setBorderStyle(QXlsx::Format::BorderThin);
+    QString strBottomInfo;
+    strBottomInfo+="Template "+sheet->m_sheet->ZGetTemplateName()+",";
+    strBottomInfo+=QString("Exported from PMS V%1 by %2,").arg(MyUserInfo::ZGetInstance()->m_appVersion).arg(MyUserInfo::ZGetInstance()->m_UserInfo.m_userName);
+    strBottomInfo+="at "+QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.");
+    //merge cell & print info.
+    xlsx.mergeCells(QXlsx::CellRange(rowCount+1,1,rowCount+1,colCount));
+    xlsx.write(rowCount+1,1,strBottomInfo,fmtBottomInfo);
+    if(!xlsx.saveAs(fileName))
+    {
+        QMessageBox::information(this,tr("成功提示"),tr("导出模板文件%1成功!").arg(fileName));
+        return;
+    }
+    QMessageBox::information(this,tr("成功提示"),tr("模板导出Excel文件成功!\n%1").arg(fileName));
 }
 void PTemplateEditor::ZSlotInsertPic()
 {

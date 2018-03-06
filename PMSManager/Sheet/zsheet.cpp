@@ -6,8 +6,8 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
 {
     this->m_cellDelegate=new ZCellDelegate;
     this->setItemDelegate(this->m_cellDelegate);
-    this->setRowCount(80);
-    this->setColumnCount(40);
+    this->setRowCount(100);
+    this->setColumnCount(50);
 
     //at default,initial all unit to ZCell object.
     for(qint32 i=0;i<this->rowCount();i++)

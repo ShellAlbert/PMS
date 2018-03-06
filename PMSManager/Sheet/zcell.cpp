@@ -18,7 +18,7 @@ ZCell::ZCell()
     this->ZSetRightFrame(false);
     this->ZSetFrameColor(QColor(0,0,0,255));
     this->ZSetFrameWidth(1);
-    this->ZSetTextAlignment(Qt::AlignLeft|Qt::AlignTop);
+    this->ZSetTextAlignment(Qt::AlignVCenter|Qt::AlignHCenter);
 
     this->m_cellWidgetType=CellWidget_No;
 }

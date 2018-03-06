@@ -42,14 +42,18 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
 {
     this->setWindowTitle(tr("任务管理器-Task Manager"));
     this->setWindowIcon(QIcon(":/TaskBar/images/TaskManager.png"));
+    this->setStyleSheet("QToolButton{background-color:#cce5f9;border:none;font:color #eaf7ff;}"
+                        "QToolButton::hover{background-color:#eaf7ff;}"
+                        "");
+
     this->m_vLayoutBtn=new QVBoxLayout;
 
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_taskManagerPerm&PermBits_TaskManager_NewTask)
     {
         this->m_btnAddTask=new QToolButton;
-        this->m_btnAddTask->setText(tr("创建任务"));
+        this->m_btnAddTask->setToolTip(tr("创建任务"));
         this->m_btnAddTask->setIcon(QIcon(":/TaskManager/images/TaskManager/AddTask.png"));
-        this->m_btnAddTask->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        this->m_btnAddTask->setToolButtonStyle(Qt::ToolButtonIconOnly);
         this->m_vLayoutBtn->addWidget(this->m_btnAddTask);
         connect(this->m_btnAddTask,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddTask()));
     }
@@ -57,14 +61,14 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_taskManagerPerm&PermBits_TaskManager_MdyTask)
     {
         this->m_btnMdyTask=new QToolButton;
-        this->m_btnMdyTask->setText(tr("打开任务"));
+        this->m_btnMdyTask->setToolTip(tr("打开任务"));
         this->m_btnMdyTask->setIcon(QIcon(":/TaskManager/images/TaskManager/MdyTask.png"));
-        this->m_btnMdyTask->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        this->m_btnMdyTask->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
         this->m_btnSaveTask=new QToolButton;
-        this->m_btnSaveTask->setText(tr("保存任务"));
+        this->m_btnSaveTask->setToolTip(tr("保存任务"));
         this->m_btnSaveTask->setIcon(QIcon(":/TaskManager/images/TaskManager/SaveTask.png"));
-        this->m_btnSaveTask->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        this->m_btnSaveTask->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
         this->m_vLayoutBtn->addWidget(this->m_btnMdyTask);
         this->m_vLayoutBtn->addWidget(this->m_btnSaveTask);
@@ -76,18 +80,18 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_taskManagerPerm&PermBits_TaskManager_DelTask)
     {
         this->m_btnDelTask=new QToolButton;
-        this->m_btnDelTask->setText(tr("删除任务"));
+        this->m_btnDelTask->setToolTip(tr("删除任务"));
         this->m_btnDelTask->setIcon(QIcon(":/TaskManager/images/TaskManager/DelTask.png"));
-        this->m_btnDelTask->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        this->m_btnDelTask->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
         this->m_vLayoutBtn->addWidget(this->m_btnDelTask);
         connect(this->m_btnDelTask,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelTask()));
     }
 
     this->m_btnArchieve=new QToolButton;
-    this->m_btnArchieve->setText(tr("归档任务"));
+    this->m_btnArchieve->setToolTip(tr("归档任务"));
     this->m_btnArchieve->setIcon(QIcon(":/TaskManager/images/TaskManager/WithdrawTask.png"));
-    this->m_btnArchieve->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnArchieve->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
 
     this->m_llTaskFilter=new QLabel(tr("过滤条件"));
@@ -106,9 +110,9 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
 
 
     this->m_tbTaskManage=new QToolButton;
-    this->m_tbTaskManage->setText((tr("审核管理")));
+    this->m_tbTaskManage->setToolTip((tr("审核管理")));
     this->m_tbTaskManage->setIcon(QIcon(":/TaskManager/images/TaskManager/SubmitTask.png"));
-    this->m_tbTaskManage->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_tbTaskManage->setToolButtonStyle(Qt::ToolButtonIconOnly);
     this->m_actSubmitTask=new QAction(QIcon(":/TaskManager/images/TaskManager/SubmitTask.png"),tr("提交审核"),0);
     this->m_actWithdrawTask=new QAction(QIcon(":/TaskManager/images/TaskManager/WithdrawTask.png"),tr("撤回审核"),0);
     this->m_actCheckOkay=new QAction(QIcon(":/TaskManager/images/TaskManager/SubmitTask.png"),tr("审核通过"),0);
@@ -122,9 +126,9 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_tbTaskManage->setPopupMode(QToolButton::MenuButtonPopup);
 
     this->m_btnPrint=new QToolButton;
-    this->m_btnPrint->setText(tr("打印..."));
+    this->m_btnPrint->setToolTip(tr("打印..."));
     this->m_btnPrint->setIcon(QIcon(":/TaskManager/images/TaskManager/Print.png"));
-    this->m_btnPrint->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnPrint->setToolButtonStyle(Qt::ToolButtonIconOnly);
     this->m_actPrintHtml=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/PrintHtml.png"),tr("打印Html"),0);
     connect(this->m_actPrintHtml,SIGNAL(triggered(bool)),this,SLOT(ZSlotPrintHtml()));
     this->m_actPrintPdf=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/PrintPdf.png"),tr("打印Pdf"),0);

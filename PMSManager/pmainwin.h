@@ -231,6 +231,8 @@ public:
 signals:
     void ZSignalShowTaskBar(bool bShow);
     void ZSignalShowLogBar(bool bShow);
+private slots:
+    void ZSlotTimeout();
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -240,5 +242,7 @@ private:
     QPoint m_relativePos;
     bool m_bShowTaskBar;
     bool m_bShowLogBar;
+    QTimer *m_timer;
+    qint32 m_iconIndex;
 };
 #endif // PMAINWIN_H

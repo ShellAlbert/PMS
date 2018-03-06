@@ -64,7 +64,6 @@ public:
     QTreeWidgetItem *m_generalVarItem;
     QTreeWidgetItem *m_autoVarItem;
 };
-
 class PTemplateEditor : public QFrame,public ZAckNetFrmWidget
 {
     Q_OBJECT

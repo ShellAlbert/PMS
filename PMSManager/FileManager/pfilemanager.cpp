@@ -133,19 +133,21 @@ PFileManager::PFileManager()
 {
     this->setWindowTitle(tr("文件管理器-File Manager"));
     this->setWindowIcon(QIcon(":/TaskBar/images/FileManager.png"));
-    this->setStyleSheet("QToolButton{background-color:#cce5f9;font:color #eaf7ff;padding: 6px 12px 6px 12p}"
+//    this->setStyleSheet("QToolButton{background-color:#cce5f9;font:color #eaf7ff;padding: 6px 12px 6px 12p}"
+//                        "QToolButton::hover{background-color:#eaf7ff;}"
+//                        "");
+
+    this->setStyleSheet("QToolButton{background-color:#cce5f9;border:none;font:color #eaf7ff;}"
                         "QToolButton::hover{background-color:#eaf7ff;}"
                         "");
-
-
     //left.
     this->m_vLayoutTb=new QVBoxLayout;
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_fileManagerPerm&PermBits_FileManager_NewFolder)
     {
         this->m_tbNewFolder=new QToolButton;
-        this->m_tbNewFolder->setText(tr("新建文件夹"));
+        this->m_tbNewFolder->setToolTip(tr("新建文件夹"));
         this->m_tbNewFolder->setIcon(QIcon(":/FileManager/images/FileManager/NewFolder.png"));
-        this->m_tbNewFolder->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        this->m_tbNewFolder->setToolButtonStyle(Qt::ToolButtonIconOnly);
         this->m_vLayoutTb->addWidget(this->m_tbNewFolder);
         connect(this->m_tbNewFolder,SIGNAL(clicked(bool)),this,SLOT(ZSlotNewFolder()));
     }
@@ -153,9 +155,9 @@ PFileManager::PFileManager()
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_fileManagerPerm&PermBits_FileManager_DelFolder)
     {
         this->m_tbDelFolder=new QToolButton;
-        this->m_tbDelFolder->setText(tr("删除文件夹"));
+        this->m_tbDelFolder->setToolTip(tr("删除文件夹"));
         this->m_tbDelFolder->setIcon(QIcon(":/FileManager/images/FileManager/DelFolder.png"));
-        this->m_tbDelFolder->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        this->m_tbDelFolder->setToolButtonStyle(Qt::ToolButtonIconOnly);
         this->m_vLayoutTb->addWidget(this->m_tbDelFolder);
         connect(this->m_tbDelFolder,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelFolder()));
     }
@@ -163,16 +165,16 @@ PFileManager::PFileManager()
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_fileManagerPerm&PermBits_FileManager_UploadFile)
     {
         this->m_tbUploadFile=new QToolButton;
-        this->m_tbUploadFile->setText(tr("上传文件"));
+        this->m_tbUploadFile->setToolTip(tr("上传文件"));
         this->m_tbUploadFile->setIcon(QIcon(":/FileManager/images/FileManager/UpFile.png"));
-        this->m_tbUploadFile->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        this->m_tbUploadFile->setToolButtonStyle(Qt::ToolButtonIconOnly);
         this->m_vLayoutTb->addWidget(this->m_tbUploadFile);
         connect(this->m_tbUploadFile,SIGNAL(clicked(bool)),this,SLOT(ZSlotUploadFile()));
 
         this->m_tbUploadPic=new QToolButton;
-        this->m_tbUploadPic->setText(tr("上传图片"));
+        this->m_tbUploadPic->setToolTip(tr("上传图片"));
         this->m_tbUploadPic->setIcon(QIcon(":/FileManager/images/FileManager/UpPic.png"));
-        this->m_tbUploadPic->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        this->m_tbUploadPic->setToolButtonStyle(Qt::ToolButtonIconOnly);
         this->m_vLayoutTb->addWidget(this->m_tbUploadPic);
         connect(this->m_tbUploadPic,SIGNAL(clicked(bool)),this,SLOT(ZSlotUploadPic()));
     }
@@ -180,9 +182,9 @@ PFileManager::PFileManager()
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_fileManagerPerm&PermBits_FileManager_DownloadFile)
     {
         this->m_tbOpenFile=new QToolButton;
-        this->m_tbOpenFile->setText(tr("下载文件"));
+        this->m_tbOpenFile->setToolTip(tr("下载文件"));
         this->m_tbOpenFile->setIcon(QIcon(":/FileManager/images/FileManager/DwnFile.png"));
-        this->m_tbOpenFile->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        this->m_tbOpenFile->setToolButtonStyle(Qt::ToolButtonIconOnly);
         this->m_vLayoutTb->addWidget(this->m_tbOpenFile);
         connect(this->m_tbOpenFile,SIGNAL(clicked(bool)),this,SLOT(ZSlotOpenFile()));
     }
@@ -190,17 +192,17 @@ PFileManager::PFileManager()
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_fileManagerPerm&PermBits_FileManager_DelFile)
     {
         this->m_tbDelFile=new QToolButton;
-        this->m_tbDelFile->setText(tr("删除文件"));
+        this->m_tbDelFile->setToolTip(tr("删除文件"));
         this->m_tbDelFile->setIcon(QIcon(":/FileManager/images/FileManager/DelFile.png"));
-        this->m_tbDelFile->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        this->m_tbDelFile->setToolButtonStyle(Qt::ToolButtonIconOnly);
         this->m_vLayoutTb->addWidget(this->m_tbDelFile);
         connect(this->m_tbDelFile,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelFile()));
     }
 
     this->m_tbExpandAll=new QToolButton;
-    this->m_tbExpandAll->setText(tr("全部展开"));
+    this->m_tbExpandAll->setToolTip(tr("全部展开"));
     this->m_tbExpandAll->setIcon(QIcon(":/FileManager/images/FileManager/Expand.png"));
-    this->m_tbExpandAll->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_tbExpandAll->setToolButtonStyle(Qt::ToolButtonIconOnly);
     connect(this->m_tbExpandAll,SIGNAL(clicked(bool)),this,SLOT(ZSlotExpandAll()));
     this->m_vLayoutTb->addStretch(1);
     this->m_vLayoutTb->addWidget(this->m_tbExpandAll);
