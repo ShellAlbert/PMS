@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QPluginLoader>
 #include <QSqlError>
+#include <QTimer>
 #include <NetPro/pnetfrmfile.h>
 int QBytes2Int(QByteArray bytes) {
     int addr = bytes[0] & 0x000000FF;
@@ -21,8 +22,47 @@ QByteArray Int2QByte(int number)
     abyte0[3] = (uchar) ((0xff000000 & number) >> 24);
     return abyte0;
 }
-PTcpSocket::PTcpSocket(qint32 sockFd,QObject *parent):QTcpSocket(parent)
+PTcpThread::PTcpThread(qint32 sockFd,QObject *parent):QThread(parent)
 {
+    this->m_sockFd=sockFd;
+}
+
+void PTcpThread::run()
+{
+    //create a new tcp socket.
+    this->m_tcpSocket=new QTcpSocket;
+    if(!this->m_tcpSocket->setSocketDescriptor(this->m_sockFd))
+    {
+        emit this->ZSignalSocketLog(this->m_tcpSocket->errorString());
+        return;
+    }
+    connect(this->m_tcpSocket,SIGNAL(readyRead()),this,SLOT(ZSlotReadData()),Qt::DirectConnection);
+    connect(this->m_tcpSocket,SIGNAL(disconnected()),this,SLOT(ZSlotDisconnected()));
+    qDebug()<<"client connected:"<<this->m_sockFd;
+    this->m_IPPort=this->m_tcpSocket->peerAddress().toString()+":"+QString::number(this->m_tcpSocket->peerPort(),10);
+
+    //open database connection.
+    if(QSqlDatabase::contains("qt_sql_default_connection"))
+    {
+        this->m_mysqlDb=QSqlDatabase::database("qt_sql_default_connection");
+    }else{
+        this->m_mysqlDb=QSqlDatabase::addDatabase("QMYSQL");
+    }
+    this->m_mysqlDb.setHostName("127.0.0.1");
+    this->m_mysqlDb.setPort(3306);
+    this->m_mysqlDb.setUserName("root");
+    this->m_mysqlDb.setPassword("123456");
+    this->m_mysqlDb.setDatabaseName("pms");
+    if(this->m_mysqlDb.open())
+    {
+        qDebug()<<"new client open PMS db ok!";
+    }else{
+        qDebug()<<"new client open PMS db failed";
+        qDebug()<<this->m_mysqlDb.lastError();
+        return;
+    }
+
+    //prepare network tcp protocols.
     this->m_recvBuffer=new QByteArray;
     this->m_recvBuffer->resize(2*1024*1024);
     this->m_recvDataSize=0;
@@ -32,43 +72,47 @@ PTcpSocket::PTcpSocket(qint32 sockFd,QObject *parent):QTcpSocket(parent)
     connect(this->m_netPro,SIGNAL(ZSignalUserLogin(QString)),this,SLOT(ZSlotUserLogin(QString)));
     connect(this->m_netPro,SIGNAL(ZSignalUserLogout(QString)),this,SLOT(ZSlotUserLogout(QString)));
 
-    this->m_mysqlDb=QSqlDatabase::addDatabase("QMYSQL");
-    this->m_mysqlDb.setHostName("127.0.0.1");
-    this->m_mysqlDb.setPort(3306);
-    this->m_mysqlDb.setUserName("root");
-    this->m_mysqlDb.setPassword("123456");
-    this->m_mysqlDb.setDatabaseName("pms");
-    if(this->m_mysqlDb.open())
-    {
-        qDebug()<<"open ok!";
-    }else{
-        qDebug()<<"open failed";
-        qDebug()<<this->m_mysqlDb.lastError();
-    }
-
-    this->m_sockFd=sockFd;
-    this->setSocketDescriptor(sockFd);
-    connect(this,SIGNAL(readyRead()),this,SLOT(ZSlotReadData()));
-
+    //create timeout counter.
     this->m_timeoutCnt=60;
-}
-PTcpSocket::~PTcpSocket()
-{
-    delete this->m_timeoutTimer;
-    delete this->m_recvBuffer;
-    delete this->m_netPro;
-}
-void PTcpSocket::ZSlotDoInitial()
-{
-    this->m_timeoutCnt=120;
     this->m_timeoutTimer=new QTimer;
     connect(this->m_timeoutTimer,SIGNAL(timeout()),this,SLOT(ZSlotTimeoutTimer()));
-    this->m_timeoutTimer->start(1000);
+    this->m_timeoutTimer->start(200);
+
+    //make this thread a event loop.
+    this->exec();
+
+    //clean resource after event loop.
+    this->m_timeoutTimer->stop();
+    delete this->m_timeoutTimer;
+    this->m_tcpSocket->close();
+    this->m_tcpSocket->deleteLater();
+
+    delete this->m_recvBuffer;
+    delete this->m_netPro;
+    qDebug()<<"client thread exit:"<<this->m_sockFd;
 }
-void PTcpSocket::ZSlotTimeoutTimer()
+void PTcpThread::ZSlotDisconnected()
+{
+    qDebug()<<"client disconnected:"<<this->m_sockFd;
+    this->m_tcpSocket->deleteLater();
+    //cause exec() to exit.
+    this->exit(0);
+}
+void PTcpThread::ZSlotTimeoutTimer()
 {
     if(this->m_netPro->ZGetLoginUserName().isEmpty())
     {
+        qDebug()<<"No user login,timeout="<<this->m_timeoutCnt;
+        if(this->m_timeoutCnt>0)
+        {
+            this->m_timeoutCnt--;
+        }else{
+            qDebug()<<"timeout to exit";
+            //            emit this->ZSignalSocketLog(tr("client <%1:%2> no user login timeout,shutdown!").arg(this->m_tcpSocket->peerAddress().toString()).arg(this->m_netPro->ZGetLoginUserName()));
+            //            emit this->ZSignalUserLogout(this->m_tcpSocket->peerAddress().toString(),"NoUserLogin");
+            //cause exec() to exit.
+            this->exit(-1);
+        }
         return; // no user login.
     }
 
@@ -76,48 +120,51 @@ void PTcpSocket::ZSlotTimeoutTimer()
     {
         this->m_timeoutCnt--;
     }else{
+        qDebug()<<"timeout to exit.";
         //timeout.long time to recv heart beat netFrm.
         //maybe socket is dead.close socket.
-        emit this->ZSignalSocketLog(tr("client <%1:%2> active timeout,shutdown!").arg(this->peerAddress().toString()).arg(this->m_netPro->ZGetLoginUserName()));
-        emit this->ZSignalUserLogout(this->peerAddress().toString(),this->m_netPro->ZGetLoginUserName());
-        this->close();
+        //        emit this->ZSignalSocketLog(tr("client <%1:%2> active timeout,shutdown!").arg(this->m_tcpSocket->peerAddress().toString()).arg(this->m_netPro->ZGetLoginUserName()));
+        //        emit this->ZSignalUserLogout(this->m_tcpSocket->peerAddress().toString(),this->m_netPro->ZGetLoginUserName());
+
+        //cause exec() to exit.
+        this->exit(-1);
     }
 }
-void PTcpSocket::ZSlotUserLogin(QString userName)
+void PTcpThread::ZSlotUserLogin(QString userName)
 {
-    emit this->ZSignalUserLogin(this->peerAddress().toString(),userName);
+    emit this->ZSignalUserLogin(this->m_IPPort,userName);
 }
-void PTcpSocket::ZSlotUserLogout(QString userName)
+void PTcpThread::ZSlotUserLogout(QString userName)
 {
-    emit this->ZSignalUserLogout(this->peerAddress().toString(),userName);
+    emit this->ZSignalUserLogout(this->m_IPPort,userName);
 }
-void PTcpSocket::ZSlotHeartBeat(QString userName)
+void PTcpThread::ZSlotHeartBeat(QString userName)
 {
-    emit this->ZSignalHeartBeat(this->peerAddress().toString(),userName);
+    emit this->ZSignalHeartBeat(this->m_IPPort,userName);
 }
-void PTcpSocket::ZSlotReadData()
+void PTcpThread::ZSlotReadData()
 {
     qint32 nCanReadBytes;
-    while(this->bytesAvailable()>0)
+    while(this->m_tcpSocket->bytesAvailable()>0)
     {
         //socket alive,reset timeout counter.
-        this->m_timeoutCnt=120;
+        this->m_timeoutCnt=60;
 
         //read data maximum.
-        if((this->m_recvBuffer->size()-this->m_recvDataSize)>this->bytesAvailable())
+        if((this->m_recvBuffer->size()-this->m_recvDataSize)>this->m_tcpSocket->bytesAvailable())
         {
-            nCanReadBytes=this->bytesAvailable();
+            nCanReadBytes=this->m_tcpSocket->bytesAvailable();
         }else{
             nCanReadBytes=this->m_recvBuffer->size()-this->m_recvDataSize;
         }
-        qint32 nRealReadBytes=this->read(this->m_recvBuffer->data()+this->m_recvDataSize,nCanReadBytes);
+        qint32 nRealReadBytes=this->m_tcpSocket->read(this->m_recvBuffer->data()+this->m_recvDataSize,nCanReadBytes);
         this->m_recvDataSize+=nRealReadBytes;
         //qDebug()<<"read:"<<nRealReadBytes<<",total:"<<this->m_recvDataSize;
         //qDebug()<<this->m_recvBuffer;
         this->ZParseRecvData();
     }
 }
-void PTcpSocket::ZParseRecvData()
+void PTcpThread::ZParseRecvData()
 {
     QString frmSyncHeader("BePMS");
     qint32 frmSize;
@@ -178,10 +225,10 @@ void PTcpSocket::ZParseRecvData()
         memmove(this->m_recvBuffer->data(),this->m_recvBuffer->data()+index,this->m_recvDataSize);
     }
 }
-void PTcpSocket::ZTxAckNetFrm(QString xmlData,qint32 netFrmSerialNo)
+void PTcpThread::ZTxAckNetFrm(QString xmlData,qint32 netFrmSerialNo)
 {
     QString syncHeader("BePMS");//sync header.
-    qint32 nfrmSize;//frame size.
+    qint32 nfrmSize=0;//frame size.
     //frame serial No.
     //frame xml data.
     QByteArray frmSyncHeader=syncHeader.toUtf8();
@@ -197,10 +244,17 @@ void PTcpSocket::ZTxAckNetFrm(QString xmlData,qint32 netFrmSerialNo)
     arrayTxData.append(frmSize);//frame size.
     arrayTxData.append(frmSerialNo);//frame serial no.
     arrayTxData.append(frmXmlData);//frame xml data.
-    this->write(arrayTxData);
-    this->waitForBytesWritten();
+    if(this->m_tcpSocket->isWritable())
+    {
+        this->m_tcpSocket->write(arrayTxData);
+        this->m_tcpSocket->waitForBytesWritten();
+    }
+    return;
 }
-
+//////////////////////////////////////////////////////////////////////
+/// \brief PTcpServer::PTcpServer
+/// \param parent
+//////////////////////////////////////////////////////////////////////////
 PTcpServer::PTcpServer(QObject *parent) : QTcpServer(parent)
 {
 }
@@ -209,18 +263,19 @@ PTcpServer::~PTcpServer()
 }
 void PTcpServer::incomingConnection(qintptr socketDescriptor)
 {
-    //qDebug()<<"new connection:"<<socketDescriptor;
-    PTcpSocket *tcpSocket=new PTcpSocket(socketDescriptor);
-    connect(tcpSocket,SIGNAL(ZSignalSocketLog(QString)),this,SIGNAL(ZSignalServerLog(QString)));
-    connect(tcpSocket,SIGNAL(ZSignalHeartBeat(QString,QString)),this,SIGNAL(ZSignalHeartBeat(QString,QString)));
-    connect(tcpSocket,SIGNAL(ZSignalUserLogin(QString,QString)),this,SIGNAL(ZSignalUserLogin(QString,QString)));
-    connect(tcpSocket,SIGNAL(ZSignalUserLogout(QString,QString)),this,SIGNAL(ZSignalUserLogout(QString,QString)));
+    qDebug()<<"new connection:"<<socketDescriptor;
+    PTcpThread *thread=new PTcpThread(socketDescriptor);
+    //log message.
+    connect(thread,SIGNAL(ZSignalSocketLog(QString)),this,SIGNAL(ZSignalServerLog(QString)));
 
-    QThread *tcpThread=new QThread;
-    connect(tcpThread,SIGNAL(started()),tcpSocket,SLOT(ZSlotDoInitial()));
-    connect(tcpSocket,SIGNAL(disconnected()),tcpThread,SLOT(terminate()));
-    connect(tcpThread,SIGNAL(finished()),tcpThread,SLOT(deleteLater()));
-    connect(tcpThread,SIGNAL(finished()),tcpSocket,SLOT(deleteLater()));
-    tcpSocket->moveToThread(tcpThread);
-    tcpThread->start();
+    //heartbeat &login &logout signals.
+    connect(thread,SIGNAL(ZSignalHeartBeat(QString,QString)),this,SIGNAL(ZSignalHeartBeat(QString,QString)));
+    connect(thread,SIGNAL(ZSignalUserLogin(QString,QString)),this,SIGNAL(ZSignalUserLogin(QString,QString)));
+    connect(thread,SIGNAL(ZSignalUserLogout(QString,QString)),this,SIGNAL(ZSignalUserLogout(QString,QString)));
+
+    //once a thread is not needed, it will be beleted later
+    connect(thread,SIGNAL(finished()),thread,SLOT(deleteLater()));
+
+    thread->start();
 }
+

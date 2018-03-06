@@ -2,6 +2,7 @@
 #define PGBLPARA_H
 
 #include <QString>
+#include <QMutex>
 class PGblPara
 {
 public:
@@ -20,6 +21,8 @@ public:
     qint32 m_totalBlock;
     qint32 m_blockSize;
     qint32 m_remainBytes;
+    //mutex for mysql.
+    QMutex m_muxDB;
 private:
     static PGblPara* m_pInstance;
 };

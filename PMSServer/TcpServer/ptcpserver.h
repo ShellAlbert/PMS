@@ -7,22 +7,29 @@
 #include <QTimer>
 #include <QMutex>
 #include "NetPro/pnetpro.h"
-class PTcpSocket:public QTcpSocket
+#include <QThread>
+class PTcpThread:public QThread
 {
     Q_OBJECT
 public:
-    explicit PTcpSocket(qint32 sockFd,QObject *parent = 0);
-    ~PTcpSocket();
-public slots:
-    void ZSlotDoInitial();
+    explicit PTcpThread(qint32 sockFd,QObject *parent = 0);
+
+protected:
+    void run();
+
 signals:
     void ZSignalSocketLog(QString socketLogMsg);
     void ZSignalHeartBeat(QString addr,QString userName);
     void ZSignalUserLogin(QString addr,QString userName);
     void ZSignalUserLogout(QString addr,QString userName);
+
+    void ZSignalTxData(QByteArray txData);
 private slots:
     void ZSlotReadData();
+    void ZSlotDisconnected();
+
     void ZSlotTimeoutTimer();
+
     void ZSlotHeartBeat(QString userName);
     void ZSlotUserLogin(QString userName);
     void ZSlotUserLogout(QString userName);
@@ -30,15 +37,21 @@ private:
     void ZParseRecvData();
     void ZTxAckNetFrm(QString xmlData,qint32 netFrmSerialNo);
 private:
+    //tcp socket.
     qint32 m_sockFd;
+    QTcpSocket *m_tcpSocket;
+
+    //network protocol.
     QByteArray *m_recvBuffer;
     qint32 m_recvDataSize;
     PNetPro *m_netPro;
 
-private:
-    QTimer *m_timeoutTimer;
+    //timeout handler.
     qint32 m_timeoutCnt;
-private:
+    QString m_IPPort;
+    QTimer *m_timeoutTimer;
+
+    //mysql database.
     QSqlDatabase m_mysqlDb;
 };
 class PTcpServer : public QTcpServer
@@ -47,6 +60,7 @@ class PTcpServer : public QTcpServer
 public:
     explicit PTcpServer(QObject *parent = 0);
     ~PTcpServer();
+
 signals:
     void ZSignalServerLog(QString logMsg);
     void ZSignalHeartBeat(QString addr,QString userName);
@@ -54,8 +68,6 @@ signals:
     void ZSignalUserLogout(QString addr,QString userName);
 protected:
     void incomingConnection(qintptr socketDescriptor);
-private:
-    QMap<QString,PTcpSocket*> m_tcpSocketMap;
 };
 
 #endif // PTCPSERVER_H
