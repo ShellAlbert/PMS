@@ -294,11 +294,13 @@ void ZVarInfoDia::ZSetXmlData(QString xmlData)
                 QXmlStreamAttributes attr=tXmlReader.attributes();
                 QString type=attr.value(QString("type")).toString();
                 QString rule=attr.value(QString("rule")).toString();
+                QString refVal=attr.value(QString("refVal")).toString();
                 QString geVarName=tXmlReader.readElementText();
                 QTreeWidgetItem *item=new QTreeWidgetItem;
                 item->setText(0,geVarName);
                 item->setText(1,type);
                 item->setText(2,rule);
+                item->setText(3,refVal);
                 this->m_treeGeVar->addTopLevelItem(item);
             }else if(nodeName==QString("AutoVar"))
             {
@@ -331,9 +333,11 @@ QString ZVarInfoDia::ZGetXmlData()
         QString geVarName=item->text(0);
         QString geVarType=item->text(1);
         QString geVarRule=item->text(2);
+        QString geVarRefVal=item->text(3);
         tXmlWriter.writeStartElement(QString("GeVar"));
         tXmlWriter.writeAttribute(QString("type"),geVarType);
         tXmlWriter.writeAttribute(QString("rule"),geVarRule);
+        tXmlWriter.writeAttribute(QString("refVal"),geVarRefVal);
         tXmlWriter.writeCharacters(geVarName);
         tXmlWriter.writeEndElement();//GeVar.
     }

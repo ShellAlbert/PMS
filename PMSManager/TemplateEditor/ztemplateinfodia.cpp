@@ -4,7 +4,8 @@
 #include <QMessageBox>
 ZTemplateInfoDia::ZTemplateInfoDia(TemplateInfoDiaType type,QWidget *parent):ZBaseInfoDia(ZBaseInfoDia::Dialog_End_By_Calling_Close,parent)
 {
-    this->setMinimumSize(200,100);
+
+    this->m_llOpTips=new QLabel;
 
     this->m_llTemplateName=new QLabel(tr("模板名称"));
     this->m_leTempalteName=new QLineEdit;
@@ -15,90 +16,97 @@ ZTemplateInfoDia::ZTemplateInfoDia(TemplateInfoDiaType type,QWidget *parent):ZBa
     this->m_leVarSourceName->setMaxLength(16);
 
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("Okay"));
-
+    this->m_tbOkay->setText(tr("OKAY"));
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("Cancel"));
+    this->m_tbCancel->setText(tr("CANCEL"));
     this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
     this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_tbCancel->setIcon(QIcon(":/common/images/common/cancel.png"));
     this->m_tbCancel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_hLayoutBtn=new QHBoxLayout;
+    this->m_hLayoutBtn->addStretch(1);
+    this->m_hLayoutBtn->addWidget(this->m_tbOkay);
+    this->m_hLayoutBtn->addWidget(this->m_tbCancel);
 
     this->m_gridLayout=new QGridLayout;
-    this->setLayout(this->m_gridLayout);
-
     this->m_diaType=type;
     switch(type)
     {
     case Type_NewTemplate:
         this->setWindowTitle(tr("创建新模板"));
+        this->m_llOpTips->setText(tr("即将创建新的模板，请输入模板名称。"));
         this->m_gridLayout->addWidget(this->m_llTemplateName,0,0,1,1);
         this->m_gridLayout->addWidget(this->m_leTempalteName,0,1,1,1);
-        this->m_gridLayout->addWidget(this->m_tbOkay,1,0,1,1);
-        this->m_gridLayout->addWidget(this->m_tbCancel,1,1,1,1);
         break;
     case Type_DelTemplate:
         this->setWindowTitle(tr("删除模板"));
+        this->m_llOpTips->setText(tr("即将删除下列模板，确认后删除。"));
         this->m_leTempalteName->setEnabled(false);
         this->m_gridLayout->addWidget(this->m_llTemplateName,0,0,1,1);
         this->m_gridLayout->addWidget(this->m_leTempalteName,0,1,1,1);
-        this->m_gridLayout->addWidget(this->m_tbOkay,1,0,1,1);
-        this->m_gridLayout->addWidget(this->m_tbCancel,1,1,1,1);
         break;
     case Type_GetTemplate:
         this->setWindowTitle(tr("获取模板"));
+        this->m_llOpTips->setText(tr("即将获取下列模板。"));
         this->m_leTempalteName->setEnabled(false);
         this->m_gridLayout->addWidget(this->m_llTemplateName,0,0,1,1);
         this->m_gridLayout->addWidget(this->m_leTempalteName,0,1,1,1);
-        this->m_gridLayout->addWidget(this->m_tbOkay,1,0,1,1);
-        this->m_gridLayout->addWidget(this->m_tbCancel,1,1,1,1);
         break;
     case Type_SaveTemplate:
         this->setWindowTitle(tr("保存模板"));
+        this->m_llOpTips->setText(tr("即将保存下列模板的修改，确认后保存。"));
         this->m_leTempalteName->setEnabled(false);
         this->m_gridLayout->addWidget(this->m_llTemplateName,0,0,1,1);
         this->m_gridLayout->addWidget(this->m_leTempalteName,0,1,1,1);
-        this->m_gridLayout->addWidget(this->m_tbOkay,1,0,1,1);
-        this->m_gridLayout->addWidget(this->m_tbCancel,1,1,1,1);
         break;
     case Type_BindVarSource:
         this->setWindowTitle(tr("绑定变量源"));
+        this->m_llOpTips->setText(tr("您确定将模板与变量源进行绑定吗？"));
         this->m_leTempalteName->setEnabled(false);
         this->m_leVarSourceName->setEnabled(false);
         this->m_gridLayout->addWidget(this->m_llTemplateName,0,0,1,1);
         this->m_gridLayout->addWidget(this->m_leTempalteName,0,1,1,1);
         this->m_gridLayout->addWidget(this->m_llVarSourcName,1,0,1,1);
         this->m_gridLayout->addWidget(this->m_leVarSourceName,1,1,1,1);
-        this->m_gridLayout->addWidget(this->m_tbOkay,2,0,1,1);
-        this->m_gridLayout->addWidget(this->m_tbCancel,2,1,1,1);
         break;
     case Type_UnbindVarSource:
         this->setWindowTitle(tr("解除绑定变量源"));
+        this->m_llOpTips->setText(tr("您确定解除模板与变量源的绑定吗？"));
         this->m_leTempalteName->setEnabled(false);
         this->m_leVarSourceName->setEnabled(false);
         this->m_gridLayout->addWidget(this->m_llTemplateName,0,0,1,1);
         this->m_gridLayout->addWidget(this->m_leTempalteName,0,1,1,1);
         this->m_gridLayout->addWidget(this->m_llVarSourcName,1,0,1,1);
         this->m_gridLayout->addWidget(this->m_leVarSourceName,1,1,1,1);
-        this->m_gridLayout->addWidget(this->m_tbOkay,2,0,1,1);
-        this->m_gridLayout->addWidget(this->m_tbCancel,2,1,1,1);
         break;
     default:
         break;
     }
+
+    this->m_vLayout=new QVBoxLayout;
+    this->m_vLayout->addWidget(this->m_llOpTips);
+    this->m_vLayout->addLayout(this->m_gridLayout);
+    this->m_vLayout->addLayout(this->m_hLayoutBtn);
+    this->setLayout(this->m_vLayout);
 
     connect(this->m_tbOkay,SIGNAL(clicked(bool)),this,SLOT(ZSlotOkay()));
     connect(this->m_tbCancel,SIGNAL(clicked(bool)),this,SLOT(ZSlotCancel()));
 }
 ZTemplateInfoDia::~ZTemplateInfoDia()
 {
+    delete this->m_llOpTips;
+
     delete this->m_llTemplateName;
     delete this->m_leTempalteName;
     delete this->m_llVarSourcName;
     delete this->m_leVarSourceName;
+    delete this->m_gridLayout;
+
     delete this->m_tbOkay;
     delete this->m_tbCancel;
-    delete this->m_gridLayout;
+    delete this->m_hLayoutBtn;
+
+    delete this->m_vLayout;
 }
 void ZTemplateInfoDia::ZSetTemplateName(QString name)
 {

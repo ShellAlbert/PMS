@@ -32,16 +32,21 @@ private slots:
     void ZSlotOkay();
     void ZSlotCancel();
 private:
+    QLabel *m_llOpTips;
+
     QLabel *m_llTemplateName;
     QLineEdit *m_leTempalteName;
     QLabel *m_llVarSourcName;
     QLineEdit *m_leVarSourceName;
+    QGridLayout *m_gridLayout;
 
     QToolButton *m_tbOkay;
     QToolButton *m_tbCancel;
-    QGridLayout *m_gridLayout;
-    TemplateInfoDiaType m_diaType;
+    QHBoxLayout *m_hLayoutBtn;
 
+    QVBoxLayout *m_vLayout;
+    //dialog type.
+    TemplateInfoDiaType m_diaType;
     QString m_templateXmlData;
 };
 

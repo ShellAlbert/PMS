@@ -18,7 +18,7 @@ public:
     void ZProcessAckNetFrm(QString item,QString cmd,QStringList paraList,qint32 ackNetRetCode);
     QStringList ZGetSelectedTemplateList();
 protected:
-    QSize sizeHint() const;
+
 private:
     QTreeWidget *m_tree;
     QToolButton *m_tbOkay;

@@ -24,37 +24,50 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
     connect(this,SIGNAL(itemClicked(QTableWidgetItem*)),this,SLOT(ZSlotItemEntered()));
 
     this->m_popupMenu=new QMenu(this);
-    this->m_actionHAlignLeft=new QAction(QIcon(":/images/ztemplateeditor_halignleft.png"),tr("H-Left"),this);
+
+    this->m_actBindVar=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/BindVar.png"),tr("绑定变量"),this);
+    connect(this->m_actBindVar,SIGNAL(triggered()),this,SIGNAL(ZSignalBindVar()));
+    this->m_actUnbindVar=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/UnbindVar.png"),tr("解绑变量"),this);
+    connect(this->m_actUnbindVar,SIGNAL(triggered()),this,SIGNAL(ZSignalUnbindVar()));
+
+    this->m_subMenuAlign=new QMenu(tr("对齐方式"));
+    this->m_actionHAlignLeft=new QAction(QIcon(":/alignment/images/alignment/HAlignLeft.png"),tr("左对齐"),this);
     connect(this->m_actionHAlignLeft,SIGNAL(triggered()),this,SLOT(ZSlotHAlignLeft()));
 
-    this->m_actionHAlignCenter=new QAction(QIcon(":/images/ztemplateeditor_haligncenter.png"),tr("H-Center"),this);
+    this->m_actionHAlignCenter=new QAction(QIcon(":/alignment/images/alignment/HAlignCenter.png"),tr("水平居中"),this);
     connect(this->m_actionHAlignCenter,SIGNAL(triggered()),this,SLOT(ZSlotHAlignCenter()));
 
-    this->m_actionHAlignRight=new QAction(QIcon(":/images/ztemplateeditor_halignright.png"),tr("H-Right"),this);
+    this->m_actionHAlignRight=new QAction(QIcon(":/alignment/images/alignment/HAlignRight.png"),tr("右对齐"),this);
     connect(this->m_actionHAlignRight,SIGNAL(triggered()),this,SLOT(ZSlotHAlignRight()));
 
-    this->m_actionVAlignTop=new QAction(QIcon(":/images/ztemplateeditor_valigntop.png"),tr("V-Top"),this);
+    this->m_actionVAlignTop=new QAction(QIcon(":/alignment/images/alignment/VAlignTop.png"),tr("上对齐"),this);
     connect(this->m_actionVAlignTop,SIGNAL(triggered()),this,SLOT(ZSlotVAlignTop()));
 
-    this->m_actionVAlignCenter=new QAction(QIcon(":/images/ztemplateeditor_valigncenter.png"),tr("V-Center"),this);
+    this->m_actionVAlignCenter=new QAction(QIcon(":/alignment/images/alignment/VAlignCenter.png"),tr("垂直居中"),this);
     connect(this->m_actionVAlignCenter,SIGNAL(triggered()),this,SLOT(ZSlotVAlignCenter()));
 
-    this->m_actionVAlignBottom=new QAction(QIcon(":/images/ztemplateeditor_valignbottom.png"),tr("V-Bottom"),this);
+    this->m_actionVAlignBottom=new QAction(QIcon(":/alignment/images/alignment/VAlignBottom.png"),tr("下对齐"),this);
     connect(this->m_actionVAlignBottom,SIGNAL(triggered()),this,SLOT(ZSlotVAlignBottom()));
 
-    this->m_actionMerge=new QAction(QIcon(":/images/ztemplateeditor_merge.png"),tr("Merge"),this);
+    this->m_actionMerge=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Merge.png"),tr("合并"),this);
     connect(this->m_actionMerge,SIGNAL(triggered()),this,SLOT(ZSlotMerge()));
-    this->m_actionSplit=new QAction(QIcon(":/images/ztemplateeditor_split.png"),tr("Split"),this);
+    this->m_actionSplit=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Split.png"),tr("拆分"),this);
     connect(this->m_actionSplit,SIGNAL(triggered()),this,SLOT(ZSlotSplit()));
 
-    this->m_popupMenu->addSection(tr("Horizontal"));
-    this->m_popupMenu->addAction(this->m_actionHAlignLeft);
-    this->m_popupMenu->addAction(this->m_actionHAlignCenter);
-    this->m_popupMenu->addAction(this->m_actionHAlignRight);
-    this->m_popupMenu->addSection(tr("Vertical"));
-    this->m_popupMenu->addAction(this->m_actionVAlignTop);
-    this->m_popupMenu->addAction(this->m_actionVAlignCenter);
-    this->m_popupMenu->addAction(this->m_actionVAlignBottom);
+    this->m_subMenuAlign->addSection(tr("HAlign"));
+    this->m_subMenuAlign->addAction(this->m_actionHAlignLeft);
+    this->m_subMenuAlign->addAction(this->m_actionHAlignCenter);
+    this->m_subMenuAlign->addAction(this->m_actionHAlignRight);
+    this->m_subMenuAlign->addSection(tr("VAlign"));
+    this->m_subMenuAlign->addAction(this->m_actionVAlignTop);
+    this->m_subMenuAlign->addAction(this->m_actionVAlignCenter);
+    this->m_subMenuAlign->addAction(this->m_actionVAlignBottom);
+
+    this->m_popupMenu->addSection(tr("BindUnBind"));
+    this->m_popupMenu->addAction(this->m_actBindVar);
+    this->m_popupMenu->addAction(this->m_actUnbindVar);
+    this->m_popupMenu->addSection(tr("Alignment"));
+    this->m_popupMenu->addMenu(this->m_subMenuAlign);
     this->m_popupMenu->addSection(tr("Cell Command"));
     this->m_popupMenu->addAction(this->m_actionMerge);
     this->m_popupMenu->addAction(this->m_actionSplit);
@@ -63,12 +76,15 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
 ZSheet::~ZSheet()
 {
     delete this->m_cellDelegate;
+    delete this->m_actBindVar;
+    delete this->m_actUnbindVar;
     delete this->m_actionHAlignLeft;
     delete this->m_actionHAlignCenter;
     delete this->m_actionHAlignRight;
     delete this->m_actionVAlignTop;
     delete this->m_actionVAlignCenter;
     delete this->m_actionVAlignBottom;
+    delete this->m_subMenuAlign;
     delete this->m_actionMerge;
     delete this->m_actionSplit;
     delete this->m_popupMenu;

@@ -1,5 +1,6 @@
 #include "ptemplateeditor.h"
 #include <QMessageBox>
+#include <QHeaderView>
 #include <TemplateEditor/zgeneralvarinfodia.h>
 #include <TemplateEditor/zautovarinfodia.h>
 #include <TemplateEditor/zfontinfodia.h>
@@ -452,6 +453,8 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 this->m_tabWidget->addTab(sheetWidget,QIcon(":/TaskBar/images/Sheet.png"),"<*>"+templateName);
                 this->m_tabWidget->setCurrentWidget(sheetWidget);
                 connect(sheetWidget,SIGNAL(ZSignalDataChanged(QString)),this,SLOT(ZSlotSheetDataChanged(QString)));
+                connect(sheetWidget->m_sheet,SIGNAL(ZSignalBindVar()),this,SLOT(ZSlotCellBindVar()));
+                connect(sheetWidget->m_sheet,SIGNAL(ZSignalUnbindVar()),this,SLOT(ZSlotCellUnbindVar()));
                 this->ZAddLogMsg(tr("add template [%1] success.").arg(templateName));
             }
         }else if(cmd=="del")
@@ -519,6 +522,8 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 this->m_tabWidget->addTab(sheetWidget,QIcon(":/TaskBar/images/Sheet.png"),templateName);
                 this->m_tabWidget->setCurrentWidget(sheetWidget);
                 connect(sheetWidget,SIGNAL(ZSignalDataChanged(QString)),this,SLOT(ZSlotSheetDataChanged(QString)));
+                connect(sheetWidget->m_sheet,SIGNAL(ZSignalBindVar()),this,SLOT(ZSlotCellBindVar()));
+                connect(sheetWidget->m_sheet,SIGNAL(ZSignalUnbindVar()),this,SLOT(ZSlotCellUnbindVar()));
                 this->ZAddLogMsg(tr("get template [%1] success,fileSize:%2.").arg(templateName).arg(fileSize));
             }
         }else if(cmd=="save")
@@ -2104,6 +2109,7 @@ ZSheetWidget::ZSheetWidget()
     this->m_spliter=new QSplitter(Qt::Vertical);
     this->m_sheet=new ZSheet(this->m_spliter);
     this->m_treeWidget=new QTreeWidget(this->m_spliter);
+    this->m_treeWidget->header()->setVisible(false);
     this->m_treeWidget->setColumnCount(5);
     this->m_treeWidget->setStyleSheet("QTreeView::item:hover{background-color:rgb(0,255,0,50)}"
                                       "QTreeView::item:selected{background-color:rgb(255,0,0,100)}"
@@ -2113,6 +2119,7 @@ ZSheetWidget::ZSheetWidget()
     this->m_generalVarItem->setText(1,tr("绑定单元格"));
     this->m_generalVarItem->setText(2,tr("变量类型"));
     this->m_generalVarItem->setText(3,tr("变量规则"));
+    this->m_generalVarItem->setText(4,tr("参考值"));
     this->m_autoVarItem=new QTreeWidgetItem;
     this->m_autoVarItem->setText(0,tr("自动变量"));
     this->m_autoVarItem->setText(1,tr("绑定单元格"));
@@ -2152,6 +2159,10 @@ void ZSheetWidget::ZSlotVarDblClicked(QTreeWidgetItem*item,int column)
         {
             QString xy=item->text(1);
             QStringList xyList=xy.split(",");
+            if(xyList.size()!=2)
+            {
+                return;
+            }
             this->m_sheet->setCurrentCell(xyList.at(0).toInt()-1,xyList.at(1).toInt()-1);
         }
     }
@@ -2707,11 +2718,13 @@ void ZSheetWidget::ZPutVarSourceXmlData(QString xmlData)
                 QXmlStreamAttributes attr=tXmlReader.attributes();
                 QString type=attr.value(QString("type")).toString();
                 QString rule=attr.value(QString("rule")).toString();
+                QString refVal=attr.value(QString("refVal")).toString();
                 QString name=tXmlReader.readElementText();
                 QTreeWidgetItem *item=new QTreeWidgetItem;
                 item->setText(0,name);
                 item->setText(2,type);
                 item->setText(3,rule);
+                item->setText(4,refVal);
                 this->m_generalVarItem->addChild(item);
                 this->m_treeWidget->expandAll();
             }else if(nodeName=="AutoVar")

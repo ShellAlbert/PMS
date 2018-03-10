@@ -61,7 +61,8 @@ private slots:
     void ZSlotSplit();
 signals:
     void ZSignalSheetChanged(QString templateName);
-
+    void ZSignalBindVar();
+    void ZSignalUnbindVar();
 protected:
     void mousePressEvent(QMouseEvent *event);
 private:
@@ -78,6 +79,11 @@ private:
 
     //right menu.
     QMenu *m_popupMenu;
+
+    QAction *m_actBindVar;
+    QAction *m_actUnbindVar;
+
+    QMenu *m_subMenuAlign;
     QAction *m_actionHAlignLeft;
     QAction *m_actionHAlignCenter;
     QAction *m_actionHAlignRight;

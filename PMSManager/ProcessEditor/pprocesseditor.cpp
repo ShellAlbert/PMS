@@ -480,6 +480,7 @@ void PProcessEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList para
             }else{
                 //add item to tree.
                 QTreeWidgetItem *item=new QTreeWidgetItem;
+                item->setIcon(0,QIcon(":/ProcessEditor/images/ProcessEditor/Process.png"));
                 item->setText(0,processName);
                 item->setText(1,stepNum);
                 item->setText(2,creator);

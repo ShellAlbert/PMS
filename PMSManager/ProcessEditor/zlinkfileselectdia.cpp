@@ -4,6 +4,7 @@
 ZLinkFileSelectDia::ZLinkFileSelectDia(QWidget *parent):QDialog(parent)
 {
     this->setWindowTitle(tr("请选择需要关联的文件"));
+    this->setMinimumSize(600,300);
 
     this->m_tree=new QTreeWidget;
     this->m_tree->setColumnCount(5);
@@ -16,10 +17,13 @@ ZLinkFileSelectDia::ZLinkFileSelectDia(QWidget *parent):QDialog(parent)
     this->m_tree->setHeaderLabels(headerList);
 
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("Okay"));
-
+    this->m_tbOkay->setText(tr("OKAY"));
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("Cancel"));
+    this->m_tbCancel->setText(tr("CANCEL"));
+    this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
+    this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_tbCancel->setIcon(QIcon(":/common/images/common/cancel.png"));
+    this->m_tbCancel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     this->m_hLayout=new QHBoxLayout;
     this->m_hLayout->addWidget(this->m_tbOkay);
@@ -45,10 +49,6 @@ ZLinkFileSelectDia::~ZLinkFileSelectDia()
     delete this->m_tbCancel;
     delete this->m_hLayout;
     delete this->m_vLayout;
-}
-QSize ZLinkFileSelectDia::sizeHint() const
-{
-    return QSize(500,250);
 }
 void ZLinkFileSelectDia::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraList,qint32 ackNetRetCode)
 {
@@ -93,7 +93,16 @@ void ZLinkFileSelectDia::ZProcessAckNetFrm(QString item,QString cmd,QStringList 
                     {
                         QTreeWidgetItem *fileItem=new QTreeWidgetItem(1);//type=0 is folder.type=1 is file.
                         fileItem->setCheckState(0,Qt::Unchecked);
-                        fileItem->setIcon(0,QIcon(":/FileManager/images/FileManager/PdfFile.png"));
+                        if(fileType=="pdf")
+                        {
+                            fileItem->setIcon(0,QIcon(":/FileManager/images/FileManager/PdfFile.png"));
+                        }else if(fileType=="png")
+                        {
+                            fileItem->setIcon(0,QIcon(":/FileManager/images/FileManager/ImageFile.png"));
+                        }else if(fileType=="jpg")
+                        {
+                            fileItem->setIcon(0,QIcon(":/FileManager/images/FileManager/ImageFile.png"));
+                        }
                         fileItem->setText(0,fileName);
                         fileItem->setText(1,fileType);
                         fileItem->setText(2,QString("%1K").arg(fileSize/1024));
