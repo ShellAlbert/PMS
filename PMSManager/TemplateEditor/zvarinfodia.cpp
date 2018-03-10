@@ -9,7 +9,7 @@
 #include <QFileDialog>
 ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
 {
-    this->setMinimumSize(400,300);
+    this->setMinimumSize(600,400);
     this->setWindowTitle(tr("正在编辑变量源[%1]").arg(varSourceName));
     this->m_varSourceName=varSourceName;
 
@@ -25,11 +25,12 @@ ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
     this->m_tbDelGeVar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     this->m_treeGeVar=new QTreeWidget;
-    this->m_treeGeVar->setColumnCount(3);
+    this->m_treeGeVar->setColumnCount(4);
     QStringList geVarHeaders;
     geVarHeaders<<tr("变量名称");
     geVarHeaders<<tr("数据类型");
     geVarHeaders<<tr("变量规则");
+    geVarHeaders<<tr("参考值");
     this->m_treeGeVar->setHeaderLabels(geVarHeaders);
 
 
@@ -54,34 +55,44 @@ ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
 
     this->m_tbImport=new QToolButton;
     this->m_tbImport->setText(tr("导入..."));
-    this->m_tbImport->setIcon(QIcon(":/common/images/common/okay.png"));
+    this->m_tbImport->setIcon(QIcon(":/UserManager/images/UserManager/Import.png"));
     this->m_tbImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("Okay"));
+    this->m_tbOkay->setText(tr("OKAY"));
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("Cancel"));
+    this->m_tbCancel->setText(tr("CANCEL"));
     this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
     this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_tbCancel->setIcon(QIcon(":/common/images/common/cancel.png"));
     this->m_tbCancel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
-    this->m_gridLayout=new QGridLayout;
-    this->m_gridLayout->addWidget(this->m_llGeneralVar,0,0,1,1);
-    this->m_gridLayout->addWidget(this->m_tbAddGeVar,0,1,1,1);
-    this->m_gridLayout->addWidget(this->m_tbDelGeVar,0,2,1,1);
-    this->m_gridLayout->addWidget(this->m_treeGeVar,1,0,1,3);
+    this->m_hLayoutGeVar=new QHBoxLayout;
+    this->m_hLayoutGeVar->addWidget(this->m_llGeneralVar);
+    this->m_hLayoutGeVar->addStretch(1);
+    this->m_hLayoutGeVar->addWidget(this->m_tbAddGeVar);
+    this->m_hLayoutGeVar->addWidget(this->m_tbDelGeVar);
 
-    this->m_gridLayout->addWidget(this->m_llAutoVar,2,0,1,1);
-    this->m_gridLayout->addWidget(this->m_tbAddAutoVar,2,1,1,1);
-    this->m_gridLayout->addWidget(this->m_tbDelAutoVar,2,2,1,1);
-    this->m_gridLayout->addWidget(this->m_treeAutoVar,3,0,1,3);
+    this->m_hLayoutAutoVar=new QHBoxLayout;
+    this->m_hLayoutAutoVar->addWidget(this->m_llAutoVar);
+    this->m_hLayoutAutoVar->addStretch(1);
+    this->m_hLayoutAutoVar->addWidget(this->m_tbAddAutoVar);
+    this->m_hLayoutAutoVar->addWidget(this->m_tbDelAutoVar);
 
-    this->m_gridLayout->addWidget(this->m_tbImport,4,0,1,1);
-    this->m_gridLayout->addWidget(this->m_tbOkay,4,1,1,1);
-    this->m_gridLayout->addWidget(this->m_tbCancel,4,2,1,1);
+    this->m_hLayoutBtn=new QHBoxLayout;
+    this->m_hLayoutBtn->addWidget(this->m_tbImport);
+    this->m_hLayoutBtn->addStretch(1);
+    this->m_hLayoutBtn->addWidget(this->m_tbOkay);
+    this->m_hLayoutBtn->addWidget(this->m_tbCancel);
 
-    this->setLayout(this->m_gridLayout);
+    this->m_vLayoutMain=new QVBoxLayout;
+    this->m_vLayoutMain->addLayout(this->m_hLayoutGeVar);
+    this->m_vLayoutMain->addWidget(this->m_treeGeVar);
+    this->m_vLayoutMain->addLayout(this->m_hLayoutAutoVar);
+    this->m_vLayoutMain->addWidget(this->m_treeAutoVar);
+    this->m_vLayoutMain->addLayout(this->m_hLayoutBtn);
+
+    this->setLayout(this->m_vLayoutMain);
 
 
     connect(this->m_tbAddGeVar,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddGeneralVar()));
@@ -109,7 +120,11 @@ ZVarInfoDia::~ZVarInfoDia()
     delete this->m_tbImport;
     delete this->m_tbOkay;
     delete this->m_tbCancel;
-    delete this->m_gridLayout;
+
+    delete this->m_hLayoutGeVar;
+    delete this->m_hLayoutAutoVar;
+    delete this->m_hLayoutBtn;
+    delete this->m_vLayoutMain;
 }
 void ZVarInfoDia::ZSlotAddGeneralVar()
 {
@@ -119,6 +134,7 @@ void ZVarInfoDia::ZSlotAddGeneralVar()
         QString varName=dia.ZGetVarName();
         QString varType=dia.ZGetVarType();
         QString varRule=dia.ZGetVarRule();
+        QString valRef=dia.ZGetRefValue();
         //search all exists varName to avoid the same name.
         for(qint32 i=0;i<this->m_treeGeVar->topLevelItemCount();i++)
         {
@@ -133,6 +149,7 @@ void ZVarInfoDia::ZSlotAddGeneralVar()
         item->setText(0,varName);
         item->setText(1,varType);
         item->setText(2,varRule);
+        item->setText(3,valRef);
         this->m_treeGeVar->addTopLevelItem(item);
     }
 }
@@ -207,23 +224,53 @@ void ZVarInfoDia::ZSlotImport()
     //bypass the Examples(1)+Example Data(5)+Data(2).
     nRowNo+=8;
     //start to read data.
-    for(qint32 i=1;i<=nRowCnt;i++)
+    for(qint32 i=0;i<nRowCnt;i++)
     {
         ZVarSourceInfo varInfo;
-        varInfo.m_varName=xlsx.read(nRowCnt+i,1).toString();
-        varInfo.m_varType=xlsx.read(nRowCnt+i,2).toString();
-        varInfo.m_rule=xlsx.read(nRowCnt+i,3).toString();
-        varInfo.m_refValue=xlsx.read(nRowCnt+i,4).toString();
-        varInfo.m_cell=xlsx.read(nRowCnt+i,5).toString();
+        varInfo.m_varName=xlsx.read(nRowNo+i,1).toString();
+        varInfo.m_varType=xlsx.read(nRowNo+i,2).toString();
+        varInfo.m_rule=xlsx.read(nRowNo+i,3).toString();
+        varInfo.m_refValue=xlsx.read(nRowNo+i,4).toString();
+        varInfo.m_cell=xlsx.read(nRowNo+i,5).toString();
         varList.append(varInfo);
     }
-    QMessageBox::information(this,tr("成功提示"),tr("Excel变量源模板导入成功!\n共导入变量%1个.").arg(QString::number(varList.size(),10)));
+
     for(qint32 i=0;i<varList.size();i++)
     {
         ZVarSourceInfo varInfo;
         varInfo=varList.at(i);
         qDebug()<<varInfo.m_varName<<","<<varInfo.m_varType<<","<<varInfo.m_rule<<","<<varInfo.m_refValue<<","<<varInfo.m_cell;
+
+        //search all exists varName to avoid the same name.
+        bool bExist=false;
+        for(qint32 i=0;i<this->m_treeGeVar->topLevelItemCount();i++)
+        {
+            QTreeWidgetItem *item=this->m_treeGeVar->topLevelItem(i);
+            if(item->text(0)==varInfo.m_varName.right(varInfo.m_varName.length()-1))
+            {
+                bExist=true;
+                break;
+            }
+        }
+        if(bExist)
+        {
+            QMessageBox::critical(this,tr("错误提示"),tr("变量名%1已经存在,自动跳过!").arg(varInfo.m_varName));
+            continue;
+        }
+        //check VarType.
+        if(varInfo.m_varType!="String"&&varInfo.m_varType!="Digital"&&varInfo.m_varType!="Datetime"&&varInfo.m_varType!="Boolean")
+        {
+            QMessageBox::critical(this,tr("错误提示"),tr("变量名%1数据类型%2不可识别!").arg(varInfo.m_varName).arg(varInfo.m_varType));
+            continue;
+        }
+        QTreeWidgetItem *item=new QTreeWidgetItem;
+        item->setText(0,varInfo.m_varName.right(varInfo.m_varName.length()-1));//remove the first '@' prefix.
+        item->setText(1,varInfo.m_varType);
+        item->setText(2,varInfo.m_rule);
+        item->setText(3,varInfo.m_refValue);
+        this->m_treeGeVar->addTopLevelItem(item);
     }
+    QMessageBox::information(this,tr("成功提示"),tr("Excel变量源模板导入成功!\n共导入变量%1个.").arg(QString::number(varList.size(),10)));
 }
 void ZVarInfoDia::ZSlotOkay()
 {

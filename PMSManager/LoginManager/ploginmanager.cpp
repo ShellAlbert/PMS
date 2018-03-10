@@ -240,7 +240,7 @@ PLoginManager::PLoginManager(QWidget *parent):ZBaseInfoDia(ZBaseInfoDia::Dialog_
     this->m_llInfo=new QLabel;
     this->m_llInfo->setMargin(8);
     this->m_llInfo->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-    this->m_llInfo->setText(tr("捷温汽车系统(中国)有限公司      柘园生物提供技术支持"));
+    this->m_llInfo->setText(tr("捷温汽车系统(中国)有限公司\t\t柘园生物技术支持"));
 
     this->m_stackedWidget=new QStackedWidget;
     this->m_stackedWidget->addWidget(this->m_loginPart);

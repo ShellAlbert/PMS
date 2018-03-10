@@ -49,8 +49,11 @@ private:
     QToolButton *m_tbImport;
     QToolButton *m_tbOkay;
     QToolButton *m_tbCancel;
-    QGridLayout *m_gridLayout;
 
+    QHBoxLayout *m_hLayoutGeVar;
+    QHBoxLayout *m_hLayoutAutoVar;
+    QHBoxLayout *m_hLayoutBtn;
+    QVBoxLayout *m_vLayoutMain;
 private:
     QString m_varSourceName;
 };

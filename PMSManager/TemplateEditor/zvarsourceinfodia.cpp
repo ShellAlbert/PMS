@@ -9,10 +9,10 @@ ZVarSourceInfoDia::ZVarSourceInfoDia(VarSourceInfoDiaType type,QWidget *parent):
     this->m_leVarSourceName->setMaxLength(16);
 
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("Okay"));
+    this->m_tbOkay->setText(tr("OKAY"));
 
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("Cancel"));
+    this->m_tbCancel->setText(tr("CANCEL"));
 
     this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
     this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);

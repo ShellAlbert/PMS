@@ -155,7 +155,8 @@ RESOURCES += \
 RC_FILE += app.rc
 
 DISTFILES += \
-    DefaultUI.qss
+    DefaultUI.qss \
+    BlueSkin.qss
 
 INCLUDEPATH += $$PWD/FileManager/poppler
 DEPENDPATH += $$PWD/FileManager/poppler
