@@ -962,9 +962,9 @@ void PMainWin::ZSlotShowSystemLog()
 }
 void PMainWin::ZSlotShowDataBackup()
 {
-    if(MyUserInfo::ZGetInstance()->m_UserInfo.m_userName!="root")
+    if(MyUserInfo::ZGetInstance()->m_UserInfo.m_userName!="admin")
     {
-        QMessageBox::critical(this,tr("错误提示"),tr("您无权限访问<备份还原>功能模块!\n只有root用户才有权限访问该功能模块!"));
+        QMessageBox::critical(this,tr("错误提示"),tr("您无权限访问<备份还原>功能模块!\n只有admin用户才有权限访问该功能模块!"));
         return;
     }
     ZBackupManager dia(this);

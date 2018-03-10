@@ -10,6 +10,9 @@
 #include <QSpinBox>
 #include <QLabel>
 #include <QDateTimeEdit>
+#include <QApplication>
+#include <QClipboard>
+#include <QMessageBox>
 #include "pgblpara.h"
 #include <QPaintEvent>
 ZTaskSheet::ZTaskSheet(QTreeWidget *varTree,QWidget *parent):QTableWidget(parent)
@@ -294,11 +297,17 @@ void ZTaskSheet::ZSetTemplateXmlDataAndVarSourceXmlData(QString templateXmlData,
                 QXmlStreamAttributes attr=tXmlReader.attributes();
                 QString xy=attr.value(QString("xy")).toString();
                 QString type=attr.value(QString("type")).toString();
+                QString dataType=attr.value(QString("dataType")).toString();
+                QString rule=attr.value(QString("rule")).toString();
+                QString refVal=attr.value(QString("refVal")).toString();
                 QString varName=tXmlReader.readElementText();
                 if(type=="general"){
                     QTreeWidgetItem *item=new QTreeWidgetItem(1);
-                    item->setText(0,xy);
-                    item->setText(1,varName);
+                    item->setText(0,xy);//cell
+                    item->setText(1,varName);//var name.
+                    item->setText(2,dataType);//data type.
+                    item->setText(3,rule);//rule.
+                    item->setText(4,refVal);//refval.
                     this->m_varTree->topLevelItem(0)->addChild(item);
                 }else if(type=="auto"){
                     QTreeWidgetItem *item=new QTreeWidgetItem(1);
@@ -323,11 +332,13 @@ void ZTaskSheet::ZSetTemplateXmlDataAndVarSourceXmlData(QString templateXmlData,
                 QXmlStreamAttributes attr=varSrcXmlReader.attributes();
                 QString dataType=attr.value(QString("type")).toString();
                 QString varRule=attr.value(QString("rule")).toString();
+                QString varRefVal=attr.value(QString("refVal")).toString();
                 QString varName=varSrcXmlReader.readElementText();
                 VarInfo info;
                 info.varType="general";
                 info.dataType=dataType;
                 info.varRule=varRule;
+                info.value=varRefVal;
                 this->m_varMap.insert(varName,info);
             }else if(nodeName=="AutoVar")
             {
@@ -474,15 +485,63 @@ void ZTaskSheet::ZSlotCellClicked(QTableWidgetItem*item)
     }
 }
 
+ZCellDataCheckReportDialog::ZCellDataCheckReportDialog(QWidget *parent):QDialog(parent)
+{
+    this->setWindowTitle(tr("数据检查报告"));
+    this->setMinimumSize(400,200);
 
+    this->m_te=new QTextEdit;
+
+    this->m_tbCopy=new QToolButton;
+    this->m_tbCopy->setText(tr("复制到剪贴板"));
+    this->m_tbOkay=new QToolButton;
+    this->m_tbOkay->setText(tr("OKAY"));
+    this->m_tbCopy->setIcon(QIcon(":/common/images/common/okay.png"));
+    this->m_tbCopy->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
+    this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_hLayout=new QHBoxLayout;
+    this->m_hLayout->addStretch(1);
+    this->m_hLayout->addWidget(this->m_tbCopy);
+    this->m_hLayout->addWidget(this->m_tbOkay);
+
+    this->m_vLayout=new QVBoxLayout;
+    this->m_vLayout->addWidget(this->m_te);
+    this->m_vLayout->addLayout(this->m_hLayout);
+    this->setLayout(this->m_vLayout);
+
+    connect(this->m_tbCopy,SIGNAL(clicked(bool)),this,SLOT(ZSlotCopy2Clipboard()));
+    connect(this->m_tbOkay,SIGNAL(clicked(bool)),this,SLOT(accept()));
+}
+ZCellDataCheckReportDialog::~ZCellDataCheckReportDialog()
+{
+    delete this->m_te;
+    delete this->m_tbCopy;
+    delete this->m_tbOkay;
+    delete this->m_hLayout;
+    delete this->m_vLayout;
+}
+void ZCellDataCheckReportDialog::ZAddReportLog(QString reportLog)
+{
+    this->m_te->append(reportLog);
+}
+void ZCellDataCheckReportDialog::ZSlotCopy2Clipboard()
+{
+    QClipboard *cb=QApplication::clipboard();
+    cb->setText(this->m_te->toPlainText());
+    QMessageBox::information(this,tr("复制成功"),tr("已经复制到系统剪贴板中."));
+}
 ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
 {
     this->m_treeVar=new QTreeWidget;
-    this->m_treeVar->setColumnCount(3);
+    this->m_treeVar->setColumnCount(5);
     QStringList headerList;
     headerList<<tr("绑定单元格");
     headerList<<tr("变量名称");
     headerList<<tr("数据类型");
+    headerList<<tr("规则");
+    headerList<<tr("参考值");
     this->m_treeVar->setHeaderLabels(headerList);
     this->m_treeVar->setStyleSheet("QTreeWidget{background-color:#5B677A;color:white;}");
     this->m_geVarItem=new QTreeWidgetItem(0);
@@ -495,7 +554,7 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
     this->m_llTaskStateIcon->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     this->m_llTaskStateText=new QLabel;
     this->m_llTaskStateText->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-    this->m_llTaskStateText->setStyleSheet("QLabel{font-size:20px;color:black;}");
+    this->m_llTaskStateText->setStyleSheet("QLabel{font-size:14px;color:black;}");
     this->m_hLayoutTaskState=new QHBoxLayout;
     this->m_hLayoutTaskState->addWidget(this->m_llTaskStateIcon);
     this->m_hLayoutTaskState->addWidget(this->m_llTaskStateText);
@@ -650,7 +709,7 @@ void ZTaskWidget::ZSetGeVarBindCellEditable(bool bEditable)
         if(cell)
         {
             cell->ZSetLockCell(!bEditable);
-            cell->setToolTip(tr("普通变量 需要手工填写"));
+            cell->setToolTip(tr("普通变量,需要手工填写"));
             this->m_sheet->m_cellDelegate->ZAddBindGeVar(cell);
             switch(cell->ZGetCellWidgetType())
             {
@@ -726,30 +785,24 @@ void ZTaskWidget::ZSetVarValueXmlData(QString xmlData)
                         ZCell *cell=static_cast<ZCell*>(this->m_sheet->item(x,y));
                         if(cell)
                         {
-                            switch(cell->ZGetCellWidgetType())
+                            if(ZCell::CellWidget_No==cell->ZGetCellWidgetType())
                             {
-                            case ZCell::CellWidget_No:
                                 cell->ZSetCellData(varValue);
-                                break;
-                            case ZCell::CellWidget_QCheckBox:
+                            }else if(ZCell::CellWidget_QCheckBox==cell->ZGetCellWidgetType())
                             {
                                 QCheckBox *cb=static_cast<QCheckBox*>(this->m_sheet->cellWidget(x,y));
                                 if(cb)
                                 {
                                     cb->setChecked(varValue==QString("1")?true:false);
                                 }
-                            }
-                                break;
-                            case ZCell::CellWidget_QComboBox:
+                            }else if(ZCell::CellWidget_QComboBox==cell->ZGetCellWidgetType())
                             {
                                 QComboBox *cb=static_cast<QComboBox*>(this->m_sheet->cellWidget(x,y));
                                 if(cb)
                                 {
                                     cb->setCurrentText(varValue);
                                 }
-                            }
-                                break;
-                            case ZCell::CellWidget_QDateTimeEdit:
+                            }else if(ZCell::CellWidget_QDateTimeEdit==cell->ZGetCellWidgetType())
                             {
                                 QDateTimeEdit *dte=static_cast<QDateTimeEdit*>(this->m_sheet->cellWidget(x,y));
                                 if(dte)
@@ -757,8 +810,6 @@ void ZTaskWidget::ZSetVarValueXmlData(QString xmlData)
                                     qDebug()<<"setDateTime:"<<varValue;
                                     dte->setDateTime(QDateTime::fromString(varValue,"yyyy-MM-ddThh:mm:ss"));
                                 }
-                            }
-                                break;
                             }
                         }
                     }
@@ -769,6 +820,8 @@ void ZTaskWidget::ZSetVarValueXmlData(QString xmlData)
 }
 bool ZTaskWidget::ZCheckCellDataValidation()
 {
+    QString checkLog;
+    bool bCheckOkay=true;
     for(qint32 i=0;i<this->m_geVarItem->childCount();i++)
     {
         QTreeWidgetItem *item=this->m_geVarItem->child(i);
@@ -779,17 +832,69 @@ bool ZTaskWidget::ZCheckCellDataValidation()
         ZCell *cell=static_cast<ZCell*>(this->m_sheet->item(x,y));
         if(cell)
         {
-            switch(cell->ZGetCellWidgetType())
+            if(ZCell::CellWidget_No==cell->ZGetCellWidgetType())
             {
-            case ZCell::CellWidget_No:
                 if(cell->ZGetCellData().isEmpty())
                 {
-                    emit this->ZSignalLogMsg(tr("普通变量单元格(%1,%2)没有填写数据!").arg(x+1).arg(y+1));
-                    return false;
+                    QString errLog(tr("普通变量单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                    emit this->ZSignalLogMsg(errLog);
+                    checkLog.append(errLog);
+                    bCheckOkay=false;
                 }
-                break;
-            default:
-                break;
+            }else if(ZCell::CellWidget_QLabel==cell->ZGetCellWidgetType())
+            {
+                if(cell->ZGetCellData().isEmpty())
+                {
+                    QString errLog(tr("Label单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                    emit this->ZSignalLogMsg(errLog);
+                    checkLog.append(errLog);
+                    bCheckOkay=false;
+                }
+            }else if(ZCell::CellWidget_QLineEdit==cell->ZGetCellWidgetType())
+            {
+                if(cell->ZGetCellData().isEmpty())
+                {
+                    QString errLog(tr("LineEdit单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                    emit this->ZSignalLogMsg(errLog);
+                    checkLog.append(errLog);
+                    bCheckOkay=false;
+                }
+            }else if(ZCell::CellWidget_QCheckBox==cell->ZGetCellWidgetType())
+            {
+                if(cell->ZGetCellData().isEmpty())
+                {
+                    QString errLog(tr("CheckBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                    emit this->ZSignalLogMsg(errLog);
+                    checkLog.append(errLog);
+                    bCheckOkay=false;
+                }
+            }else if(ZCell::CellWidget_QComboBox==cell->ZGetCellWidgetType())
+            {
+                if(cell->ZGetCellData().isEmpty())
+                {
+                    QString errLog(tr("ComboBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                    emit this->ZSignalLogMsg(errLog);
+                    checkLog.append(errLog);
+                    bCheckOkay=false;
+                }
+            }else if(ZCell::CellWidget_QDateTimeEdit==cell->ZGetCellWidgetType())
+            {
+                if(cell->ZGetCellData().isEmpty())
+                {
+                    QString errLog(tr("DateTime单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                    emit this->ZSignalLogMsg(errLog);
+                    checkLog.append(errLog);
+                    bCheckOkay=false;
+                }
+            }else if(ZCell::CellWidget_QSpinBox==cell->ZGetCellWidgetType())
+            {
+                if(cell->ZGetCellData().isEmpty())
+                {
+                    QString errLog(tr("SpinBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                    emit this->ZSignalLogMsg(errLog);
+                    checkLog.append(errLog);
+                    bCheckOkay=false;
+                }
             }
         }
     }
@@ -805,12 +910,16 @@ bool ZTaskWidget::ZCheckCellDataValidation()
         {
             if(cell->ZGetCellData().isEmpty())
             {
-                emit this->ZSignalLogMsg(tr("自动变量单元格(%1,%2)没有填写数据!").arg(x+1).arg(y+1));
-                return false;
+                emit this->ZSignalLogMsg(tr("自动变量单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                bCheckOkay=false;
             }
         }
     }
-    return true;
+    //show cell data check report dialog.
+    ZCellDataCheckReportDialog dia(this);
+    dia.ZAddReportLog(checkLog);
+    dia.exec();
+    return bCheckOkay;
 }
 
 void ZTaskWidget::ZSetTaskState(qint32 state)
@@ -818,7 +927,7 @@ void ZTaskWidget::ZSetTaskState(qint32 state)
     this->m_sheet->ZSetTaskState(state);
     this->m_TaskState=state;
     this->m_llTaskStateText->setText(ZGetTaskStateString(state));
-    this->m_llTaskStateIcon->setPixmap(QPixmap(ZGetTaskStateIconName(state)));
+    this->m_llTaskStateIcon->setPixmap(QPixmap(ZGetTaskStateIconName(state)).scaled(10,10));
     switch(state)
     {
     case Task_Type_New:

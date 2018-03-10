@@ -2,6 +2,7 @@
 #include <BackupManager/zbackupinfodia.h>
 #include <BackupManager/zlistbackupinfodia.h>
 #include <QMessageBox>
+#include <QDebug>
 ZBackupManager::ZBackupManager(QWidget *parent):QDialog(parent)
 {
     this->setMinimumSize(600,300);
@@ -81,6 +82,7 @@ void ZBackupManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList para
                 qint32 fileSize=paraList.at(1).toInt();
                 QString creator=paraList.at(2);
                 QString createTime=paraList.at(3);
+                QString pathSize=paraList.at(4);
                 QTreeWidgetItem *item=new QTreeWidgetItem;
                 item->setText(0,backupName);
                 item->setText(1,QString("%1 KB").arg(fileSize/1024));
@@ -92,6 +94,7 @@ void ZBackupManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList para
                 {
                     this->m_tree->resizeColumnToContents(i);
                 }
+                qDebug()<<"PathSize:"<<pathSize;
             }
         }else if(cmd=="backup")
         {

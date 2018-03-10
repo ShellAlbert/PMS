@@ -4,9 +4,12 @@
 #include <QTableWidget>
 #include <Sheet/zcelldelegate.h>
 #include <QTreeWidget>
+#include <QToolButton>
+#include <QTextEdit>
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QLabel>
+#include <QDialog>
 #include <QMap>
 class ZTaskSheet : public QTableWidget
 {
@@ -63,6 +66,22 @@ private:
     QMap<QString,VarInfo> m_varMap;
 
     qint32 m_taskState;
+};
+class ZCellDataCheckReportDialog:public QDialog
+{
+    Q_OBJECT
+public:
+    ZCellDataCheckReportDialog(QWidget *parent=0);
+    ~ZCellDataCheckReportDialog();
+    void ZAddReportLog(QString reportLog);
+private slots:
+    void ZSlotCopy2Clipboard();
+private:
+    QTextEdit *m_te;
+    QToolButton *m_tbCopy;
+    QToolButton *m_tbOkay;
+    QHBoxLayout *m_hLayout;
+    QVBoxLayout *m_vLayout;
 };
 class ZTaskWidget:public QFrame
 {

@@ -5,6 +5,8 @@ ZTaskInfoDia::ZTaskInfoDia(ZTaskInfoDia::TaskInfoDiaType type,QWidget *parent):Z
 {
     this->setMinimumSize(400,200);
 
+    this->m_llOpTips=new QLabel;
+
     this->m_llTaskName=new QLabel(tr("任务名称"));
     this->m_leTaskName=new QLineEdit;
 
@@ -21,13 +23,17 @@ ZTaskInfoDia::ZTaskInfoDia(ZTaskInfoDia::TaskInfoDiaType type,QWidget *parent):Z
     this->m_leStepName->setEnabled(false);
 
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("Okay"));
+    this->m_tbOkay->setText(tr("OKAY"));
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("Cancel"));
+    this->m_tbCancel->setText(tr("CANCEL"));
     this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
     this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_tbCancel->setIcon(QIcon(":/common/images/common/cancel.png"));
     this->m_tbCancel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_hLayoutBtn=new QHBoxLayout;
+    this->m_hLayoutBtn->addStretch(1);
+    this->m_hLayoutBtn->addWidget(this->m_tbOkay);
+    this->m_hLayoutBtn->addWidget(this->m_tbCancel);
 
     this->m_gridLayout=new QGridLayout;
     this->m_gridLayout->addWidget(this->m_llTaskName,0,0,1,1);
@@ -40,56 +46,68 @@ ZTaskInfoDia::ZTaskInfoDia(ZTaskInfoDia::TaskInfoDiaType type,QWidget *parent):Z
     this->m_gridLayout->addWidget(this->m_llStepName,3,0,1,1);
     this->m_gridLayout->addWidget(this->m_leStepName,3,1,1,1);
 
-    this->m_gridLayout->addWidget(this->m_tbOkay,4,0,1,1);
-    this->m_gridLayout->addWidget(this->m_tbCancel,4,1,1,1);
-    this->setLayout(this->m_gridLayout);
-
     this->m_diaType=type;
     switch(type)
     {
     case Type_NewTask:
         this->setWindowTitle(tr("新建任务"));
+        this->m_llOpTips->setText(tr("新任务名称为自动创建,一般不需要修改。"));
         break;
     case Type_OpenTask:
         this->setWindowTitle(tr("打开任务"));
+        this->m_llOpTips->setText(tr("即时打开下列任务，确定后打开。"));
         this->m_leTaskName->setEnabled(false);
         break;
     case Type_SaveTask:
         this->setWindowTitle(tr("保存任务"));
+        this->m_llOpTips->setText(tr("下列任务将被保存，确定后保存。"));
         this->m_leTaskName->setEnabled(false);
         break;
     case Type_DelTask:
         this->setWindowTitle(tr("删除任务"));
+        this->m_llOpTips->setText(tr("下列任务将被删除，删除不可逆，确定后删除。"));
         this->m_leTaskName->setEnabled(false);
         break;
     case Type_SubmitTask:
         this->setWindowTitle(tr("提交审核任务"));
+        this->m_llOpTips->setText(tr("下列任务将被提交到您的上级审核。"));
         this->m_leTaskName->setEnabled(false);
         break;
     case Type_WithdrawTask:
         this->setWindowTitle(tr("撤回未审核任务"));
+        this->m_llOpTips->setText(tr("下列提交未审核的任务将被撤回。"));
         this->m_leTaskName->setEnabled(false);
         break;
     case Type_CheckOkayTask:
         this->setWindowTitle(tr("审核通过任务"));
+        this->m_llOpTips->setText(tr("下列任务将被您审核通过，通过后不可修改。"));
         this->m_leTaskName->setEnabled(false);
         break;
     case Type_CheckFailedTask:
         this->setWindowTitle(tr("审核失败任务"));
+        this->m_llOpTips->setText(tr("下列任务将被您审核失败，提交者需要修改再次提交审核。"));
         this->m_leTaskName->setEnabled(false);
         break;
     case Type_ArchieveTask:
         this->setWindowTitle(tr("归档任务"));
+        this->m_llOpTips->setText(tr("下列任务将被您归档处理，归档后的任务不可修改。"));
         this->m_leTaskName->setEnabled(false);
         break;
     default:
         break;
     }
+    this->m_vLayout=new QVBoxLayout;
+    this->m_vLayout->addWidget(this->m_llOpTips);
+    this->m_vLayout->addLayout(this->m_gridLayout);
+    this->m_vLayout->addLayout(this->m_hLayoutBtn);
+    this->setLayout(this->m_vLayout);
+
     connect(this->m_tbOkay,SIGNAL(clicked(bool)),this,SLOT(ZSlotOkay()));
     connect(this->m_tbCancel,SIGNAL(clicked(bool)),this,SLOT(ZSlotCancel()));
 }
 ZTaskInfoDia::~ZTaskInfoDia()
 {
+    delete this->m_llOpTips;
     delete this->m_llTaskName;
     delete this->m_leTaskName;
     delete this->m_llRefTemplateName;
@@ -98,9 +116,11 @@ ZTaskInfoDia::~ZTaskInfoDia()
     delete this->m_leProcessName;
     delete this->m_llStepName;
     delete this->m_leStepName;
+    delete this->m_gridLayout;
     delete this->m_tbOkay;
     delete this->m_tbCancel;
-    delete this->m_gridLayout;
+    delete this->m_hLayoutBtn;
+    delete this->m_vLayout;
 }
 void ZTaskInfoDia::ZParseAckNetFrmXmlData()
 {

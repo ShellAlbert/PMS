@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QXmlStreamWriter>
+#include "pgblpara.h"
 PNetFrmBackup::PNetFrmBackup(QSqlDatabase db):PNetFrm(db)
 {
 
@@ -30,12 +31,28 @@ void PNetFrmBackup::ZListBackup()
         tXmlWriter.writeAttribute(QString("cmd"),QString("list"));
         tXmlWriter.writeAttribute(QString("retCode"),QString("%1").arg(retCode));
         tXmlWriter.writeAttribute(QString("errMsg"),errMsg);
-        tXmlWriter.writeCharacters("failed");
+        tXmlWriter.writeCharacters("0B");//pathSize.
         tXmlWriter.writeEndElement();//Backup.
         this->m_opLogMsg=QString("list backup failed:[%1].").arg(errMsg);
     }else{
         while(query.next())
         {
+            quint64 pathSize=PGblPara::ZGetInstance()->ZGetPathSize(QDir::currentPath());
+            float fSize=0;
+            QString strPathSize;
+            if(pathSize<1024)
+            {
+                fSize=pathSize;
+                strPathSize=QString::number(fSize,'f',2)+QString("B");
+            }else if(pathSize>=1024 && pathSize<=(1024*1024))
+            {
+                fSize=pathSize/1024.0;
+                strPathSize=QString::number(fSize,'f',2)+QString("KB");
+            }else{
+                fSize=pathSize/1024.0/1024.0;
+                strPathSize=QString::number(fSize,'f',2)+QString("MB");
+            }
+
             QString backupName=query.value(0).toString();
             QString fileSize=query.value(1).toString();
             QString creator=query.value(2).toString();
@@ -47,7 +64,7 @@ void PNetFrmBackup::ZListBackup()
             tXmlWriter.writeAttribute(QString("fileSize"),fileSize);
             tXmlWriter.writeAttribute(QString("creator"),creator);
             tXmlWriter.writeAttribute(QString("createTime"),createTime);
-            tXmlWriter.writeCharacters("okay");
+            tXmlWriter.writeCharacters(strPathSize);
             tXmlWriter.writeEndElement();//Backup.
         }
         this->m_opLogMsg=QString("list backup success");

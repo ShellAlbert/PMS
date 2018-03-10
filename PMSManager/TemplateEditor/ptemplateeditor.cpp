@@ -2433,12 +2433,18 @@ QString ZSheetWidget::ZGetTemplateXmlData()
         QTreeWidgetItem *item=this->m_generalVarItem->child(i);
         QString varName=item->text(0);
         QString bindCell=item->text(1);
+        QString dataType=item->text(2);
+        QString rule=item->text(3);
+        QString refVal=item->text(4);
         //only save the bindCell not null.
         if(!bindCell.isEmpty())
         {
             tXmlWriter.writeStartElement(QString("bindvar"));
             tXmlWriter.writeAttribute(QString("xy"),bindCell);
             tXmlWriter.writeAttribute(QString("type"),QString("general"));
+            tXmlWriter.writeAttribute(QString("dataType"),dataType);
+            tXmlWriter.writeAttribute(QString("rule"),rule);
+            tXmlWriter.writeAttribute(QString("refVal"),refVal);
             tXmlWriter.writeCharacters(varName);
             tXmlWriter.writeEndElement();//bindvar.
         }

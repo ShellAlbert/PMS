@@ -44,6 +44,9 @@ private slots:
     void ZSlotOkay();
     void ZSlotCancel();
 private:
+
+    QLabel *m_llOpTips;
+
     QLabel *m_llTaskName;
     QLineEdit *m_leTaskName;
     QLabel *m_llRefTemplateName;
@@ -52,11 +55,16 @@ private:
     QLineEdit *m_leProcessName;
     QLabel *m_llStepName;
     QLineEdit *m_leStepName;
+    QGridLayout *m_gridLayout;
 
     QToolButton *m_tbOkay;
     QToolButton *m_tbCancel;
-    QGridLayout *m_gridLayout;
+    QHBoxLayout *m_hLayoutBtn;
 
+    //main layout
+    QVBoxLayout *m_vLayout;
+
+    //task dialog type.
     TaskInfoDiaType m_diaType;
 
     QString m_taskValueXmlData;

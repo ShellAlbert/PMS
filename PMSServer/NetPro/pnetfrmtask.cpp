@@ -19,7 +19,7 @@ void PNetFrmTask::ZListNewTask(QString roleName)
     QMap<QString,QList<StepInfo*>*> processMap;
     //SELECT `StepName`,`ProcessName`,`LinkTemplates`,`LinkFiles` FROM `pms`.`StepInfo` WHERE ProcessName IN (SELECT ProcessName FROM `pms`.`StepInfo` WHERE LinkRoles='FuckJapanWoman' GROUP BY ProcessName);
     QSqlQuery query(this->m_db);
-    if(roleName==QString("root"))
+    if(roleName==QString("admin"))
     {
         query.prepare("SELECT `StepName`,`ProcessName`,`LinkTemplates`,`LinkFiles` FROM `pms`.`StepInfo` WHERE ProcessName IN (SELECT ProcessName FROM `pms`.`StepInfo` GROUP BY ProcessName)");
     }else{
@@ -146,6 +146,8 @@ void PNetFrmTask::ZListNewTask(QString roleName)
         list=NULL;
     }
     processMap.clear();
+
+    //qDebug()<<this->m_ackNetFrmXmlData;
 }
 void PNetFrmTask::ZListTask(QString creator,qint32 taskState)
 {

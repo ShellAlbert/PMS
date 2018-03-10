@@ -23,6 +23,8 @@ public:
         return m_pInstance;
     }
     void ZLoadCfgFile();
+
+    quint64 ZGetPathSize(QString path);
 public:
     QString m_newVersionNo;
     qint32 m_totalBlock;

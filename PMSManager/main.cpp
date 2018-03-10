@@ -8,6 +8,8 @@
 #include <LoginManager/ploginmanager.h>
 #include <FormDesigner/pformdesigner.h>
 #include <QSettings>
+//the administrator username is admin,not root!!!
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);

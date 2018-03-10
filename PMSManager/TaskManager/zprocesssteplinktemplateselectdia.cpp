@@ -4,7 +4,7 @@
 #include <QMessageBox>
 ZProcessStepLinkTemplateSelectDia::ZProcessStepLinkTemplateSelectDia(QWidget *parent):QDialog(parent)
 {
-    this->setMinimumSize(500,300);
+    this->setMinimumSize(600,300);
 
     this->setWindowTitle(tr("请选择创建任务要引用的模板"));
     this->m_tree=new QTreeWidget;
@@ -16,9 +16,9 @@ ZProcessStepLinkTemplateSelectDia::ZProcessStepLinkTemplateSelectDia(QWidget *pa
     headerList<<tr("关联模板");
     this->m_tree->setHeaderLabels(headerList);
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("Okay"));
+    this->m_tbOkay->setText(tr("OKAY"));
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("Cancel"));
+    this->m_tbCancel->setText(tr("CANCEL"));
     this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
     this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_tbCancel->setIcon(QIcon(":/common/images/common/cancel.png"));

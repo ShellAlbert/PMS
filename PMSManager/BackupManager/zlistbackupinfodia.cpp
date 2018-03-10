@@ -64,10 +64,12 @@ void ZListBackupInfoDia::ZParseAckNetFrmXmlData()
                         QString fileSize=attr.value(QString("fileSize")).toString();
                         QString creator=attr.value(QString("creator")).toString();
                         QString createTime=attr.value(QString("createTime")).toString();
+                        QString pathSize=tXmlReader.readElementText();
                         paraList.append(backupName);
                         paraList.append(fileSize);
                         paraList.append(creator);
                         paraList.append(createTime);
+                        paraList.append(pathSize);
                     }
                     this->ZGetAckNetFrmProcessWidget()->ZProcessAckNetFrm("backup","list",paraList,retCode);
                 }//list.

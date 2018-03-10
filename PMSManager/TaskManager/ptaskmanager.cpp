@@ -884,6 +884,7 @@ void PTaskManager::ZSlotCloseTabWidget(qint32 index)
 }
 void PTaskManager::ZSlotDblClickOpenTask(QModelIndex index)
 {
+    (void)(index);
     this->ZSlotMdyTask();
 }
 void PTaskManager::ZSlotRefreshTaskList(qint32 index)

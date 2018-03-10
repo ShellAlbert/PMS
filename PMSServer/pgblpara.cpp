@@ -29,3 +29,17 @@ void PGblPara::ZLoadCfgFile()
     qDebug()<<"PMSManager binary file:"<<appFileName;
     qDebug()<<"PMSManager new version:"<<this->m_newVersionNo<<"totalBlock:"<<this->m_totalBlock<<"blockSize:"<<this->m_blockSize<<"remainSize:"<<this->m_remainBytes;
 }
+quint64 PGblPara::ZGetPathSize(QString path)
+{
+    QDir dir(path);
+    quint64 size = 0;
+    foreach(QFileInfo fileInfo, dir.entryInfoList(QDir::Files))
+    {
+        size += fileInfo.size();
+    }
+    foreach(QString subDir, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+    {
+        size += this->ZGetPathSize(path + QDir::separator() + subDir);
+    }
+    return size;
+}
