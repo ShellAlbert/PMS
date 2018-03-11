@@ -51,6 +51,13 @@ ZGraphicsView::ZGraphicsView(ZGraphicsView::OpMode mode,QGraphicsScene *parent):
     this->m_moveProxyWidget=NULL;
     this->m_resizeHProxyWidget=NULL;
     this->m_resizeVProxyWidget=NULL;
+
+    //no editable at default.
+    this->m_bEditable=false;
+
+    this->m_scaleFactor=30;
+
+    connect(this,SIGNAL(ZSignalZoom(bool)),this,SLOT(ZSlotZoom(bool)));
 }
 void ZGraphicsView::ZAddRectangle()
 {
@@ -92,8 +99,38 @@ void ZGraphicsView::ZAddBarGraph()
     this->m_opMode=Mode_Add_Bar_Graph;
     this->setCursor(QCursor(QPixmap(":/FormDesigner/images/FormDesigner/LineItem.png")));
 }
+void ZGraphicsView::ZSlotEditable(bool editable)
+{
+    this->m_bEditable=editable;
+}
+void ZGraphicsView::ZSlotZoom(bool zoom)
+{
+    if(zoom && this->m_scaleFactor>=0)
+    {
+        this->m_scaleFactor+=10;
+        QMatrix oldMatrix=this->matrix();
+        this->resetMatrix();
+        this->translate(oldMatrix.dx(),oldMatrix.dy());
+        this->scale(this->m_scaleFactor/100.0,this->m_scaleFactor/100.0);
+    }else if(!zoom && this->m_scaleFactor>=0)
+    {
+        this->m_scaleFactor-=10;
+        QMatrix oldMatrix=this->matrix();
+        this->resetMatrix();
+        this->translate(oldMatrix.dx(),oldMatrix.dy());
+        this->scale(this->m_scaleFactor/100.0,this->m_scaleFactor/100.0);
+    }else if(this->m_scaleFactor<0)
+    {
+        this->m_scaleFactor=0.0;
+    }
+}
 void ZGraphicsView::mousePressEvent(QMouseEvent *event)
 {
+    if(!this->m_bEditable)
+    {
+        return;
+    }
+
     switch(this->m_opMode)
     {
     case Mode_Normal:
@@ -205,6 +242,11 @@ void ZGraphicsView::mousePressEvent(QMouseEvent *event)
 
 void ZGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
+    if(!this->m_bEditable)
+    {
+        return;
+    }
+
     //优先级,优先改变尺寸，然后才是移动。
     if(this->m_bLeftButtonPressed && this->m_resizeHProxyWidget!=NULL)
     {
@@ -264,6 +306,11 @@ void ZGraphicsView::mouseMoveEvent(QMouseEvent *event)
 void ZGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
+    if(!this->m_bEditable)
+    {
+        return;
+    }
+
     this->m_bLeftButtonPressed=false;
     this->m_moveProxyWidget=NULL;
     this->m_opMode=Mode_Normal;
@@ -272,6 +319,11 @@ void ZGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 }
 void ZGraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    if(!this->m_bEditable)
+    {
+        return;
+    }
+
     QGraphicsItem *item=this->itemAt(event->pos());
     if(item==NULL)
     {
@@ -290,8 +342,22 @@ void ZGraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
         widget->ZOpenAttributeDialog();
     }
 }
+void ZGraphicsView::wheelEvent(QWheelEvent *e)
+{
+    if(e->delta()>0)
+    {
+        emit this->ZSignalZoom(true);
+    }else{
+        emit this->ZSignalZoom(false);
+    }
+}
 void ZGraphicsView::keyPressEvent(QKeyEvent *event)
 {
+    if(!this->m_bEditable)
+    {
+        return;
+    }
+
     if(event->key()==Qt::Key_Delete)
     {
         QList<QGraphicsItem*> itemList=this->m_scene->selectedItems();
@@ -309,7 +375,7 @@ ZFormWidget::ZFormWidget()
 {
     this->m_cbEditable=new QCheckBox;
     this->m_cbEditable->setText(tr("编辑模式"));
-    this->m_cbEditable->setChecked(true);
+    this->m_cbEditable->setChecked(false);
 
     this->m_llLeftTop[0]=new QLabel;
     this->m_llLeftTop[0]->setFixedSize(10,10);
@@ -364,6 +430,7 @@ ZFormWidget::ZFormWidget()
     this->m_vLayout->addWidget(this->m_view);
     this->setLayout(this->m_vLayout);
 
+    connect(this->m_cbEditable,SIGNAL(clicked(bool)),this->m_view,SLOT(ZSlotEditable(bool)));
     connect(this->m_view,SIGNAL(ZSignalDataChanged()),this,SIGNAL(ZSignalDataChanged()));
 }
 ZFormWidget::~ZFormWidget()

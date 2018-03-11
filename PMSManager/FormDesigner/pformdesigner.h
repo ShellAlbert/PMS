@@ -55,14 +55,18 @@ public:
     void ZAddText();
     void ZAddLine();
     void ZAddBarGraph();
+public slots:
+    void ZSlotEditable(bool editable);
+    void ZSlotZoom(bool zoom);
 signals:
     void ZSignalDataChanged();
+    void ZSignalZoom(bool zoom);
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
-
+    void wheelEvent(QWheelEvent *e);
     void keyPressEvent(QKeyEvent *event);
 private:
     OpMode m_opMode;
@@ -73,6 +77,10 @@ private:
     QPoint m_startPos;
     QGraphicsProxyWidget *m_resizeHProxyWidget;
     QGraphicsProxyWidget *m_resizeVProxyWidget;
+
+private:
+    bool m_bEditable;
+    qint32 m_scaleFactor;
 };
 class ZFormWidget:public QFrame
 {

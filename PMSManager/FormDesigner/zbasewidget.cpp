@@ -4,7 +4,7 @@ ZBaseWidget::ZBaseWidget()
 {
     this->setStyleSheet("QFrame{background-color:transparent;}");
     this->m_vLayout=new QVBoxLayout;
-    this->m_vLayout->setMargin(0);
+    this->m_vLayout->setContentsMargins(0,0,0,0);
     this->setLayout(this->m_vLayout);
     this->m_editMode=false;
 }
