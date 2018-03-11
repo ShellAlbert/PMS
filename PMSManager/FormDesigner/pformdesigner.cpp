@@ -102,6 +102,27 @@ void ZGraphicsView::ZAddBarGraph()
 void ZGraphicsView::ZSlotEditable(bool editable)
 {
     this->m_bEditable=editable;
+    if(!this->m_bEditable)
+    {
+        //deSelect all elements.
+        QList<QGraphicsItem*> list=this->scene()->items();
+        for(qint32 i=0;i<list.count();i++)
+        {
+            QGraphicsItem* item=list.at(i);
+            if(item->type()==QGraphicsProxyWidget::Type)
+            {
+                QGraphicsProxyWidget *proxyWid=qgraphicsitem_cast<QGraphicsProxyWidget*>(item);
+                if(proxyWid)
+                {
+                    ZBaseWidget *bw=qobject_cast<ZBaseWidget*>(proxyWid->widget());
+                    if(bw)
+                    {
+                        bw->ZSetEditMode(false);
+                    }
+                }
+            }
+        }
+    }
 }
 void ZGraphicsView::ZSlotZoom(bool zoom)
 {
@@ -458,6 +479,10 @@ ZFormWidget::~ZFormWidget()
     delete this->m_scene;
     delete this->m_view;
     delete this->m_vLayout;
+}
+bool ZFormWidget::ZIsEditable()
+{
+    return this->m_cbEditable->isChecked();
 }
 QString ZFormWidget::ZGetFormName()
 {
@@ -1076,6 +1101,10 @@ void PFormDesigner::ZSlotSelectAll()
     {
         return;
     }
+    if(!widget->ZIsEditable())
+    {
+        return;
+    }
     QList<QGraphicsItem*> list=widget->m_scene->items();
     for(qint32 i=0;i<list.count();i++)
     {
@@ -1136,6 +1165,10 @@ void PFormDesigner::ZSlotAddRectangle()
     {
         return;
     }
+    if(!widget->ZIsEditable())
+    {
+        return;
+    }
     widget->m_view->ZAddRectangle();
     emit this->ZSignalLogMsg(tr("Add new Rectangle item."));
 }
@@ -1147,6 +1180,10 @@ void PFormDesigner::ZSlotAddCheckBox()
     }
     ZFormWidget *widget=qobject_cast<ZFormWidget*>(this->m_tabWidget->currentWidget());
     if(widget==NULL)
+    {
+        return;
+    }
+    if(!widget->ZIsEditable())
     {
         return;
     }
@@ -1164,6 +1201,10 @@ void PFormDesigner::ZSlotAddSpinBox()
     {
         return;
     }
+    if(!widget->ZIsEditable())
+    {
+        return;
+    }
     widget->m_view->ZAddSpinBox();
     emit this->ZSignalLogMsg(tr("Add new SpinBox item."));
 }
@@ -1175,6 +1216,10 @@ void PFormDesigner::ZSlotAddDateTimeEdit()
     }
     ZFormWidget *widget=qobject_cast<ZFormWidget*>(this->m_tabWidget->currentWidget());
     if(widget==NULL)
+    {
+        return;
+    }
+    if(!widget->ZIsEditable())
     {
         return;
     }
@@ -1192,6 +1237,10 @@ void PFormDesigner::ZSlotAddTable()
     {
         return;
     }
+    if(!widget->ZIsEditable())
+    {
+        return;
+    }
     widget->m_view->ZAddTable();
     emit this->ZSignalLogMsg(tr("Add new Table item."));
 }
@@ -1206,6 +1255,10 @@ void PFormDesigner::ZSlotAddText()
     {
         return;
     }
+    if(!widget->ZIsEditable())
+    {
+        return;
+    }
     widget->m_view->ZAddText();
     emit this->ZSignalLogMsg(tr("Add new Text item."));
 }
@@ -1217,6 +1270,10 @@ void PFormDesigner::ZSlotAddLine()
     }
     ZFormWidget *widget=qobject_cast<ZFormWidget*>(this->m_tabWidget->currentWidget());
     if(widget==NULL)
+    {
+        return;
+    }
+    if(!widget->ZIsEditable())
     {
         return;
     }
@@ -1264,6 +1321,10 @@ void PFormDesigner::ZSlotBarGraph()
     {
         return;
     }
+    if(!widget->ZIsEditable())
+    {
+        return;
+    }
     widget->m_view->ZAddBarGraph();
     emit this->ZSignalLogMsg(tr("Add new barGraph item."));
 }
@@ -1273,9 +1334,28 @@ void PFormDesigner::ZSlotPieGraph()
 }
 void PFormDesigner::ZSlotPrint()
 {
+#if 0
     QPrintDialog dia(this);
     connect(&dia,SIGNAL(accepted(QPrinter*)),this,SLOT(ZSlotDoPrinter(QPrinter*)));
     dia.exec();
+#endif
+    if(this->m_tabWidget->currentIndex()==0)
+    {
+        return;
+    }
+    ZFormWidget *widget=qobject_cast<ZFormWidget*>(this->m_tabWidget->currentWidget());
+    if(widget==NULL)
+    {
+        return;
+    }
+
+    QImage img(widget->m_view->width(),widget->m_view->height(),QImage::Format_ARGB32);
+    img.fill(Qt::white);
+    QString pngFileName("report.png");
+    QPainter painter(&img);
+    painter.setRenderHint(QPainter::Antialiasing);
+    widget->m_view->render(&painter);
+    img.save(pngFileName);
 }
 void PFormDesigner::ZSlotPrintView()
 {

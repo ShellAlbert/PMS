@@ -18,6 +18,9 @@ public:
 
     QColor ZGetBackgroundColor();
     void ZSetBackgroundColor(QColor color);
+
+    void ZSetXYSize(qint32 x,qint32 y,qint32 width,qint32 height);
+    void ZGetXYSize(qint32 *x,qint32 *y,qint32 *width,qint32 *height);
 private slots:
     void ZSlotChangeColor();
 private:
@@ -25,9 +28,21 @@ private:
     QLineEdit *m_leColor;
     QToolButton *m_tbChange;
 
+    QLabel *m_llX;
+    QLineEdit *m_leX;
+    QLabel *m_llY;
+    QLineEdit *m_leY;
+    QLabel *m_llWidth;
+    QLineEdit *m_leWidth;
+    QLabel *m_llHeight;
+    QLineEdit *m_leHeight;
+    QGridLayout *m_gridLayout;
+
+
     QToolButton *m_tbOkay;
     QToolButton *m_tbCancel;
-    QGridLayout *m_gridLayout;
+    QHBoxLayout *m_hLayout;
+    QVBoxLayout *m_vLayout;
 
     QColor m_color;
 };

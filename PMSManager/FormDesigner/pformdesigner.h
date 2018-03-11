@@ -94,6 +94,8 @@ public:
 
     QString ZGetXmlData();
     void ZPutXmlData(QString formXmlData);
+
+    bool ZIsEditable();
 signals:
     void ZSignalDataChanged();
 protected:
