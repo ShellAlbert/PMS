@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QGridLayout>
+#include <QGraphicsRectItem>
 class ZRectangleDialog:public QDialog
 {
     Q_OBJECT
@@ -30,17 +31,6 @@ private:
 
     QColor m_color;
 };
-class ZRectangleItem:public QWidget
-{
-public:
-    ZRectangleItem();
-    QColor ZGetColor();
-    void ZSetColor(QColor color);
-protected:
-    void paintEvent(QPaintEvent *e);
-private:
-    QColor m_color;
-};
 class ZRectangleWidget : public ZBaseWidget
 {
     Q_OBJECT
@@ -48,7 +38,11 @@ public:
     ZRectangleWidget();
     ~ZRectangleWidget();
     void ZOpenAttributeDialog();
-public:
-    ZRectangleItem *m_rectItem;
+    QColor ZGetColor();
+    void ZSetColor(QColor color);
+protected:
+    void paintEvent(QPaintEvent *e);
+private:
+    QColor m_color;
 };
 #endif // ZRECTANGLEWIDGET_H

@@ -11,7 +11,7 @@ public:
     ZCheckBoxWidget();
     ~ZCheckBoxWidget();
     void ZOpenAttributeDialog();
-private:
+public:
     QCheckBox *m_cb;
 };
 #endif // ZCHECKBOXWIDGET_H

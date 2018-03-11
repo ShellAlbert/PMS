@@ -14,9 +14,9 @@ ZRectangleDialog::ZRectangleDialog(QWidget *parent):QDialog(parent)
     this->m_tbChange->setText(tr("更改..."));
 
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("Okay"));
+    this->m_tbOkay->setText(tr("OKAY"));
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("Cancel"));
+    this->m_tbCancel->setText(tr("CANCEL"));
 
     this->m_gridLayout=new QGridLayout;
     this->m_gridLayout->addWidget(this->m_llColor,0,0,1,1);
@@ -57,39 +57,52 @@ void ZRectangleDialog::ZSetBackgroundColor(QColor color)
     this->m_leColor->setText(tr("%1,%2,%3").arg(color.red()).arg(color.green()).arg(color.blue()));
     this->m_leColor->setStyleSheet(QString("QLineEdit{background-color:rgb(%1,%2,%3);}").arg(color.red()).arg(color.green()).arg(color.blue()));
 }
-ZRectangleItem::ZRectangleItem()
-{
-    this->m_color=QColor(0,0,0);
-}
-QColor ZRectangleItem::ZGetColor()
-{
-    return this->m_color;
-}
-void ZRectangleItem::ZSetColor(QColor color)
-{
-    this->m_color=color;
-}
-void ZRectangleItem::paintEvent(QPaintEvent *e)
-{
-    QPainter painter(this);
-    painter.fillRect(QRect(0,0,this->width(),this->height()),this->m_color);
-}
 ZRectangleWidget::ZRectangleWidget()
 {
-    this->m_rectItem=new ZRectangleItem;
-    this->m_rectItem->setMinimumSize(50,25);
-    this->m_vLayout->addWidget(this->m_rectItem);
+    this->setMinimumSize(60,30);
 }
 ZRectangleWidget::~ZRectangleWidget()
 {
-    delete this->m_rectItem;
+
 }
 void ZRectangleWidget::ZOpenAttributeDialog()
 {
     ZRectangleDialog dia;
-    dia.ZSetBackgroundColor(this->m_rectItem->ZGetColor());
+    dia.ZSetBackgroundColor(this->ZGetColor());
     if(dia.exec()==QDialog::Accepted)
     {
-        this->m_rectItem->ZSetColor(dia.ZGetBackgroundColor());
+        this->m_color=dia.ZGetBackgroundColor();
+        this->update();
+    }
+}
+QColor ZRectangleWidget::ZGetColor()
+{
+    return this->m_color;
+}
+void ZRectangleWidget::ZSetColor(QColor color)
+{
+    this->m_color=color;
+    this->update();
+}
+void ZRectangleWidget::paintEvent(QPaintEvent *e)
+{
+    Q_UNUSED(e);
+    QPainter painter(this);
+    painter.fillRect(QRectF(0,0,this->width(),this->height()),QBrush(this->m_color));
+
+    //call the parent's event.
+    if(this->m_editMode)
+    {
+        QRect LeftTop(0,0,10,10);
+        painter.fillRect(LeftTop,Qt::red);
+
+        QRect RightTop(this->width()-10,0,10,10);
+        painter.fillRect(RightTop,Qt::blue);
+
+        QRect LeftBottom(0,this->height()-10,10,10);
+        painter.fillRect(LeftBottom,Qt::green);
+
+        QRect RightBottom(this->width()-10,this->height()-10,10,10);
+        painter.fillRect(RightBottom,Qt::yellow);
     }
 }

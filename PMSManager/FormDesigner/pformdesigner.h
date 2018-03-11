@@ -42,6 +42,7 @@ public:
         Mode_Add_Text=5,
         Mode_Add_Line=6,
         Mode_Add_Rectangle=7,
+        Mode_Add_Bar_Graph=8,
     }OpMode;
 
     ZGraphicsView(OpMode mode=Mode_Normal,QGraphicsScene *parent=0);
@@ -53,6 +54,7 @@ public:
     void ZAddTable();
     void ZAddText();
     void ZAddLine();
+    void ZAddBarGraph();
 signals:
     void ZSignalDataChanged();
 protected:
@@ -60,6 +62,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
+
+    void keyPressEvent(QKeyEvent *event);
 private:
     OpMode m_opMode;
     QGraphicsScene *m_scene;
@@ -88,6 +92,7 @@ protected:
     void resizeEvent(QResizeEvent *event);
 public:
     QHBoxLayout *m_hLayout;
+    QCheckBox *m_cbEditable;
     QLabel *m_llLeftTop[2];
     QLabel *m_llLeftBottom[2];
     QLabel *m_llRightTop[2];
@@ -133,6 +138,9 @@ private slots:
     void ZSlotSelectAll();
     void ZSlotDeSelectAll();
 
+    void ZSlotBarGraph();
+    void ZSlotPieGraph();
+
     void ZSlotPrint();
     void ZSlotPrintView();
     void ZSlotDoPrinter(QPrinter *printer);
@@ -165,6 +173,11 @@ private:
     QMenu *m_menuSelect;
     QAction *m_actSelectAll;
     QAction *m_actDeSelectAll;
+
+    QToolButton *m_tbDiagram;
+    QMenu *m_menuDiagram;
+    QAction *m_actBarGraph;
+    QAction *m_actPieGraph;
 
     QToolButton *m_tbPrintView;
     QToolButton *m_tbPrint;

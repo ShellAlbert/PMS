@@ -15,10 +15,12 @@
 #include <FormDesigner/ztablewidget.h>
 #include <FormDesigner/zforminfodia.h>
 #include <FormDesigner/zlistforminfodia.h>
+#include <FormDesigner/zbargraphwidget.h>
 #include <QtPrintSupport/QPrintPreviewDialog>
 #include <QtPrintSupport/QPrintDialog>
 #include <QXmlStreamWriter>
 #include <QMessageBox>
+#include <QGraphicsItem>
 #include "pgblpara.h"
 ZFormList::ZFormList()
 {
@@ -85,6 +87,11 @@ void ZGraphicsView::ZAddLine()
     this->m_opMode=Mode_Add_Line;
     this->setCursor(QCursor(QPixmap(":/FormDesigner/images/FormDesigner/LineItem.png")));
 }
+void ZGraphicsView::ZAddBarGraph()
+{
+    this->m_opMode=Mode_Add_Bar_Graph;
+    this->setCursor(QCursor(QPixmap(":/FormDesigner/images/FormDesigner/LineItem.png")));
+}
 void ZGraphicsView::mousePressEvent(QMouseEvent *event)
 {
     switch(this->m_opMode)
@@ -97,13 +104,42 @@ void ZGraphicsView::mousePressEvent(QMouseEvent *event)
             this->m_moveProxyWidget=qgraphicsitem_cast<QGraphicsProxyWidget*>(item);
             if(this->m_moveProxyWidget!=NULL)
             {
+                //select it.
+                ZBaseWidget *bw=qobject_cast<ZBaseWidget*>(this->m_moveProxyWidget->widget());
+                if(bw)
+                {
+                    bw->ZSetEditMode(true);
+                }
+
+                //if we choose a element,then move it to new pos.
                 this->m_startPos.setX(event->pos().x()-this->m_moveProxyWidget->widget()->x());
                 this->m_startPos.setY(event->pos().y()-this->m_moveProxyWidget->widget()->y());
+            }else{
+                //we click at a empty pos,deselect all elements.
+                //set all editable to fix mode.
+                QList<QGraphicsItem*> list=this->scene()->items();
+                for(qint32 i=0;i<list.count();i++)
+                {
+                    QGraphicsItem* item=list.at(i);
+                    if(item->type()==QGraphicsProxyWidget::Type)
+                    {
+                        QGraphicsProxyWidget *proxyWid=qgraphicsitem_cast<QGraphicsProxyWidget*>(item);
+                        if(proxyWid)
+                        {
+                            ZBaseWidget *bw=qobject_cast<ZBaseWidget*>(proxyWid->widget());
+                            if(bw)
+                            {
+                                bw->ZSetEditMode(false);
+                            }
+                        }
+                    }
+                }
             }
         }
         break;
     case Mode_Add_Line:
     {
+        //add a line element to view.
         ZLineWidget *lw=new ZLineWidget;
         QGraphicsProxyWidget  *proxy=this->m_scene->addWidget(lw);
         proxy->setPos(event->pos());
@@ -111,6 +147,7 @@ void ZGraphicsView::mousePressEvent(QMouseEvent *event)
         break;
     case Mode_Add_Rectangle:
     {
+        //add a rectange element to view.
         ZRectangleWidget *lw=new ZRectangleWidget;
         QGraphicsProxyWidget  *proxy=this->m_scene->addWidget(lw);
         proxy->setPos(event->pos());
@@ -118,6 +155,7 @@ void ZGraphicsView::mousePressEvent(QMouseEvent *event)
         break;
     case Mode_Add_Text:
     {
+        //add a text element to view.
         ZTextWidget *tw=new ZTextWidget;
         QGraphicsProxyWidget  *proxy=this->m_scene->addWidget(tw);
         proxy->setPos(event->pos());
@@ -125,6 +163,7 @@ void ZGraphicsView::mousePressEvent(QMouseEvent *event)
         break;
     case Mode_Add_CheckBox:
     {
+        //add a checkbox element to view.
         ZCheckBoxWidget *cbw=new ZCheckBoxWidget;
         QGraphicsProxyWidget  *proxy=this->m_scene->addWidget(cbw);
         proxy->setPos(event->pos());
@@ -148,6 +187,13 @@ void ZGraphicsView::mousePressEvent(QMouseEvent *event)
     {
         ZTableWidget *tw=new ZTableWidget;
         QGraphicsProxyWidget  *proxy=this->m_scene->addWidget(tw);
+        proxy->setPos(event->pos());
+    }
+        break;
+    case Mode_Add_Bar_Graph:
+    {
+        ZBarGraphWidget *bgw=new ZBarGraphWidget;
+        QGraphicsProxyWidget  *proxy=this->m_scene->addWidget(bgw);
         proxy->setPos(event->pos());
     }
         break;
@@ -176,19 +222,25 @@ void ZGraphicsView::mouseMoveEvent(QMouseEvent *event)
         QGraphicsProxyWidget *widget=qgraphicsitem_cast<QGraphicsProxyWidget*>(item);
         if(widget)
         {
-            qint32 curX=event->pos().x();
-            qint32 curY=event->pos().y();
-            qint32 widthRangeXMin=widget->x()+widget->geometry().width()-10;
-            qint32 widthRangeXMax=widget->x()+widget->geometry().width()+10;
-            qint32 widthRangeYMin=widget->y();
-            qint32 widthRangeYMax=widget->y()+widget->geometry().height();
+            //map to scene coordinates.
+            QPointF eventPosScene=this->mapToScene(event->pos());
+            QPointF widgetPosScene=item->mapToScene(item->pos());
+            qDebug()<<"eventPos:"<<eventPosScene<<",itemPos:"<<widgetPosScene;
+
+            qint32 curX=eventPosScene.x();
+            qint32 curY=eventPosScene.y();
+
+            qint32 widthRangeXMin=widgetPosScene.x()+widget->geometry().width()-10;
+            qint32 widthRangeXMax=widgetPosScene.x()+widget->geometry().width()+10;
+            qint32 widthRangeYMin=widgetPosScene.y();
+            qint32 widthRangeYMax=widgetPosScene.y()+widget->geometry().height();
             qDebug()<<"x:"<<curX<<widthRangeXMin<<widthRangeXMax;
             qDebug()<<"y:"<<curY<<widthRangeYMin<<widthRangeYMax;
 
-            qint32 heightRangeXMin=widget->x();
-            qint32 heightRangeXMax=widget->x()+widget->geometry().width();
-            qint32 heightRangeYMin=widget->y()+widget->geometry().height()-10;
-            qint32 heightRangeYMax=widget->y()+widget->geometry().height()+10;
+            qint32 heightRangeXMin=widgetPosScene.x();
+            qint32 heightRangeXMax=widgetPosScene.x()+widget->geometry().width();
+            qint32 heightRangeYMin=widgetPosScene.y()+widget->geometry().height()-10;
+            qint32 heightRangeYMax=widgetPosScene.y()+widget->geometry().height()+10;
             if(curX>widthRangeXMin && curX<widthRangeXMax && curY >widthRangeYMin && curY<widthRangeYMax)
             {
                 this->setCursor(Qt::SizeHorCursor);
@@ -211,6 +263,7 @@ void ZGraphicsView::mouseMoveEvent(QMouseEvent *event)
 }
 void ZGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event);
     this->m_bLeftButtonPressed=false;
     this->m_moveProxyWidget=NULL;
     this->m_opMode=Mode_Normal;
@@ -233,11 +286,31 @@ void ZGraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
     ZBaseWidget *widget=qobject_cast<ZBaseWidget*>(proxy->widget());
     if(widget)
     {
+        widget->ZSetEditMode(true);
         widget->ZOpenAttributeDialog();
+    }
+}
+void ZGraphicsView::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key()==Qt::Key_Delete)
+    {
+        QList<QGraphicsItem*> itemList=this->m_scene->selectedItems();
+        for(qint32 i=0;i<itemList.size();i++)
+        {
+            QGraphicsItem *item=itemList.at(i);
+            this->m_scene->removeItem(item);
+            delete item;
+            item=NULL;
+        }
+        itemList.clear();
     }
 }
 ZFormWidget::ZFormWidget()
 {
+    this->m_cbEditable=new QCheckBox;
+    this->m_cbEditable->setText(tr("编辑模式"));
+    this->m_cbEditable->setChecked(true);
+
     this->m_llLeftTop[0]=new QLabel;
     this->m_llLeftTop[0]->setFixedSize(10,10);
     this->m_llLeftTop[0]->setStyleSheet("QLabel{background-color:red;}");
@@ -271,6 +344,7 @@ ZFormWidget::ZFormWidget()
     this->m_cbPageSize->addItem("A3");
     this->m_hLayout=new QHBoxLayout;
     this->m_hLayout->addStretch(1);
+    this->m_hLayout->addWidget(this->m_cbEditable);
     this->m_hLayout->addWidget(this->m_llLeftTop[0]);
     this->m_hLayout->addWidget(this->m_llLeftTop[1]);
     this->m_hLayout->addWidget(this->m_llLeftBottom[0]);
@@ -302,6 +376,7 @@ ZFormWidget::~ZFormWidget()
         item=NULL;
     }
 
+    delete this->m_cbEditable;
     delete this->m_llLeftTop[0];
     delete this->m_llLeftTop[1];
     delete this->m_llLeftBottom[0];
@@ -348,8 +423,8 @@ QString ZFormWidget::ZGetXmlData()
                     tXmlWriter.writeStartElement(QString("Line"));
                     tXmlWriter.writeAttribute(QString("x"),QString("%1").arg(lw->x()));
                     tXmlWriter.writeAttribute(QString("y"),QString("%1").arg(lw->y()));
-                    tXmlWriter.writeAttribute(QString("width"),QString("%1").arg(lw->width()));
-                    tXmlWriter.writeAttribute(QString("height"),QString("%1").arg(lw->height()));
+                    tXmlWriter.writeAttribute(QString("width"),QString("%1").arg(lw->rect().width()));
+                    tXmlWriter.writeAttribute(QString("height"),QString("%1").arg(lw->rect().height()));
                     tXmlWriter.writeAttribute(QString("lw"),QString("%1").arg(lw->m_lineItem->ZGetWidth()));
                     QColor color=lw->m_lineItem->ZGetColor();
                     tXmlWriter.writeCharacters(QString("%1,%2,%3").arg(color.red()).arg(color.green()).arg(color.blue()));
@@ -361,9 +436,9 @@ QString ZFormWidget::ZGetXmlData()
                     tXmlWriter.writeStartElement(QString("Rectangle"));
                     tXmlWriter.writeAttribute(QString("x"),QString("%1").arg(rw->x()));
                     tXmlWriter.writeAttribute(QString("y"),QString("%1").arg(rw->y()));
-                    tXmlWriter.writeAttribute(QString("width"),QString("%1").arg(rw->width()));
-                    tXmlWriter.writeAttribute(QString("height"),QString("%1").arg(rw->height()));
-                    QColor color=rw->m_rectItem->ZGetColor();
+                    tXmlWriter.writeAttribute(QString("width"),QString("%1").arg(rw->rect().width()));
+                    tXmlWriter.writeAttribute(QString("height"),QString("%1").arg(rw->rect().height()));
+                    QColor color=rw->ZGetColor();
                     tXmlWriter.writeCharacters(QString("%1,%2,%3").arg(color.red()).arg(color.green()).arg(color.blue()));
                     tXmlWriter.writeEndElement();//Rectangle.
                 }
@@ -373,14 +448,37 @@ QString ZFormWidget::ZGetXmlData()
                     tXmlWriter.writeStartElement(QString("Text"));
                     tXmlWriter.writeAttribute(QString("x"),QString("%1").arg(tw->x()));
                     tXmlWriter.writeAttribute(QString("y"),QString("%1").arg(tw->y()));
-                    tXmlWriter.writeAttribute(QString("width"),QString("%1").arg(tw->width()));
-                    tXmlWriter.writeAttribute(QString("height"),QString("%1").arg(tw->height()));
+                    tXmlWriter.writeAttribute(QString("width"),QString("%1").arg(tw->rect().width()));
+                    tXmlWriter.writeAttribute(QString("height"),QString("%1").arg(tw->rect().height()));
                     tXmlWriter.writeAttribute(QString("fontName"),tw->m_fontName);
                     tXmlWriter.writeAttribute(QString("fontSize"),QString("%1").arg(tw->m_fontSize));
                     tXmlWriter.writeAttribute(QString("bold"),QString("%1").arg(tw->m_fontBold?1:0));
                     tXmlWriter.writeAttribute(QString("italic"),QString("%1").arg(tw->m_fontItalic?1:0));
                     tXmlWriter.writeCharacters(tw->m_llText->text());
                     tXmlWriter.writeEndElement();//Text.
+                }
+                ZCheckBoxWidget *cbw=qobject_cast<ZCheckBoxWidget*>(proxyWid->widget());
+                if(cbw)
+                {
+                    tXmlWriter.writeStartElement(QString("CheckBox"));
+                    tXmlWriter.writeAttribute(QString("x"),QString("%1").arg(cbw->x()));
+                    tXmlWriter.writeAttribute(QString("y"),QString("%1").arg(cbw->y()));
+                    tXmlWriter.writeAttribute(QString("width"),QString("%1").arg(cbw->rect().width()));
+                    tXmlWriter.writeAttribute(QString("height"),QString("%1").arg(cbw->rect().height()));
+                    tXmlWriter.writeAttribute(QString("checked"),cbw->m_cb->isChecked()?"1":"0");
+                    tXmlWriter.writeCharacters(cbw->m_cb->text());
+                    tXmlWriter.writeEndElement();//CheckBox.
+                }
+                ZBarGraphWidget *bgw=qobject_cast<ZBarGraphWidget*>(proxyWid->widget());
+                if(bgw)
+                {
+                    tXmlWriter.writeStartElement(QString("BarGraph"));
+                    tXmlWriter.writeAttribute(QString("x"),QString("%1").arg(bgw->x()));
+                    tXmlWriter.writeAttribute(QString("y"),QString("%1").arg(bgw->y()));
+                    tXmlWriter.writeAttribute(QString("width"),QString("%1").arg(bgw->rect().width()));
+                    tXmlWriter.writeAttribute(QString("height"),QString("%1").arg(bgw->rect().height()));
+                    tXmlWriter.writeCharacters("title");
+                    tXmlWriter.writeEndElement();//BarGraph.
                 }
             }
         }
@@ -453,8 +551,35 @@ void ZFormWidget::ZPutXmlData(QString formXmlData)
                 qint32 blue=colorList.at(2).toInt();
                 ZRectangleWidget *rw=new ZRectangleWidget;
                 rw->setFixedSize(width,height);
-                rw->m_rectItem->ZSetColor(QColor(red,green,blue));
+                rw->ZSetColor(QColor(red,green,blue));
                 QGraphicsProxyWidget  *proxy=this->m_scene->addWidget(rw);
+                proxy->setPos(x,y);
+            }else if(nodeName==QString("CheckBox"))
+            {
+                QXmlStreamAttributes attr=tXmlReader.attributes();
+                qint32 x=attr.value(QString("x")).toInt();
+                qint32 y=attr.value(QString("y")).toInt();
+                qint32 width=attr.value(QString("width")).toInt();
+                qint32 height=attr.value(QString("height")).toInt();
+                qint32 checked=attr.value(QString("checked")).toInt();
+                QString text=tXmlReader.readElementText();
+                ZCheckBoxWidget *cbw=new ZCheckBoxWidget;
+                cbw->setFixedSize(width,height);
+                cbw->m_cb->setText(text);
+                cbw->m_cb->setChecked(checked?true:false);
+                QGraphicsProxyWidget  *proxy=this->m_scene->addWidget(cbw);
+                proxy->setPos(x,y);
+            }else if(nodeName==QString("BarGraph"))
+            {
+                QXmlStreamAttributes attr=tXmlReader.attributes();
+                qint32 x=attr.value(QString("x")).toInt();
+                qint32 y=attr.value(QString("y")).toInt();
+                qint32 width=attr.value(QString("width")).toInt();
+                qint32 height=attr.value(QString("height")).toInt();
+                QString text=tXmlReader.readElementText();
+                ZBarGraphWidget *bgw=new ZBarGraphWidget;
+                bgw->setFixedSize(width,height);
+                QGraphicsProxyWidget  *proxy=this->m_scene->addWidget(bgw);
                 proxy->setPos(x,y);
             }//nodeName.
         }//StarElement.
@@ -469,9 +594,9 @@ PFormDesigner::PFormDesigner()
 {
     this->setWindowTitle(tr("报表生成器-Form Designer"));
     this->setWindowIcon(QIcon(":/TaskBar/images/FormDesigner.png"));
-//    this->setStyleSheet("QToolButton{background-color:#cce5f9;font:color #eaf7ff;padding: 6px 12px 6px 12p}"
-//                        "QToolButton::hover{background-color:#eaf7ff;}"
-//                        "");
+    //    this->setStyleSheet("QToolButton{background-color:#cce5f9;font:color #eaf7ff;padding: 6px 12px 6px 12p}"
+    //                        "QToolButton::hover{background-color:#eaf7ff;}"
+    //                        "");
     this->setStyleSheet("QToolButton{background-color:#cce5f9;border:none;font:color #eaf7ff;}"
                         "QToolButton::hover{background-color:#eaf7ff;}"
                         "");
@@ -543,6 +668,21 @@ PFormDesigner::PFormDesigner()
     this->m_tbSelect->setMenu(this->m_menuSelect);
     this->m_tbSelect->setPopupMode(QToolButton::InstantPopup);
 
+    this->m_tbDiagram=new QToolButton;
+    this->m_tbDiagram->setToolTip(tr("汇总图表"));
+    this->m_tbDiagram->setText(tr("图表"));
+    this->m_tbDiagram->setIcon(QIcon(":/FormDesigner/images/FormDesigner/PrintPreview.png"));
+    this->m_tbDiagram->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_actBarGraph=new QAction(QIcon(":/FormDesigner/images/FormDesigner/SelectAll.png"),tr("柱状图"),0);
+    this->m_actPieGraph=new QAction(QIcon(":/FormDesigner/images/FormDesigner/DeSelectAll.png"),tr("饼图"),0);
+    connect(this->m_actBarGraph,SIGNAL(triggered(bool)),this,SLOT(ZSlotBarGraph()));
+    connect(this->m_actPieGraph,SIGNAL(triggered(bool)),this,SLOT(ZSlotPieGraph()));
+    this->m_menuDiagram=new QMenu;
+    this->m_menuDiagram->addAction(this->m_actBarGraph);
+    this->m_menuDiagram->addAction(this->m_actPieGraph);
+    this->m_tbDiagram->setMenu(this->m_menuDiagram);
+    this->m_tbDiagram->setPopupMode(QToolButton::InstantPopup);
+
     this->m_tbPrintView=new QToolButton;
     this->m_tbPrintView->setToolTip(tr("打印预览"));
     this->m_tbPrintView->setText(tr("预览"));
@@ -561,6 +701,7 @@ PFormDesigner::PFormDesigner()
     this->m_vLayoutTb->addWidget(this->m_tbFormOp);
     this->m_vLayoutTb->addWidget(this->m_tbFormComponent);
     this->m_vLayoutTb->addWidget(this->m_tbSelect);
+    this->m_vLayoutTb->addWidget(this->m_tbDiagram);
     this->m_vLayoutTb->addWidget(this->m_tbPrintView);
     this->m_vLayoutTb->addWidget(this->m_tbPrint);
 
@@ -608,6 +749,11 @@ PFormDesigner::~PFormDesigner()
     delete this->m_actDeSelectAll;
     delete this->m_menuSelect;
     delete this->m_tbSelect;
+
+    delete this->m_actBarGraph;
+    delete this->m_actPieGraph;
+    delete this->m_menuDiagram;
+    delete this->m_tbDiagram;
 
     delete this->m_tbPrint;
     delete this->m_tbPrintView;
@@ -1040,6 +1186,24 @@ void PFormDesigner::ZSlotCloseTab(qint32 index)
     this->m_tabWidget->removeTab(index);
     delete this->m_tabWidget->widget(index);
 }
+void PFormDesigner::ZSlotBarGraph()
+{
+    if(this->m_tabWidget->currentIndex()==0)
+    {
+        return;
+    }
+    ZFormWidget *widget=qobject_cast<ZFormWidget*>(this->m_tabWidget->currentWidget());
+    if(widget==NULL)
+    {
+        return;
+    }
+    widget->m_view->ZAddBarGraph();
+    emit this->ZSignalLogMsg(tr("Add new barGraph item."));
+}
+void PFormDesigner::ZSlotPieGraph()
+{
+
+}
 void PFormDesigner::ZSlotPrint()
 {
     QPrintDialog dia(this);
@@ -1063,6 +1227,7 @@ void PFormDesigner::ZSlotDoPrinter(QPrinter *printer)
     {
         return;
     }
+#if 0
     QPainter painter(printer);
     //print all element in scene.
     QList<QGraphicsItem*> list=widget->m_scene->items();
@@ -1086,7 +1251,7 @@ void PFormDesigner::ZSlotDoPrinter(QPrinter *printer)
                 ZRectangleWidget *rw=qobject_cast<ZRectangleWidget*>(proxyWid->widget());
                 if(rw)
                 {
-                    painter.fillRect(QRectF(rw->x(),rw->y(),rw->width(),rw->height()),rw->m_rectItem->ZGetColor());
+                    painter.fillRect(QRectF(rw->x(),rw->y(),rw->width(),rw->height()),rw->ZGetColor());
                 }
                 ZTextWidget *tw=qobject_cast<ZTextWidget*>(proxyWid->widget());
                 if(tw)
@@ -1096,4 +1261,5 @@ void PFormDesigner::ZSlotDoPrinter(QPrinter *printer)
             }
         }
     }
+#endif
 }

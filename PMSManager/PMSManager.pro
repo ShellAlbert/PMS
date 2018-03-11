@@ -80,7 +80,8 @@ SOURCES += main.cpp\
     FormDesigner/zlistforminfodia.cpp \
     BackupManager/zbackupmanager.cpp \
     BackupManager/zbackupinfodia.cpp \
-    BackupManager/zlistbackupinfodia.cpp
+    BackupManager/zlistbackupinfodia.cpp \
+    FormDesigner/zbargraphwidget.cpp
 
 HEADERS  += pmainwin.h \
     UserManager/pusermanagerwin.h \
@@ -147,7 +148,8 @@ HEADERS  += pmainwin.h \
     FormDesigner/zlistforminfodia.h \
     BackupManager/zbackupmanager.h \
     BackupManager/zbackupinfodia.h \
-    BackupManager/zlistbackupinfodia.h
+    BackupManager/zlistbackupinfodia.h \
+    FormDesigner/zbargraphwidget.h
 
 RESOURCES += \
     pms.qrc

@@ -4,7 +4,7 @@ ZBaseWidget::ZBaseWidget()
 {
     this->setStyleSheet("QFrame{background-color:transparent;}");
     this->m_vLayout=new QVBoxLayout;
-    this->m_vLayout->setMargin(10);
+    this->m_vLayout->setMargin(0);
     this->setLayout(this->m_vLayout);
     this->m_editMode=false;
 }
@@ -15,12 +15,6 @@ ZBaseWidget::~ZBaseWidget()
 void ZBaseWidget::ZSetEditMode(bool edit)
 {
     this->m_editMode=edit;
-    if(this->m_editMode)
-    {
-        this->m_vLayout->setMargin(10);
-    }else{
-        this->m_vLayout->setMargin(0);
-    }
     this->update();
 }
 bool ZBaseWidget::ZGetIsEditMode()
