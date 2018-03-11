@@ -5,8 +5,21 @@
 #include <QDebug>
 ZBackupManager::ZBackupManager(QWidget *parent):QDialog(parent)
 {
-    this->setMinimumSize(600,300);
+    this->setMinimumSize(600,500);
     this->setWindowTitle(tr("备份管理器-Backup Manager"));
+
+    this->m_pieSeries=new QPieSeries;
+    this->m_pieSeries->setHoleSize(0.35);
+    this->m_pieSeries->append("数据库 4.2%",4.2);
+    this->m_pieSeries->append("文件 10.5%",10.3);
+    this->m_pieSeries->append("其他 85.3%",85.3);
+    this->m_chartView=new QChartView;
+    this->m_chartView->setRenderHint(QPainter::Antialiasing);
+    this->m_chartView->chart()->setTitle(tr("服务器存储空间:数据库0MB,文件系统0MB"));
+    this->m_chartView->chart()->addSeries(this->m_pieSeries);
+    this->m_chartView->chart()->legend()->setAlignment(Qt::AlignRight);
+    this->m_chartView->chart()->setTheme(QChart::ChartThemeBlueCerulean);
+    //this->m_chartView->chart()->legend()->setFont(QFont("Arial",7));
 
     this->m_tree=new QTreeWidget;
     this->m_tree->setColumnCount(4);
@@ -43,6 +56,7 @@ ZBackupManager::ZBackupManager(QWidget *parent):QDialog(parent)
     this->m_hLayout->addWidget(this->m_tbClose);
 
     this->m_vLayout=new QVBoxLayout;
+    this->m_vLayout->addWidget(this->m_chartView);
     this->m_vLayout->addWidget(this->m_tree);
     this->m_vLayout->addLayout(this->m_hLayout);
     this->setLayout(this->m_vLayout);
@@ -60,6 +74,9 @@ ZBackupManager::ZBackupManager(QWidget *parent):QDialog(parent)
 }
 ZBackupManager::~ZBackupManager()
 {
+    this->m_chartView->chart()->removeSeries(this->m_pieSeries);
+    delete this->m_pieSeries;
+    delete this->m_chartView;
     delete this->m_tree;
     delete this->m_tbBackup;
     delete this->m_tbRestore;
@@ -95,6 +112,11 @@ void ZBackupManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList para
                     this->m_tree->resizeColumnToContents(i);
                 }
                 qDebug()<<"PathSize:"<<pathSize;
+                QStringList sizeList=pathSize.split(":");
+                if(sizeList.size()==2)
+                {
+                    this->m_chartView->chart()->setTitle(tr("服务器存储空间:数据库%1,文件系统%2").arg(sizeList.at(0)).arg(sizeList.at(1)));
+                }
             }
         }else if(cmd=="backup")
         {

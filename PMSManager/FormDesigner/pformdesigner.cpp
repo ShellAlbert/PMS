@@ -639,6 +639,7 @@ void PFormDesigner::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraL
                 QString createTime=paraList.at(2);
 
                 QTreeWidgetItem *formItem=new QTreeWidgetItem(0);
+                formItem->setIcon(0,QIcon(":/FormDesigner/images/FormDesigner/FormOp.png"));
                 formItem->setText(0,formName);
                 formItem->setText(1,QString("0"));
                 formItem->setText(2,creator);

@@ -1060,7 +1060,10 @@ PGuideWin::PGuideWin(QWidget *parent):QWidget(parent)
     this->setWindowFlags(this->windowFlags()|Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
     this->setWindowOpacity(0);
     this->m_lblGuide=new QLabel;
-    this->m_lblGuide->setPixmap(QPixmap(":/GuideWin/images/GuideWin/Guide1.png"));
+    this->m_lblGuide->setStyleSheet("background:transparent");
+    this->m_movie=new QMovie(":/gifs/images/gifs/guide.gif");
+    this->m_lblGuide->setMovie(this->m_movie);
+    this->m_movie->start();
     this->m_vLayout=new QVBoxLayout;
     this->m_vLayout->setContentsMargins(0,0,0,0);
     this->m_vLayout->addWidget(this->m_lblGuide);
@@ -1068,41 +1071,14 @@ PGuideWin::PGuideWin(QWidget *parent):QWidget(parent)
 
     this->m_bShowTaskBar=false;
     this->m_bShowLogBar=false;
-    this->resize(48,48);
-
-    //icon cartoon.
-    this->m_iconIndex=0;
-    this->m_timer=new QTimer;
-    connect(this->m_timer,SIGNAL(timeout()),this,SLOT(ZSlotTimeout()));
-    this->m_timer->start(1000);
+    this->resize(64,64);
 }
 PGuideWin::~PGuideWin()
 {
-    this->m_timer->stop();
-    delete this->m_timer;
+    this->m_movie->stop();
+    delete this->m_movie;
     delete this->m_lblGuide;
     delete this->m_vLayout;
-}
-void PGuideWin::ZSlotTimeout()
-{
-    if(this->m_iconIndex++>=3)
-    {
-        this->m_iconIndex=0;
-    }
-    switch(this->m_iconIndex)
-    {
-    case 0:
-        this->m_lblGuide->setPixmap(QPixmap(":/GuideWin/images/GuideWin/Guide1.png"));
-        break;
-    case 1:
-        this->m_lblGuide->setPixmap(QPixmap(":/GuideWin/images/GuideWin/Guide2.png"));
-        break;
-    case 2:
-        this->m_lblGuide->setPixmap(QPixmap(":/GuideWin/images/GuideWin/Guide3.png"));
-        break;
-    default:
-        break;
-    }
 }
 void PGuideWin::mousePressEvent(QMouseEvent *event)
 {

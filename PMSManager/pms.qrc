@@ -167,6 +167,7 @@
     <qresource prefix="/gifs">
         <file>images/gifs/loading.gif</file>
         <file>images/gifs/logining.gif</file>
+        <file>images/gifs/guide.gif</file>
     </qresource>
     <qresource prefix="/common">
         <file>images/common/add.png</file>

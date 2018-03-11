@@ -11,6 +11,10 @@ public:
     void ZDoBackup(QString creator);
     void ZDoRestore(QString backupName);
     void ZDoDelete(QString backupName);
+
+private:
+    QString ZGetFileSystemDataSize(void);
+    QString ZGetDatabaseDataSize(void);
 };
 
 #endif // PNETFRMBACKUP_H

@@ -23,13 +23,22 @@ private:
     QLineEdit *m_leAppName;
     QLabel *m_llVersion;
     QLineEdit *m_leVersion;
+    QLabel *m_llCompileDate;
+    QLineEdit *m_leCompileDate;
+    QLabel *m_llCopyright;
+    QLineEdit *m_leCopyright;
     QLabel *m_llMachineNo;
     QLineEdit *m_leMachineNo;
     QLabel *m_llRegisterNo;
     QTextEdit *m_teRegisterNo;
+    QGridLayout *m_gridLayout;
+
     QToolButton *m_tbOkay;
     QToolButton *m_tbCancel;
-    QGridLayout *m_gridLayout;
+    QHBoxLayout *m_hLayout;
+
+    QVBoxLayout *m_vLayout;
+
 
     QProcess *m_process;
 };

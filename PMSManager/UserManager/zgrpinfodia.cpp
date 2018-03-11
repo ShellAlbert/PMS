@@ -579,12 +579,12 @@ ZGrpInfoDia::ZGrpInfoDia(GrpInfoDiaType type,QWidget *parent):ZBaseInfoDia(ZBase
         break;
     case Type_MdyGrp:
         this->setWindowTitle(tr("编辑角色"));
-        this->m_letGrpName->setEnabled(false);
+        this->m_letGrpName->setFocusPolicy(Qt::NoFocus);
         break;
     case Type_DelGrp:
         this->setWindowTitle(tr("删除角色"));
-        this->m_letGrpName->setEnabled(false);
-        this->m_tetGrpMemo->setEnabled(false);
+        this->m_letGrpName->setFocusPolicy(Qt::NoFocus);
+        this->m_tetGrpMemo->setFocusPolicy(Qt::NoFocus);
         break;
     default:
         break;

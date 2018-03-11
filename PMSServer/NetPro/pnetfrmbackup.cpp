@@ -35,24 +35,10 @@ void PNetFrmBackup::ZListBackup()
         tXmlWriter.writeEndElement();//Backup.
         this->m_opLogMsg=QString("list backup failed:[%1].").arg(errMsg);
     }else{
+        QString strFileSystemDataSize=this->ZGetFileSystemDataSize();
+        QString strDatabaseDataSize=this->ZGetDatabaseDataSize();
         while(query.next())
         {
-            quint64 pathSize=PGblPara::ZGetInstance()->ZGetPathSize(QDir::currentPath());
-            float fSize=0;
-            QString strPathSize;
-            if(pathSize<1024)
-            {
-                fSize=pathSize;
-                strPathSize=QString::number(fSize,'f',2)+QString("B");
-            }else if(pathSize>=1024 && pathSize<=(1024*1024))
-            {
-                fSize=pathSize/1024.0;
-                strPathSize=QString::number(fSize,'f',2)+QString("KB");
-            }else{
-                fSize=pathSize/1024.0/1024.0;
-                strPathSize=QString::number(fSize,'f',2)+QString("MB");
-            }
-
             QString backupName=query.value(0).toString();
             QString fileSize=query.value(1).toString();
             QString creator=query.value(2).toString();
@@ -64,7 +50,7 @@ void PNetFrmBackup::ZListBackup()
             tXmlWriter.writeAttribute(QString("fileSize"),fileSize);
             tXmlWriter.writeAttribute(QString("creator"),creator);
             tXmlWriter.writeAttribute(QString("createTime"),createTime);
-            tXmlWriter.writeCharacters(strPathSize);
+            tXmlWriter.writeCharacters(strDatabaseDataSize+":"+strFileSystemDataSize);
             tXmlWriter.writeEndElement();//Backup.
         }
         this->m_opLogMsg=QString("list backup success");
@@ -263,4 +249,39 @@ void PNetFrmBackup::ZDoDelete(QString backupName)
     tXmlWriter.writeEndElement();//Backup.
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
+}
+QString PNetFrmBackup::ZGetFileSystemDataSize(void)
+{
+    //get File size.
+    quint64 pathSize=PGblPara::ZGetInstance()->ZGetPathSize(QDir::currentPath());
+    float fSize=0;
+    QString strPathSize;
+    if(pathSize<1024)
+    {
+        fSize=pathSize;
+        strPathSize=QString::number(fSize,'f',2)+QString("B");
+    }else if(pathSize>=1024 && pathSize<=(1024*1024))
+    {
+        fSize=pathSize/1024.0;
+        strPathSize=QString::number(fSize,'f',2)+QString("KB");
+    }else{
+        fSize=pathSize/1024.0/1024.0;
+        strPathSize=QString::number(fSize,'f',2)+QString("MB");
+    }
+    return strPathSize;
+}
+QString PNetFrmBackup::ZGetDatabaseDataSize(void)
+{
+    //get mysql database size.
+    //SELECT CONCAT(ROUND(SUM(DATA_LENGTH/1024/1024),2),'MB') AS DATA FROM information_schema.tables WHERE table_schema='pms';
+    QSqlQuery query(this->m_db);
+    if(!query.exec("SELECT CONCAT(ROUND(SUM(DATA_LENGTH/1024/1024),2),'MB') AS DATA FROM information_schema.tables WHERE table_schema='pms'"))
+    {
+        return QString("0B");
+    }
+    while(query.next())
+    {
+        return query.value(0).toString();
+    }
+    return QString("0B");
 }
