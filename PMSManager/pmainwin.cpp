@@ -806,6 +806,32 @@ void PMainWin::ZSlotShowLogBar(bool bShow)
 {
     this->m_statusBarWidget->setVisible(bShow);
 }
+void PMainWin::ZSlotLatchModule(qint32 moduleNo)
+{
+    switch(moduleNo)
+    {
+    case 1:
+        this->ZSlotShowUserManager();
+        break;
+    case 2:
+        this->ZSlotShowTemplateEditor();
+        break;
+    case 3:
+        this->ZSlotShowFileManager();
+        break;
+    case 4:
+        this->ZSlotShowProcessEditor();
+        break;
+    case 5:
+        this->ZSlotShowTaskManager();
+        break;
+    case 6:
+        this->ZSlotShowFormDesigner();
+        break;
+    default:
+        break;
+    }
+}
 void PMainWin::ZSlotUpdateStatusBarTime()
 {
     this->m_runCounter++;
@@ -1072,9 +1098,57 @@ PGuideWin::PGuideWin(QWidget *parent):QWidget(parent)
     this->m_bShowTaskBar=false;
     this->m_bShowLogBar=false;
     this->resize(64,64);
+
+
+
+    this->m_actShowTopBar=new QAction(QIcon(":/GuideWin/images/GuideWin/Top.png"),tr("工具栏"));
+    this->m_actShowTopBar->setCheckable(true);
+    this->m_actShowBottomBar=new QAction(QIcon(":/GuideWin/images/GuideWin/Bottom.png"),tr("状态栏"));
+    this->m_actShowBottomBar->setCheckable(true);
+    connect(this->m_actShowTopBar,SIGNAL(toggled(bool)),this,SIGNAL(ZSignalShowTaskBar(bool)));
+    connect(this->m_actShowBottomBar,SIGNAL(toggled(bool)),this,SIGNAL(ZSignalShowLogBar(bool)));
+
+    this->m_actUserManager=new QAction(QIcon(":/TaskBar/images/UserManager.png"),tr("用户管理"));
+    this->m_actTemplateEdit=new QAction(QIcon(":/TaskBar/images/TemplateEditor.png"),tr("模板编辑"));
+    this->m_actFileManager=new QAction(QIcon(":/TaskBar/images/FileManager.png"),tr("文件管理"));
+    this->m_actProcessEdit=new QAction(QIcon(":/TaskBar/images/ProcessEditor.png"),tr("工序编辑"));
+    this->m_actTaskManage=new QAction(QIcon(":/TaskBar/images/TaskManager.png"),tr("任务管理"));
+    this->m_actFormDesign=new QAction(QIcon(":/TaskBar/images/ReportDesigner.png"),tr("报表生成"));
+    connect(this->m_actUserManager,SIGNAL(toggled(bool)),this,SLOT(ZSlotLatchModule()));
+    connect(this->m_actTemplateEdit,SIGNAL(toggled(bool)),this,SLOT(ZSlotLatchModule()));
+    connect(this->m_actFileManager,SIGNAL(toggled(bool)),this,SLOT(ZSlotLatchModule()));
+    connect(this->m_actProcessEdit,SIGNAL(toggled(bool)),this,SLOT(ZSlotLatchModule()));
+    connect(this->m_actTaskManage,SIGNAL(toggled(bool)),this,SLOT(ZSlotLatchModule()));
+    connect(this->m_actFormDesign,SIGNAL(toggled(bool)),this,SLOT(ZSlotLatchModule()));
+
+    this->m_subMenu=new QMenu(tr("功能模块"));
+    this->m_subMenu->addAction(this->m_actUserManager);
+    this->m_subMenu->addAction(this->m_actTemplateEdit);
+    this->m_subMenu->addAction(this->m_actFileManager);
+    this->m_subMenu->addAction(this->m_actProcessEdit);
+    this->m_subMenu->addAction(this->m_actTaskManage);
+    this->m_subMenu->addAction(this->m_actFormDesign);
+
+    this->m_menu=new QMenu;
+    this->m_menu->addAction(this->m_actShowTopBar);
+    this->m_menu->addAction(this->m_actShowBottomBar);
+    this->m_menu->addSeparator();
+    this->m_menu->addMenu(this->m_subMenu);
 }
 PGuideWin::~PGuideWin()
 {
+
+    delete this->m_actUserManager;
+    delete this->m_actTemplateEdit;
+    delete this->m_actFileManager;
+    delete this->m_actProcessEdit;
+    delete this->m_actTaskManage;
+    delete this->m_actFormDesign;
+    delete this->m_subMenu;
+    delete this->m_actShowTopBar;
+    delete this->m_actShowBottomBar;
+    delete this->m_menu;
+
     this->m_movie->stop();
     delete this->m_movie;
     delete this->m_lblGuide;
@@ -1086,14 +1160,10 @@ void PGuideWin::mousePressEvent(QMouseEvent *event)
     {
     case Qt::LeftButton:
         this->m_relativePos=this->pos()-event->globalPos();
-        this->m_bShowLogBar=!this->m_bShowLogBar;
-        emit this->ZSignalShowLogBar(this->m_bShowLogBar);
         break;
     case Qt::MidButton:
         break;
     case Qt::RightButton:
-        this->m_bShowTaskBar=!this->m_bShowTaskBar;
-        emit this->ZSignalShowTaskBar(this->m_bShowTaskBar);
         break;
     default:
         break;
@@ -1102,4 +1172,31 @@ void PGuideWin::mousePressEvent(QMouseEvent *event)
 void PGuideWin::mouseMoveEvent(QMouseEvent *event)
 {
     this->move(event->globalPos()+this->m_relativePos);
+}
+void PGuideWin::contextMenuEvent(QContextMenuEvent *event)
+{
+    this->m_menu->exec(event->globalPos());
+}
+void PGuideWin::ZSlotLatchModule()
+{
+    QAction *sender=qobject_cast<QAction*>(this->sender());
+    if(sender==this->m_actUserManager)
+    {
+        emit this->ZSignalLatchModule(1);
+    }else if(sender==this->m_actTemplateEdit)
+    {
+        emit this->ZSignalLatchModule(2);
+    }else if(sender==this->m_actFileManager)
+    {
+        emit this->ZSignalLatchModule(3);
+    }else if(sender==this->m_actProcessEdit)
+    {
+        emit this->ZSignalLatchModule(4);
+    }else if(sender==this->m_actTaskManage)
+    {
+        emit this->ZSignalLatchModule(5);
+    }else if(sender==this->m_actFormDesign)
+    {
+        emit this->ZSignalLatchModule(6);
+    }
 }

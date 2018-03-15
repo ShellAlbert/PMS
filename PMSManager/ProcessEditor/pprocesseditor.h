@@ -81,6 +81,7 @@ private slots:
     void ZSlotRemoveTab(qint32 index);
     void ZSlotDataChanged(QString processName);
     void ZSlotOpenProcess(QString processName);
+    void ZSlotHelp();
 private:
     void ZAddLogMsg(QString logInfo);
 private:
@@ -92,6 +93,7 @@ private:
     QToolButton *m_tbDelProcess;
 
     QToolButton *m_tbNewStep;
+    QToolButton *m_tbHelp;
     QVBoxLayout *m_vLayoutTb;
     //right.
     QTabWidget *m_tabWidget;

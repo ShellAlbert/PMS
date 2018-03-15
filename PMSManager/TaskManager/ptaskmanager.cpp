@@ -153,10 +153,19 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_btnPrint->setMenu(this->m_menuPrint);
     this->m_btnPrint->setPopupMode(QToolButton::InstantPopup);
 
+    //help.
+    this->m_tbHelp=new QToolButton;
+    this->m_tbHelp->setToolTip(tr("获取帮助文档"));
+    this->m_tbHelp->setText(tr("帮助"));
+    this->m_tbHelp->setIcon(QIcon(":/common/images/common/help.png"));
+    this->m_tbHelp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    connect(this->m_tbHelp,SIGNAL(clicked(bool)),this,SLOT(ZSlotHelp()));
+
     this->m_vLayoutBtn->addWidget(this->m_btnArchieve);
     this->m_vLayoutBtn->addWidget(this->m_tbTaskManage);
     this->m_vLayoutBtn->addStretch(1);
     this->m_vLayoutBtn->addWidget(this->m_btnPrint);
+    this->m_vLayoutBtn->addWidget(this->m_tbHelp);
 
     //right.
     this->m_tabWidget=new QTabWidget;
@@ -214,6 +223,7 @@ PTaskManager::~PTaskManager()
     delete this->m_actPrintPdf;
     delete this->m_menuPrint;
     delete this->m_btnPrint;
+    delete this->m_tbHelp;
     delete this->m_vLayoutBtn;
 
     //right.
@@ -1021,3 +1031,7 @@ void PTaskManager::ZSlotPrint()
 
 }
 
+void PTaskManager::ZSlotHelp()
+{
+
+}

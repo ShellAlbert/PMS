@@ -135,6 +135,15 @@ PUserManagerWin::PUserManagerWin()
         connect(this->m_btnExport,SIGNAL(clicked(bool)),this,SLOT(ZSlotExport()));
     }
 
+    //help.
+    this->m_btnHelp=new QToolButton;
+    this->m_btnHelp->setToolTip(tr("获取帮助文档"));
+    this->m_btnHelp->setText(tr("帮助"));
+    this->m_btnHelp->setIcon(QIcon(":/common/images/common/help.png"));
+    this->m_btnHelp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_vLayoutBtn->addWidget(this->m_btnHelp);
+    connect(this->m_btnHelp,SIGNAL(clicked(bool)),this,SLOT(ZSlotHelp()));
+
     //main.
     this->m_hLayoutMain=new QHBoxLayout;
     this->m_hLayoutMain->addLayout(this->m_vLayoutBtn);
@@ -185,6 +194,7 @@ PUserManagerWin::~PUserManagerWin()
     {
         delete this->m_btnExport;
     }
+    delete this->m_btnHelp;
     delete this->m_vLayoutBtn;
 
     delete this->m_treeWidget;
@@ -776,6 +786,10 @@ void PUserManagerWin::ZSlotExport()
     file.close();
     this->ZAddLogMsg(tr("export user list success,[%1] records in total.").arg(nUserCnt));
     QMessageBox::information(this,tr("操作提示"),tr("导出用户成功,总计[%1]个权限组,[%2]个用户!").arg(nRoleCnt).arg(nUserCnt));
+}
+void PUserManagerWin::ZSlotHelp()
+{
+
 }
 void PUserManagerWin::closeEvent(QCloseEvent *event)
 {

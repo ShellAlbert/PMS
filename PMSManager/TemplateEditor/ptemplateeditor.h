@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QTabWidget>
+#include <QComboBox>
 #include "Sheet/zsheet.h"
 #include "pgblpara.h"
 //#include <QtXlsx/QtXlsx>
@@ -38,6 +39,7 @@ public:
     QSplitter *m_splitter;
     QVBoxLayout *m_vLayout;
 };
+
 class ZSheetWidget:public ZTabWidget
 {
     Q_OBJECT
@@ -53,11 +55,50 @@ public:
     void ZPutVarSourceXmlData(QString xmlData);
 signals:
     void ZSignalDataChanged(QString templateName);
+    void ZSignalFontChanged(QString fontFamily,qint32 fontSize,bool bold,bool italic);
+    void ZSignalAlignmentChanged(qint32 alignNo);
+    void ZSignalMergeCell();
+    void ZSignalSplitCell();
+    void ZSignalAddPic();
+    void ZSignalDelPic();
 private slots:
     void ZSlotVarDblClicked(QTreeWidgetItem*item,int column);
+    void ZSlotFontChanged();
+    void ZSlotAlignmentChanged();
+    void ZSlotMergeSplitCell();
+    void ZSlotAddDelPic();
+    void ZSlotUpdateFontSize(QString fontFamily);
+    void ZSlotCellActivated(qint32 x,qint32 y);
 public:
+
     ZSheet *m_sheet;
+    //////////////////////////
     QTreeWidget *m_treeWidget;
+
+    //line 1.
+    QComboBox *m_cbFontFamily;
+    QComboBox *m_cbFontSize;
+    QToolButton *m_tbBold;
+    QToolButton *m_tbItalic;
+    //line 2.
+    QToolButton *m_tbAlignCenter;
+    QToolButton *m_tbAlignLeft;
+    QToolButton *m_tbAlignHCenter;
+    QToolButton *m_tbAlignRight;
+    QToolButton *m_tbAlignTop;
+    QToolButton *m_tbAlignVCenter;
+    QToolButton *m_tbAlignBottom;
+    //line3.
+    QToolButton *m_tbMerge;
+    QToolButton *m_tbSplit;
+    QToolButton *m_tbAddPic;
+    QToolButton *m_tbDelPic;
+    QLineEdit *m_leXY;
+
+    QGridLayout *m_gLayoutBtn;
+
+    QFrame *m_frmBottom;
+    QHBoxLayout *m_hLayoutBottom;
     QSplitter *m_spliter;
     QVBoxLayout *m_vLayout;
 
@@ -102,7 +143,7 @@ public slots:
     void ZSlotCellFrame();
     void ZSlotCellBindVar();
     void ZSlotCellUnbindVar();
-
+    void ZSlotFontChanged(QString fontFamily,qint32 fontSize,bool bold,bool italic);
 
     void ZSlotHAlignLeft();
     void ZSlotHAlignCenter();
@@ -110,6 +151,7 @@ public slots:
     void ZSlotVAlignTop();
     void ZSlotVAlignCenter();
     void ZSlotVAlignBottom();
+    void ZSlotAlignmentChanged(qint32 alignNo);
 
     void ZSlotSysPic1();
     void ZSlotSysPic2();
@@ -133,6 +175,8 @@ public slots:
     void ZSlotPrintHtml();
     void ZSlotPrintPdf();
     void ZSlotPrint();
+
+    void ZSlotHelp();
 private:
     void ZSetTextAlignment(qint32 alignment);
     void ZAddLogMsg(QString logMsg);
@@ -205,6 +249,7 @@ private:
     QToolButton *m_tbPrintHtml;
     QToolButton *m_tbPrintPdf;
     QToolButton *m_tbPrint;
+    QToolButton *m_tbHelp;
 
     //right.
     ZTemplateWidget *m_templateWidget;

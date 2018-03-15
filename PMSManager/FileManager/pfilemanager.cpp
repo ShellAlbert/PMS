@@ -213,8 +213,17 @@ PFileManager::PFileManager()
     connect(this->m_tbExpandAll,SIGNAL(clicked(bool)),this,SLOT(ZSlotExpandAll()));
     this->m_vLayoutTb->addStretch(1);
     this->m_vLayoutTb->addWidget(this->m_tbExpandAll);
-    //right.
 
+    //help.
+    this->m_tbHelp=new QToolButton;
+    this->m_tbHelp->setToolTip(tr("获取帮助文档"));
+    this->m_tbHelp->setText(tr("帮助"));
+    this->m_tbHelp->setIcon(QIcon(":/common/images/common/help.png"));
+    this->m_tbHelp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    connect(this->m_tbHelp,SIGNAL(clicked(bool)),this,SLOT(ZSlotHelp()));
+    this->m_vLayoutTb->addWidget(this->m_tbHelp);
+
+    //right.
     this->m_tab=new QTabWidget;
     this->m_tab->setTabsClosable(true);
     this->m_fileList=new ZFileList;
@@ -257,6 +266,7 @@ PFileManager::~PFileManager()
         delete this->m_tbDelFile;
     }
     delete this->m_tbExpandAll;
+    delete this->m_tbHelp;
     delete this->m_vLayoutTb;
     //right.
     delete this->m_fileList;
@@ -678,6 +688,10 @@ void PFileManager::ZSlotExpandAll()
         return;
     }
     this->m_fileList->m_treeWidget->expandAll();
+}
+void PFileManager::ZSlotHelp()
+{
+
 }
 void PFileManager::closeEvent(QCloseEvent *event)
 {

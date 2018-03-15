@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
     QObject::connect(&netProcess,SIGNAL(ZSignalTxNetFrmFinish(qint32,qint32)),&mainWin,SLOT(ZSlotCloseWaitingDialog(qint32,qint32)));
     QObject::connect(&guideWin,SIGNAL(ZSignalShowTaskBar(bool)),&mainWin,SLOT(ZSlotShowTaskBar(bool)));
     QObject::connect(&guideWin,SIGNAL(ZSignalShowLogBar(bool)),&mainWin,SLOT(ZSlotShowLogBar(bool)));
+    QObject::connect(&guideWin,SIGNAL(ZSignalLatchModule(qint32)),&mainWin,SLOT(ZSlotLatchModule(qint32)));
 
     //login manager.
     PLoginManager loginM;

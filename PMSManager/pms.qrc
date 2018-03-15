@@ -79,6 +79,9 @@
         <file>images/alignment/VAlignBottom.png</file>
         <file>images/alignment/VAlignCenter.png</file>
         <file>images/alignment/VAlignTop.png</file>
+        <file>images/alignment/AlignCenter.png</file>
+        <file>images/alignment/Bold.png</file>
+        <file>images/alignment/Italic.png</file>
     </qresource>
     <qresource prefix="/TemplateEditor">
         <file>images/TemplateEditor/Alignment.png</file>
@@ -175,6 +178,7 @@
         <file>images/common/del.png</file>
         <file>images/common/okay.png</file>
         <file>images/common/Calendar.png</file>
+        <file>images/common/help.png</file>
     </qresource>
     <qresource prefix="/background">
         <file>images/background/background_main.png</file>
@@ -238,8 +242,7 @@
         <file>images/BackupManager/Restore.png</file>
     </qresource>
     <qresource prefix="/GuideWin">
-        <file>images/GuideWin/Guide1.png</file>
-        <file>images/GuideWin/Guide2.png</file>
-        <file>images/GuideWin/Guide3.png</file>
+        <file>images/GuideWin/Bottom.png</file>
+        <file>images/GuideWin/Top.png</file>
     </qresource>
 </RCC>

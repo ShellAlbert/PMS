@@ -56,6 +56,7 @@ private slots:
     void ZSlotPrintHtml();
     void ZSlotPrintPdf();
     void ZSlotPrint();
+    void ZSlotHelp();
     void ZSlotTaskDataChanged(QString taskName);
     void ZSlotCloseTabWidget(qint32 index);
     void ZSlotDblClickOpenTask(QModelIndex index);
@@ -82,6 +83,7 @@ private:
     QAction *m_actPrintHtml;
     QAction *m_actPrintPdf;
 
+    QToolButton *m_tbHelp;
     QVBoxLayout *m_vLayoutBtn;
 
     //right.

@@ -141,6 +141,7 @@ public slots:
     void ZSlotCloseWaitingDialog(qint32 netFrmSerialNo,qint32 retCode);
     void ZSlotShowTaskBar(bool bShow);
     void ZSlotShowLogBar(bool bShow);
+    void ZSlotLatchModule(qint32 moduleNo);
 private slots:
     void ZSlotUpdateStatusBarTime();
     void ZSlotShowUserManager();
@@ -232,9 +233,13 @@ public:
 signals:
     void ZSignalShowTaskBar(bool bShow);
     void ZSignalShowLogBar(bool bShow);
+    void ZSignalLatchModule(qint32 moduleNo);
+private slots:
+    void ZSlotLatchModule();
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event);
 private:
     QVBoxLayout *m_vLayout;
     QLabel *m_lblGuide;
@@ -242,5 +247,17 @@ private:
     QPoint m_relativePos;
     bool m_bShowTaskBar;
     bool m_bShowLogBar;
+
+private:
+    QMenu *m_menu;
+    QAction *m_actShowTopBar;
+    QAction *m_actShowBottomBar;
+    QMenu *m_subMenu;
+    QAction *m_actUserManager;
+    QAction *m_actTemplateEdit;
+    QAction *m_actFileManager;
+    QAction *m_actProcessEdit;
+    QAction *m_actTaskManage;
+    QAction *m_actFormDesign;
 };
 #endif // PMAINWIN_H

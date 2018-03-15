@@ -68,6 +68,7 @@ private slots:
     void ZSlotOpenFile();
     void ZSlotDelFile();
     void ZSlotExpandAll();
+    void ZSlotHelp();
     void ZSlotCloseTabWidget(qint32 index);
 private:
     void ZAddLogMsg(QString logMsg);
@@ -82,6 +83,7 @@ private:
     QToolButton *m_tbDelFile;
 
     QToolButton *m_tbExpandAll;
+    QToolButton *m_tbHelp;
     QVBoxLayout *m_vLayoutTb;
     //right.
     QTabWidget *m_tab;

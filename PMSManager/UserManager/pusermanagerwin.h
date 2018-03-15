@@ -31,6 +31,7 @@ private slots:
     void ZSlotExpand();
     void ZSlotImport();
     void ZSlotExport();
+    void ZSlotHelp();
     void ZSlotTreeDblClicked(QModelIndex index);
 private:
     void ZAddLogMsg(QString logMsg);
@@ -47,6 +48,7 @@ private:
     QToolButton *m_btnExpand;
     QToolButton *m_btnImport;
     QToolButton *m_btnExport;
+    QToolButton *m_btnHelp;
     QVBoxLayout *m_vLayoutBtn;
 
     //right.

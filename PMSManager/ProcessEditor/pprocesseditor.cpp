@@ -300,6 +300,15 @@ PProcessEditor::PProcessEditor()
     }
     this->m_vLayoutTb->addStretch(1);
 
+    //help.
+    this->m_tbHelp=new QToolButton;
+    this->m_tbHelp->setToolTip(tr("获取帮助文档"));
+    this->m_tbHelp->setText(tr("帮助"));
+    this->m_tbHelp->setIcon(QIcon(":/common/images/common/help.png"));
+    this->m_tbHelp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    connect(this->m_tbHelp,SIGNAL(clicked(bool)),this,SLOT(ZSlotHelp()));
+    this->m_vLayoutTb->addWidget(this->m_tbHelp);
+
     //right.
     this->m_tabWidget=new QTabWidget;
     this->m_tabWidget->setTabsClosable(true);
@@ -336,6 +345,7 @@ PProcessEditor::~PProcessEditor()
     {
         delete this->m_tbDelProcess;
     }
+    delete this->m_tbHelp;
     delete this->m_vLayoutTb;
     //right.
     delete this->m_processManager;
@@ -675,6 +685,10 @@ void PProcessEditor::ZSlotOpenProcess(QString processName)
     {
         dia->ZShowWaitingDialog();
     }
+}
+void PProcessEditor::ZSlotHelp()
+{
+
 }
 void PProcessEditor::ZAddLogMsg(QString logMsg)
 {
