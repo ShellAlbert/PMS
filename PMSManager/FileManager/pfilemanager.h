@@ -70,6 +70,8 @@ private slots:
     void ZSlotExpandAll();
     void ZSlotHelp();
     void ZSlotCloseTabWidget(qint32 index);
+
+    void ZSlotPopupMenu(const QPoint &pt);
 private:
     void ZAddLogMsg(QString logMsg);
 private:

@@ -82,6 +82,8 @@ private slots:
     void ZSlotDataChanged(QString processName);
     void ZSlotOpenProcess(QString processName);
     void ZSlotHelp();
+
+    void ZSlotPopupMenu(const QPoint &pt);
 private:
     void ZAddLogMsg(QString logInfo);
 private:

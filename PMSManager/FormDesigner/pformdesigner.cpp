@@ -804,6 +804,7 @@ PFormDesigner::PFormDesigner()
     this->m_tabWidget->setTabsClosable(true);
     this->m_formList=new ZFormList;
     this->m_tabWidget->addTab(this->m_formList,QIcon(":/FormDesigner/images/FormDesigner/FormOp.png"),tr("报表管理"));
+    this->m_tabWidget->tabBar()->tabButton(0,QTabBar::RightSide)->hide();
 
     this->m_hLayout=new QHBoxLayout;
     this->m_hLayout->addLayout(this->m_vLayoutTb);

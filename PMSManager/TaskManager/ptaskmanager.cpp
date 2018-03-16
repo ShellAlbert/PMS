@@ -14,6 +14,8 @@
 #include <QHeaderView>
 #include <QBuffer>
 #include <QFileDialog>
+#include <QMenu>
+#include <QAction>
 PTaskList::PTaskList(QWidget *parent):QFrame(parent)
 {
     this->m_llTaskFilter=new QLabel(tr("过滤条件"));
@@ -173,6 +175,9 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_taskList=new PTaskList;
     connect(this->m_taskList,SIGNAL(ZSignalFilterChanged(qint32)),this,SLOT(ZSlotRefreshTaskList(qint32)));
     this->m_tabWidget->addTab(this->m_taskList,QIcon(":/TaskBar/images/TaskManager.png"),tr("任务管理 "));
+    this->m_tabWidget->tabBar()->tabButton(0,QTabBar::RightSide)->hide();
+    this->m_taskList->m_tree->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this->m_taskList->m_tree,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotPopupMenu(QPoint)));
 
     //main.
     this->m_hLayoutMain=new QHBoxLayout;
@@ -1034,4 +1039,42 @@ void PTaskManager::ZSlotPrint()
 void PTaskManager::ZSlotHelp()
 {
 
+}
+void PTaskManager::ZSlotPopupMenu(const QPoint &pt)
+{
+    Q_UNUSED(pt);
+
+    QMenu popMenu;
+    QAction actNew(QIcon(":/TaskManager/images/TaskManager/AddTask.png"),tr("新建任务"));
+    QAction actOpen(QIcon(":/TaskManager/images/TaskManager/MdyTask.png"),tr("打开任务"));
+    QAction actDel(QIcon(":/TaskManager/images/TaskManager/DelTask.png"),tr("删除任务"));
+    QAction actArchive(QIcon(":/TaskManager/images/TaskManager/DelTask.png"),tr("归档"));
+    popMenu.addAction(&actNew);
+    popMenu.addAction(&actOpen);
+    popMenu.addAction(&actDel);
+    popMenu.addSeparator();
+    popMenu.addAction(&actArchive);
+    connect(&actNew,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddTask()));
+    connect(&actOpen,SIGNAL(triggered(bool)),this,SLOT(ZSlotMdyTask()));
+    connect(&actDel,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelTask()));
+    connect(&actArchive,SIGNAL(triggered(bool)),this,SLOT(ZSlotArchieve()));
+
+
+    QMenu subMenu(tr("审核"));
+    QAction actSubmit(QIcon(":/TaskManager/images/TaskManager/SubmitTask.png"),tr("提交审核"));
+    QAction actWithdraw(QIcon(":/TaskManager/images/TaskManager/WithdrawTask.png"),tr("撤回审核"));
+    QAction actPass(QIcon(":/TaskManager/images/TaskManager/SubmitTask.png"),tr("审核通过"));
+    QAction actFailed(QIcon(":/TaskManager/images/TaskManager/WithdrawTask.png"),tr("审核驳回"));
+    subMenu.addAction(&actSubmit);
+    subMenu.addAction(&actWithdraw);
+    subMenu.addAction(&actPass);
+    subMenu.addAction(&actFailed);
+    connect(&actSubmit,SIGNAL(triggered(bool)),this,SLOT(ZSlotSubmitTask()));
+    connect(&actWithdraw,SIGNAL(triggered(bool)),this,SLOT(ZSlotWithdrawTask()));
+    connect(&actPass,SIGNAL(triggered(bool)),this,SLOT(ZSlotCheckOkay()));
+    connect(&actFailed,SIGNAL(triggered(bool)),this,SLOT(ZSlotCheckFailed()));
+
+    popMenu.addSeparator();
+    popMenu.addMenu(&subMenu);
+    popMenu.exec(QCursor::pos());
 }

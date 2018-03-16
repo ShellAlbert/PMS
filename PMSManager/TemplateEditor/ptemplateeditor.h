@@ -177,6 +177,9 @@ public slots:
     void ZSlotPrint();
 
     void ZSlotHelp();
+
+    void ZSlotTemplateTreePopupMenu(const QPoint &pt);
+    void ZSlotVarSourceTreePopupMenu(const QPoint &pt);
 private:
     void ZSetTextAlignment(qint32 alignment);
     void ZAddLogMsg(QString logMsg);

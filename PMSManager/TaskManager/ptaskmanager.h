@@ -61,6 +61,8 @@ private slots:
     void ZSlotCloseTabWidget(qint32 index);
     void ZSlotDblClickOpenTask(QModelIndex index);
     void ZSlotRefreshTaskList(qint32 index);
+
+    void ZSlotPopupMenu(const QPoint &pt);
 private:
     void ZAddLogMsg(QString logMsg);
 private:

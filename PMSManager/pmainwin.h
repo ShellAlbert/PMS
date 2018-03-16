@@ -245,9 +245,6 @@ private:
     QLabel *m_lblGuide;
     QMovie *m_movie;
     QPoint m_relativePos;
-    bool m_bShowTaskBar;
-    bool m_bShowLogBar;
-
 private:
     QMenu *m_menu;
     QAction *m_actShowTopBar;

@@ -33,6 +33,7 @@ private slots:
     void ZSlotExport();
     void ZSlotHelp();
     void ZSlotTreeDblClicked(QModelIndex index);
+    void ZSlotPopupMenu(const QPoint &pt);
 private:
     void ZAddLogMsg(QString logMsg);
 private:

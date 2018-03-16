@@ -1085,6 +1085,8 @@ PGuideWin::PGuideWin(QWidget *parent):QWidget(parent)
 {
     this->setWindowFlags(this->windowFlags()|Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
     this->setWindowOpacity(0);
+     this->resize(64,64);
+
     this->m_lblGuide=new QLabel;
     this->m_lblGuide->setStyleSheet("background:transparent");
     this->m_movie=new QMovie(":/gifs/images/gifs/guide.gif");
@@ -1095,16 +1097,8 @@ PGuideWin::PGuideWin(QWidget *parent):QWidget(parent)
     this->m_vLayout->addWidget(this->m_lblGuide);
     this->setLayout(this->m_vLayout);
 
-    this->m_bShowTaskBar=false;
-    this->m_bShowLogBar=false;
-    this->resize(64,64);
-
-
-
     this->m_actShowTopBar=new QAction(QIcon(":/GuideWin/images/GuideWin/Top.png"),tr("工具栏"));
-    this->m_actShowTopBar->setCheckable(true);
     this->m_actShowBottomBar=new QAction(QIcon(":/GuideWin/images/GuideWin/Bottom.png"),tr("状态栏"));
-    this->m_actShowBottomBar->setCheckable(true);
     connect(this->m_actShowTopBar,SIGNAL(toggled(bool)),this,SIGNAL(ZSignalShowTaskBar(bool)));
     connect(this->m_actShowBottomBar,SIGNAL(toggled(bool)),this,SIGNAL(ZSignalShowLogBar(bool)));
 

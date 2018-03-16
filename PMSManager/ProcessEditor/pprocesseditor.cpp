@@ -6,6 +6,8 @@
 #include <ProcessEditor/zlistprocessinfodia.h>
 #include <QXmlStreamWriter>
 #include <QInputDialog>
+#include <QMenu>
+#include <QAction>
 ZProcessManager::ZProcessManager()
 {
     this->m_treeWidget=new QTreeWidget;
@@ -314,6 +316,10 @@ PProcessEditor::PProcessEditor()
     this->m_tabWidget->setTabsClosable(true);
     this->m_processManager=new ZProcessManager;
     this->m_tabWidget->addTab(this->m_processManager,QIcon(":/ProcessEditor/images/ProcessEditor/Process.png"),tr("工序管理"));
+    this->m_tabWidget->tabBar()->tabButton(0,QTabBar::RightSide)->hide();
+    this->m_processManager->m_treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this->m_processManager->m_treeWidget,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotPopupMenu(QPoint)));
+
     //main.
     this->m_hLayout=new QHBoxLayout;
     this->m_hLayout->addLayout(this->m_vLayoutTb);
@@ -695,3 +701,19 @@ void PProcessEditor::ZAddLogMsg(QString logMsg)
     emit this->ZSignalLogMsg(QString("<ProcessEditor>:")+logMsg);
 }
 
+void PProcessEditor::ZSlotPopupMenu(const QPoint &pt)
+{
+    Q_UNUSED(pt);
+    QMenu popMenu;
+    QAction actNew(QIcon(":/ProcessEditor/images/ProcessEditor/AddProcess.png"),tr("新建工序"));
+    QAction actOpen(QIcon(":/ProcessEditor/images/ProcessEditor/OpenProcess.png"),tr("打开工序"));
+    QAction actDel(QIcon(":/ProcessEditor/images/ProcessEditor/DelProcess.png"),tr("删除工序"));
+    popMenu.addAction(&actNew);
+    popMenu.addAction(&actOpen);
+    popMenu.addAction(&actDel);
+
+    connect(&actNew,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddProcess()));
+    connect(&actOpen,SIGNAL(triggered(bool)),this,SLOT(ZSlotOpenProcess()));
+    connect(&actDel,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelProcess()));
+    popMenu.exec(QCursor::pos());
+}

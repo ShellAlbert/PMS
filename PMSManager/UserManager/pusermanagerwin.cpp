@@ -9,6 +9,8 @@
 #include "pgblpara.h"
 #include <QXmlStreamWriter>
 #include <QFileDialog>
+#include <QAction>
+#include <QMenu>
 #include "NetProtocol/pnetframe.h"
 #include "pwaitingdia.h"
 #include <QDebug>
@@ -24,6 +26,8 @@ PUserManagerWin::PUserManagerWin()
     this->m_treeWidget=new QTreeWidget;
     this->m_treeWidget->setIconSize(QSize(24,24));
     this->m_treeWidget->setColumnCount(7);
+    this->m_treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this->m_treeWidget,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotPopupMenu(QPoint)));
     //this->m_treeWidget->header()->setDefaultAlignment(Qt::AlignCenter);
     QStringList headerList;
     headerList<<tr("用户名");
@@ -830,4 +834,39 @@ void PUserManagerWin::ZSlotTreeDblClicked(QModelIndex index)
             dia->ZShowWaitingDialog();
         }
     }
+}
+void PUserManagerWin::ZSlotPopupMenu(const QPoint &pt)
+{
+    QTreeWidgetItem *item=this->m_treeWidget->currentItem();
+    if(NULL==item)
+    {
+        return;
+    }
+    QMenu popMenu(this->m_treeWidget);
+    QAction actAddGrp(QIcon(":/UserManager/images/UserManager/AddGrp.png"),tr("创建组"));
+    QAction actDelGrp(QIcon(":/UserManager/images/UserManager/DelGrp.png"),tr("删除组"));
+    QAction actAddUser(QIcon(":/UserManager/images/UserManager/AddUser.png"),tr("创建用户"));
+    QAction actDelUser(QIcon(":/UserManager/images/UserManager/DelUser.png"),tr("删除用户"));
+    QAction actImport(QIcon(":/UserManager/images/UserManager/Import.png"),tr("导入..."));
+    QAction actExport(QIcon(":/UserManager/images/UserManager/Export.png"),tr("导出..."));
+    connect(&actAddGrp,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddGrp()));
+    connect(&actDelGrp,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelGrp()));
+    connect(&actAddUser,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddUser()));
+    connect(&actDelUser,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelUser()));
+    connect(&actImport,SIGNAL(triggered(bool)),this,SLOT(ZSlotImport()));
+    connect(&actExport,SIGNAL(triggered(bool)),this,SLOT(ZSlotExport()));
+    if(item->type()==0)//group.
+    {
+        popMenu.addAction(&actAddGrp);
+        popMenu.addAction(&actDelGrp);
+        popMenu.addSeparator();
+    }else if(item->type()==1) //user.
+    {
+        popMenu.addAction(&actAddUser);
+        popMenu.addAction(&actDelUser);
+        popMenu.addSeparator();
+    }
+    popMenu.addAction(&actImport);
+    popMenu.addAction(&actExport);
+    popMenu.exec(QCursor::pos());
 }

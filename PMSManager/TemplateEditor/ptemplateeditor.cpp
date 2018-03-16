@@ -18,6 +18,8 @@
 #include <QXmlStreamWriter>
 #include <QDebug>
 #include <QBuffer>
+#include <QAction>
+#include <QMenu>
 #include <QInputDialog>
 #include <QDateTimeEdit>
 #include <QPrinter>
@@ -287,6 +289,12 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
     this->m_tabWidget=new QTabWidget;
     this->m_tabWidget->setTabsClosable(true);
     this->m_tabWidget->addTab(this->m_templateWidget,QIcon(":/TaskBar/images/TemplateEditor.png"),tr("模板管理"));
+    this->m_tabWidget->tabBar()->tabButton(0,QTabBar::RightSide)->hide();
+
+    this->m_templateWidget->m_treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    this->m_templateWidget->m_treeVarSource->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this->m_templateWidget->m_treeWidget,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotTemplateTreePopupMenu(QPoint)));
+    connect(this->m_templateWidget->m_treeVarSource,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotVarSourceTreePopupMenu(QPoint)));
 
     //main layout.
     this->m_hLayoutMain=new QHBoxLayout;
@@ -2127,6 +2135,46 @@ void PTemplateEditor::ZSlotPrint()
 void PTemplateEditor::ZSlotHelp()
 {
 
+}
+void PTemplateEditor::ZSlotTemplateTreePopupMenu(const QPoint &pt)
+{
+    Q_UNUSED(pt);
+    QTreeWidgetItem *item=this->m_templateWidget->m_treeWidget->currentItem();
+    if(NULL==item)
+    {
+        return;
+    }
+    QMenu popMenu;
+    QAction actNew(QIcon(":/TemplateEditor/images/TemplateEditor/NewTemplate.png"),tr("新建模板"));
+    QAction actOpen(QIcon(":/TemplateEditor/images/TemplateEditor/OpenTemplate.png"),tr("打开模板"));
+    QAction actDel(QIcon(":/TemplateEditor/images/TemplateEditor/DelTemplate.png"),tr("删除模板"));
+    connect(&actNew,SIGNAL(triggered(bool)),this,SLOT(ZSlotNewTemplate()));
+    connect(&actOpen,SIGNAL(triggered(bool)),this,SLOT(ZSlotOpenTemplate()));
+    connect(&actDel,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelTemplate()));
+    popMenu.addAction(&actNew);
+    popMenu.addAction(&actOpen);
+    popMenu.addAction(&actDel);
+    popMenu.exec(QCursor::pos());
+}
+void PTemplateEditor::ZSlotVarSourceTreePopupMenu(const QPoint &pt)
+{
+    Q_UNUSED(pt);
+    QTreeWidgetItem *item=this->m_templateWidget->m_treeVarSource->currentItem();
+    if(NULL==item)
+    {
+        return;
+    }
+    QMenu popMenu;
+    QAction actNew(QIcon(":/TemplateEditor/images/TemplateEditor/NewTemplate.png"),tr("新建变量源"));
+    QAction actOpen(QIcon(":/TemplateEditor/images/TemplateEditor/OpenTemplate.png"),tr("打开变量源"));
+    QAction actDel(QIcon(":/TemplateEditor/images/TemplateEditor/DelTemplate.png"),tr("删除变量源"));
+    connect(&actNew,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddVarSource()));
+    connect(&actOpen,SIGNAL(triggered(bool)),this,SLOT(ZSlotOpenVarSource()));
+    connect(&actDel,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelVarSource()));
+    popMenu.addAction(&actNew);
+    popMenu.addAction(&actOpen);
+    popMenu.addAction(&actDel);
+    popMenu.exec(QCursor::pos());
 }
 void PTemplateEditor::ZAddLogMsg(QString logMsg)
 {

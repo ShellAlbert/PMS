@@ -3,6 +3,8 @@
 #include <QInputDialog>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QMenu>
+#include <QAction>
 #include <QDebug>
 #include "pgblpara.h"
 #include "FileManager/zfolderinfodia.h"
@@ -228,7 +230,10 @@ PFileManager::PFileManager()
     this->m_tab->setTabsClosable(true);
     this->m_fileList=new ZFileList;
     this->m_tab->addTab(this->m_fileList,QIcon(":/FileManager/images/FileManager/FileList.png"),tr("文件列表"));
+    this->m_tab->tabBar()->tabButton(0,QTabBar::RightSide)->hide();
     connect(this->m_tab,SIGNAL(tabCloseRequested(int)),this,SLOT(ZSlotCloseTabWidget(qint32)));
+    this->m_fileList->m_treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this->m_fileList->m_treeWidget,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotPopupMenu(QPoint)));
 
     //main.
     this->m_hLayoutMain=new QHBoxLayout;
@@ -712,4 +717,37 @@ void PFileManager::ZSlotCloseTabWidget(qint32 index)
     //delete it to remove it from tab widget.
     this->m_tab->removeTab(index);
     delete this->m_tab->widget(index);
+}
+void PFileManager::ZSlotPopupMenu(const QPoint &pt)
+{
+    Q_UNUSED(pt);
+    QTreeWidgetItem *item=this->m_fileList->m_treeWidget->currentItem();
+    if(NULL==item)
+    {
+        return;
+    }
+    QMenu popMenu;
+    QAction actNewFolder(QIcon(":/FileManager/images/FileManager/NewFolder.png"),tr("新建文件夹"));
+    QAction actDelFolder(QIcon(":/FileManager/images/FileManager/DelFolder.png"),tr("删除文件夹"));
+    QAction actUpFile(QIcon(":/FileManager/images/FileManager/UpFile.png"),tr("上传文件"));
+    QAction actUpImg(QIcon(":/FileManager/images/FileManager/ImageFile.png"),tr("上传图片"));
+    QAction actDwnFile(QIcon(":/FileManager/images/FileManager/DwnFile.png"),tr("下载"));
+
+    connect(&actNewFolder,SIGNAL(triggered(bool)),this,SLOT(ZSlotNewFolder()));
+    connect(&actDelFolder,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelFolder()));
+    connect(&actUpFile,SIGNAL(triggered(bool)),this,SLOT(ZSlotUploadFile()));
+    connect(&actUpImg,SIGNAL(triggered(bool)),this,SLOT(ZSlotUploadPic()));
+    connect(&actDwnFile,SIGNAL(triggered(bool)),this,SLOT(ZSlotOpenFile()));
+
+    if(item->type()==0)//folder.
+    {
+        popMenu.addAction(&actNewFolder);
+        popMenu.addAction(&actDelFolder);
+        popMenu.addAction(&actUpFile);
+        popMenu.addAction(&actUpImg);
+    }else if(item->type()==1)//file.
+    {
+        popMenu.addAction(&actDwnFile);
+    }
+    popMenu.exec(QCursor::pos());
 }
