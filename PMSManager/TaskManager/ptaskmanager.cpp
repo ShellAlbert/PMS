@@ -583,6 +583,17 @@ void PTaskManager::closeEvent(QCloseEvent *event)
     emit this->ZSignalCloseEvent("TaskManager");
     QFrame::closeEvent(event);
 }
+void PTaskManager::resizeEvent(QResizeEvent *event)
+{
+    if(this->m_tabWidget->currentWidget()==this->m_taskList)
+    {
+        for(qint32 i=0;i<this->m_taskList->m_tree->columnCount();i++)
+        {
+            this->m_taskList->m_tree->resizeColumnToContents(i);
+        }
+    }
+    QFrame::resizeEvent(event);
+}
 void PTaskManager::ZSlotAddTask()
 {
     ZProcessStepLinkTemplateSelectDia selectDia;

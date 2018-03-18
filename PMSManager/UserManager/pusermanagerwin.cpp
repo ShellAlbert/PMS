@@ -14,6 +14,7 @@
 #include "NetProtocol/pnetframe.h"
 #include "pwaitingdia.h"
 #include <QDebug>
+#include <KDReports/KDReports.h>
 PUserManagerWin::PUserManagerWin()
 {
     this->setWindowTitle(tr("用户管理器-User Manager"));
@@ -139,6 +140,15 @@ PUserManagerWin::PUserManagerWin()
         connect(this->m_btnExport,SIGNAL(clicked(bool)),this,SLOT(ZSlotExport()));
     }
 
+    //print.
+    this->m_btnPrint=new QToolButton;
+    this->m_btnPrint->setToolTip(tr("打印用户列表"));
+    this->m_btnPrint->setText(tr("打印"));
+    this->m_btnPrint->setIcon(QIcon(":/common/images/common/print.png"));
+    this->m_btnPrint->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_vLayoutBtn->addWidget(this->m_btnPrint);
+    connect(this->m_btnPrint,SIGNAL(clicked(bool)),this,SLOT(ZSlotPrint()));
+
     //help.
     this->m_btnHelp=new QToolButton;
     this->m_btnHelp->setToolTip(tr("获取帮助文档"));
@@ -198,6 +208,7 @@ PUserManagerWin::~PUserManagerWin()
     {
         delete this->m_btnExport;
     }
+    delete this->m_btnPrint;
     delete this->m_btnHelp;
     delete this->m_vLayoutBtn;
 
@@ -791,6 +802,126 @@ void PUserManagerWin::ZSlotExport()
     this->ZAddLogMsg(tr("export user list success,[%1] records in total.").arg(nUserCnt));
     QMessageBox::information(this,tr("操作提示"),tr("导出用户成功,总计[%1]个权限组,[%2]个用户!").arg(nRoleCnt).arg(nUserCnt));
 }
+void PUserManagerWin::ZSlotPrint()
+{
+    KDReports::Report report;
+    report.setMargins(2,2,2,2);
+    report.setHeaderBodySpacing(2); // mm
+    report.setFooterBodySpacing(2); // mm
+    report.setWatermarkPixmap(QPixmap(":/LoginManager/images/LoginManager/Logo.png"));
+
+    //set header.
+    KDReports::Header &header=report.header();
+    header.addElement(KDReports::TextElement(QObject::tr("用户列表清单")),Qt::AlignLeft);
+    header.addElement(KDReports::TextElement("PMS流水线综合管控系统"),Qt::AlignHCenter);
+    header.addElement(KDReports::TextElement("Page "),Qt::AlignRight);
+    header.addVariable( KDReports::PageNumber );
+    header.addInlineElement( KDReports::TextElement(" / "));
+    header.addVariable( KDReports::PageCount );
+    report.setHeaderLocation(KDReports::AllPages,&header);
+
+    //the user table.
+    KDReports::TableElement tableElement;
+    tableElement.setHeaderRowCount(1);
+    tableElement.setPadding(3);
+    QColor headerColor("#DADADA");
+    //序号,用户名,真实姓名,性别，手机号码，创建者，创建时间，末次登录时间,所属组
+    qint32 nRow=0;
+    // Merged header in row 0
+    KDReports::Cell& topHeader = tableElement.cell(nRow,0);
+    topHeader.setColumnSpan(9);
+    topHeader.setBackground(headerColor);
+    topHeader.addElement( KDReports::TextElement(tr("PMS系统用户列表清单")), Qt::AlignHCenter );
+    nRow++;//next row.
+    //the table header.
+    for(qint32 i=0;i<9;i++)
+    {
+        KDReports::Cell& headerCell=tableElement.cell(nRow,i);
+        headerCell.setBackground(headerColor);
+        switch(i)
+        {
+        case 0:
+            headerCell.addElement(KDReports::TextElement(tr("序号")),Qt::AlignHCenter);
+            break;
+        case 1:
+            headerCell.addElement(KDReports::TextElement(tr("用户名")),Qt::AlignHCenter);
+            break;
+        case 2:
+            headerCell.addElement(KDReports::TextElement(tr("真实姓名")),Qt::AlignHCenter);
+            break;
+        case 3:
+            headerCell.addElement(KDReports::TextElement(tr("性别")),Qt::AlignHCenter);
+            break;
+        case 4:
+            headerCell.addElement(KDReports::TextElement(tr("手机号码")),Qt::AlignHCenter);
+            break;
+        case 5:
+            headerCell.addElement(KDReports::TextElement(tr("创建者")),Qt::AlignHCenter);
+            break;
+        case 6:
+            headerCell.addElement(KDReports::TextElement(tr("创建时间")),Qt::AlignHCenter);
+            break;
+        case 7:
+            headerCell.addElement(KDReports::TextElement(tr("末次登录时间")),Qt::AlignHCenter);
+            break;
+        case 8:
+            headerCell.addElement(KDReports::TextElement(tr("所属组")),Qt::AlignHCenter);
+            break;
+        }
+    }
+    nRow++;//next row.
+
+    qint32 nIndexNo=1;
+    for(qint32 i=0;i<this->m_treeWidget->topLevelItemCount();i++)
+    {
+        QTreeWidgetItem *grpItem=this->m_treeWidget->topLevelItem(i);
+        for(qint32 j=0;j<grpItem->childCount();j++)
+        {
+            QTreeWidgetItem *userItem=grpItem->child(j);
+            tableElement.cell(nRow,0).addElement(KDReports::TextElement(QString::number(nIndexNo,10)),Qt::AlignHCenter);
+            tableElement.cell(nRow,1).addElement(KDReports::TextElement(userItem->text(0)),Qt::AlignHCenter);
+            tableElement.cell(nRow,2).addElement(KDReports::TextElement(userItem->text(1)),Qt::AlignHCenter);
+            tableElement.cell(nRow,3).addElement(KDReports::TextElement(userItem->text(2)),Qt::AlignHCenter);
+            tableElement.cell(nRow,4).addElement(KDReports::TextElement(userItem->text(3)),Qt::AlignHCenter);
+            tableElement.cell(nRow,5).addElement(KDReports::TextElement(userItem->text(4)),Qt::AlignHCenter);
+            tableElement.cell(nRow,6).addElement(KDReports::TextElement(userItem->text(5)),Qt::AlignHCenter);
+            tableElement.cell(nRow,7).addElement(KDReports::TextElement(userItem->text(6)),Qt::AlignHCenter);
+            tableElement.cell(nRow,8).addElement(KDReports::TextElement(grpItem->text(0)),Qt::AlignHCenter);
+            nRow++;//next row.
+            nIndexNo++;//next index.
+        }
+    }
+//    // Normal header in row 1
+
+//    // This would look better if centered vertically. This feature is only available since
+//    // Qt-4.3 though (QTextCharFormat::AlignMiddle)
+//    QPixmap systemPixmap( ":/LoginManager/images/LoginManager/User.png" );
+//    headerCell1.addElement( KDReports::ImageElement( systemPixmap ) );
+//    headerCell1.addInlineElement( KDReports::TextElement( " Item" ) );
+//    KDReports::Cell& headerCell2 = tableElement.cell( 1, 1 );
+//    headerCell2.setBackground( headerColor );
+//    KDReports::TextElement expected( "Expected" );
+//    expected.setItalic( true );
+//    expected.setBackground( QColor("#999999") ); // note that this background only applies to this element
+//    headerCell2.addElement( expected );
+//    headerCell2.addInlineElement( KDReports::TextElement( " shipping time" ) );
+
+    //set footer.
+    QString footerString;
+    footerString+=QObject::tr("打印日期:");
+    footerString+=QDateTime::currentDateTime().toString("yyyy年MM月dd日 hh时mm分ss秒");
+    footerString+=QString("   ");
+    footerString+=QObject::tr("制表人:");
+    footerString+=MyUserInfo::ZGetInstance()->m_UserInfo.m_realName;
+
+    KDReports::Footer &footer=report.footer();
+    footer.addElement(KDReports::TextElement(footerString),Qt::AlignHCenter);
+    report.setFooterLocation(KDReports::AllPages,&footer);
+
+    report.addElement( tableElement );
+    KDReports::PreviewDialog preview( &report );
+    preview.exec();
+}
 void PUserManagerWin::ZSlotHelp()
 {
 
@@ -799,6 +930,14 @@ void PUserManagerWin::closeEvent(QCloseEvent *event)
 {
     emit this->ZSignalCloseEvent("UserManager");
     QFrame::closeEvent(event);
+}
+void PUserManagerWin::resizeEvent(QResizeEvent *event)
+{
+    for(qint32 i=0;i<this->m_treeWidget->columnCount();i++)
+    {
+        this->m_treeWidget->resizeColumnToContents(i);
+    }
+    QFrame::resizeEvent(event);
 }
 void PUserManagerWin::ZAddLogMsg(QString logMsg)
 {

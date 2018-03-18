@@ -55,33 +55,22 @@ public:
     void ZPutVarSourceXmlData(QString xmlData);
 signals:
     void ZSignalDataChanged(QString templateName);
-    void ZSignalFontChanged(QString fontFamily,qint32 fontSize,bool bold,bool italic);
     void ZSignalAlignmentChanged(qint32 alignNo);
     void ZSignalMergeCell();
     void ZSignalSplitCell();
-    void ZSignalAddPic();
-    void ZSignalDelPic();
 private slots:
     void ZSlotVarDblClicked(QTreeWidgetItem*item,int column);
-    void ZSlotFontChanged();
     void ZSlotAlignmentChanged();
     void ZSlotMergeSplitCell();
-    void ZSlotAddDelPic();
-    void ZSlotUpdateFontSize(QString fontFamily);
     void ZSlotCellActivated(qint32 x,qint32 y);
+    void ZSlotCellAutoAdjust(void);
 public:
 
     ZSheet *m_sheet;
     //////////////////////////
     QTreeWidget *m_treeWidget;
 
-    //line 1.
-    QComboBox *m_cbFontFamily;
-    QComboBox *m_cbFontSize;
-    QToolButton *m_tbBold;
-    QToolButton *m_tbItalic;
     //line 2.
-    QToolButton *m_tbAlignCenter;
     QToolButton *m_tbAlignLeft;
     QToolButton *m_tbAlignHCenter;
     QToolButton *m_tbAlignRight;
@@ -89,10 +78,10 @@ public:
     QToolButton *m_tbAlignVCenter;
     QToolButton *m_tbAlignBottom;
     //line3.
+    QToolButton *m_tbAlignCenter;
     QToolButton *m_tbMerge;
     QToolButton *m_tbSplit;
-    QToolButton *m_tbAddPic;
-    QToolButton *m_tbDelPic;
+    QToolButton *m_tbAutoAdjust;
     QLineEdit *m_leXY;
 
     QGridLayout *m_gLayoutBtn;
@@ -116,6 +105,7 @@ public:
     void ZProcessAckNetFrm(QString item,QString cmd,QStringList paraList,qint32 ackNetRetCode);
 protected:
     void closeEvent(QCloseEvent *event);
+    void resizeEvent(QResizeEvent *event);
 signals:
     void ZSignalCloseEvent(QString widget);
     void ZSignalLogMsg(QString logMsg);
@@ -240,7 +230,6 @@ private:
     QAction *m_actSysPic2;
     QAction *m_actSysPic3;
 
-
     QToolButton *m_btnVarSourceOp;
     QMenu *m_menuVarSourceOp;
     QAction *m_actOpenVarSource;
@@ -257,7 +246,6 @@ private:
     //right.
     ZTemplateWidget *m_templateWidget;
     QTabWidget* m_tabWidget;
-
 
     //main layout.
     QHBoxLayout *m_hLayoutMain;

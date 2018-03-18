@@ -18,6 +18,7 @@ public:
     void ZProcessAckNetFrm(QString item,QString cmd,QStringList paraList,qint32 ackNetRetCode);
 protected:
     void closeEvent(QCloseEvent *event);
+    void resizeEvent(QResizeEvent *event);
 signals:
     void ZSignalCloseEvent(QString widget);
     void ZSignalLogMsg(QString logMsg);
@@ -31,6 +32,7 @@ private slots:
     void ZSlotExpand();
     void ZSlotImport();
     void ZSlotExport();
+    void ZSlotPrint();
     void ZSlotHelp();
     void ZSlotTreeDblClicked(QModelIndex index);
     void ZSlotPopupMenu(const QPoint &pt);
@@ -49,6 +51,7 @@ private:
     QToolButton *m_btnExpand;
     QToolButton *m_btnImport;
     QToolButton *m_btnExport;
+    QToolButton *m_btnPrint;
     QToolButton *m_btnHelp;
     QVBoxLayout *m_vLayoutBtn;
 

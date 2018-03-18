@@ -122,6 +122,7 @@
         <file>images/TemplateEditor/Print.png</file>
         <file>images/TemplateEditor/PrintHtml.png</file>
         <file>images/TemplateEditor/PrintPdf.png</file>
+        <file>images/TemplateEditor/AutoAdjust.png</file>
     </qresource>
     <qresource prefix="/UserManager">
         <file>images/UserManager/AddGrp.png</file>
@@ -179,6 +180,7 @@
         <file>images/common/okay.png</file>
         <file>images/common/Calendar.png</file>
         <file>images/common/help.png</file>
+        <file>images/common/print.png</file>
     </qresource>
     <qresource prefix="/background">
         <file>images/background/background_main.png</file>
@@ -235,6 +237,12 @@
         <file>images/FormDesigner/PrintPreview.png</file>
         <file>images/FormDesigner/SelectAll.png</file>
         <file>images/FormDesigner/SelectOp.png</file>
+        <file>images/FormDesigner/1leftarrow.png</file>
+        <file>images/FormDesigner/1rightarrow.png</file>
+        <file>images/FormDesigner/2leftarrow.png</file>
+        <file>images/FormDesigner/2rightarrow.png</file>
+        <file>images/FormDesigner/zoom-.png</file>
+        <file>images/FormDesigner/zoom+.png</file>
     </qresource>
     <qresource prefix="/BackupManager">
         <file>images/BackupManager/Backup.png</file>

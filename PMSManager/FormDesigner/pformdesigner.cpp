@@ -21,6 +21,12 @@
 #include <QXmlStreamWriter>
 #include <QMessageBox>
 #include <QGraphicsItem>
+#include <KDReports/KDReports.h>
+#include <KDReports/KDReportsTableElement.h>
+#include <KDReports/KDReportsCell.h>
+#include <QtSql/QSqlTableModel>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
 #include "pgblpara.h"
 ZFormList::ZFormList()
 {
@@ -789,6 +795,14 @@ PFormDesigner::PFormDesigner()
     connect(this->m_tbPrintView,SIGNAL(clicked(bool)),this,SLOT(ZSlotPrintView()));
     connect(this->m_tbPrint,SIGNAL(clicked(bool)),this,SLOT(ZSlotPrint()));
 
+    //help.
+    this->m_btnHelp=new QToolButton;
+    this->m_btnHelp->setToolTip(tr("获取帮助文档"));
+    this->m_btnHelp->setText(tr("帮助"));
+    this->m_btnHelp->setIcon(QIcon(":/common/images/common/help.png"));
+    this->m_btnHelp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    connect(this->m_btnHelp,SIGNAL(clicked(bool)),this,SLOT(ZSlotHelp()));
+
     this->m_vLayoutTb=new QVBoxLayout;
     this->m_vLayoutTb->addWidget(this->m_tbFormOp);
     this->m_vLayoutTb->addWidget(this->m_tbFormComponent);
@@ -796,9 +810,8 @@ PFormDesigner::PFormDesigner()
     this->m_vLayoutTb->addWidget(this->m_tbDiagram);
     this->m_vLayoutTb->addWidget(this->m_tbPrintView);
     this->m_vLayoutTb->addWidget(this->m_tbPrint);
-
     this->m_vLayoutTb->addStretch(1);
-
+    this->m_vLayoutTb->addWidget(this->m_btnHelp);
 
     this->m_tabWidget=new QTabWidget;
     this->m_tabWidget->setTabsClosable(true);
@@ -1358,11 +1371,152 @@ void PFormDesigner::ZSlotPrint()
     widget->m_view->render(&painter);
     img.save(pngFileName);
 }
+void PFormDesigner::ZSlotHelp()
+{
+
+}
 void PFormDesigner::ZSlotPrintView()
 {
-    QPrintPreviewDialog dia(this);
-    connect(&dia,SIGNAL(paintRequested(QPrinter*)),this,SLOT(ZSlotDoPrinter(QPrinter*)));
-    dia.exec();
+    if(this->m_tabWidget->currentIndex()==0)
+    {
+        return;
+    }
+    ZFormWidget *widget=qobject_cast<ZFormWidget*>(this->m_tabWidget->currentWidget());
+    if(widget==NULL)
+    {
+        return;
+    }
+    QString formName=QObject::tr("报表:")+widget->ZGetFormName();
+
+    KDReports::Report report;
+    report.setMargins(2,2,2,2);
+    report.setHeaderBodySpacing(6); // mm
+    report.setFooterBodySpacing(6); // mm
+    report.setWatermarkPixmap(QPixmap(":/LoginManager/images/LoginManager/Logo.png"));
+    KDReports::Header &header=report.header();
+    header.addElement(KDReports::TextElement(formName),Qt::AlignLeft);
+    header.addElement(KDReports::TextElement("PMS流水线综合管控系统"),Qt::AlignHCenter);
+    header.addElement(KDReports::TextElement("Page "),Qt::AlignRight);
+    header.addVariable( KDReports::PageNumber );
+    header.addInlineElement( KDReports::TextElement(" / "));
+    header.addVariable( KDReports::PageCount );
+    report.setHeaderLocation(KDReports::AllPages,&header);
+
+    //    KDReports::Header& header = report.header( KDReports::FirstPage );
+    //    header.addElement( KDReports::TextElement( "A tall image made to fit into the page" ) );
+
+    //    KDReports::Header& header2 = report.header( KDReports::EvenPages );
+    //    header2.addElement( KDReports::TextElement( "A wide image made to fit into the page" ) );
+
+    //    KDReports::Footer& footer = report.footer();
+    //    footer.addElement( KDReports::TextElement( "Page" ), Qt::AlignRight );
+    //    footer.addInlineElement( KDReports::TextElement( " " ) );
+    //    footer.addVariable( KDReports::PageNumber );
+    //    footer.addInlineElement( KDReports::TextElement( "/" ) );
+    //    footer.addVariable( KDReports::PageCount );
+
+    //    KDReports::ImageElement imageElement( QPixmap( ":/background/images/background/background_main.png" ) );
+    //    imageElement.setFitToPage();
+    //    report.addElement( imageElement );
+
+    //    KDReports::ImageElement imageElement2( QPixmap( ":/background/images/background/background_main.png" ) );
+    //    imageElement2.setFitToPage();
+    //    report.addElement( imageElement2 );
+
+    //    KDReports::PreviewDialog preview( &report );
+    //    preview.exec();
+
+
+
+    //    KDReports::TextElement titleElement(QObject::tr("Hello world"));
+    //    titleElement.setPointSize(20);
+    //    report.addElement(titleElement,Qt::AlignHCenter);
+    //    report.addVerticalSpacing(20);
+    //    KDReports::TextElement textElement(QObject::tr("This is a report generated with KD Report"));
+    //    report.addElement(textElement,Qt::AlignLeft);
+    //    KDReports::PreviewDialog preview(&report);
+    //    preview.exec();
+
+    // open a DB connection to an in-memory database
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(":memory:");
+    if( !db.open() ) {
+        QMessageBox::critical(0, QObject::tr("Cannot open database"),
+                              QObject::tr("Cannot create connection to the requested database. Your Qt is probably lacking the QSQLITE driver. Please check your Qt installation." ), QMessageBox::Cancel );
+        return;
+    }
+
+    // fill the DB with some test data
+    QSqlQuery query;
+    query.exec("create table airlines (id int primary key, "
+               "name varchar(20), homecountry varchar(2))");
+    query.exec("insert into airlines values(1, 'Lufthansa', 'DE')");
+    query.exec("insert into airlines values(2, 'SAS', 'SE')");
+    query.exec("insert into airlines values(3, 'United', 'US')");
+    query.exec("insert into airlines values(4, 'KLM', 'NL')");
+    query.exec("insert into airlines values(5, 'Aeroflot', 'RU')");
+
+    // Create a QSqlTableModel, connect to the previously created database, fill
+    // the db with some data.
+    QSqlTableModel tableModel( 0, db );
+    tableModel.setTable( "airlines" );
+    tableModel.select();
+    tableModel.removeColumn( 0 );
+    tableModel.setHeaderData(0, Qt::Horizontal, QObject::tr("Name"));
+    tableModel.setHeaderData(1, Qt::Horizontal, QObject::tr("Home country"));
+    QFont font = this->font();
+    font.setBold( true );
+    tableModel.setHeaderData( 0, Qt::Horizontal, font, Qt::FontRole );
+    tableModel.setHeaderData( 1, Qt::Horizontal, font, Qt::FontRole );
+
+    KDReports::AutoTableElement table1( &tableModel );
+    table1.setVerticalHeaderVisible( false );
+    report.addElement( table1 );
+
+    report.addPageBreak();
+    // To export to an image file:
+    //qDebug() << "Exporting to output.png";
+    //report.exportToImage( QSize(300, 400), "output.png", "PNG" );
+
+    // ===========================================================================
+    // Another kind of table, where the data comes from code and not from a model:
+    // ===========================================================================
+    KDReports::TableElement tableElement;
+    tableElement.setHeaderRowCount( 2 );
+    tableElement.setPadding( 3 );
+    QColor headerColor( "#DADADA" );
+    // Merged header in row 0
+    KDReports::Cell& topHeader = tableElement.cell( 0, 0 );
+    topHeader.setColumnSpan( 2 );
+    topHeader.setBackground( headerColor );
+    topHeader.addElement( KDReports::TextElement( "TableElement example" ), Qt::AlignHCenter );
+
+    // Normal header in row 1
+    KDReports::Cell& headerCell1 = tableElement.cell( 1, 0 );
+    headerCell1.setBackground( headerColor );
+    // This would look better if centered vertically. This feature is only available since
+    // Qt-4.3 though (QTextCharFormat::AlignMiddle)
+    QPixmap systemPixmap( ":/LoginManager/images/LoginManager/User.png" );
+    headerCell1.addElement( KDReports::ImageElement( systemPixmap ) );
+    headerCell1.addInlineElement( KDReports::TextElement( " Item" ) );
+    KDReports::Cell& headerCell2 = tableElement.cell( 1, 1 );
+    headerCell2.setBackground( headerColor );
+    KDReports::TextElement expected( "Expected" );
+    expected.setItalic( true );
+    expected.setBackground( QColor("#999999") ); // note that this background only applies to this element
+    headerCell2.addElement( expected );
+    headerCell2.addInlineElement( KDReports::TextElement( " shipping time" ) );
+
+    // Data in rows 2 and 3
+    tableElement.cell( 2, 0 ).addElement( KDReports::TextElement( "Network Peripherals" ) );
+    tableElement.cell( 2, 1 ).addElement( KDReports::TextElement( "4 days" ) );
+    tableElement.cell( 3, 0 ).addElement( KDReports::TextElement( "Printer Cartridges" ) );
+    tableElement.cell( 3, 1 ).addElement( KDReports::TextElement( "3 days" ) );
+
+    report.addElement( tableElement );
+
+    KDReports::PreviewDialog preview( &report );
+    preview.exec();
 }
 void PFormDesigner::ZSlotDoPrinter(QPrinter *printer)
 {

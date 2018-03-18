@@ -443,6 +443,18 @@ void PTemplateEditor::closeEvent(QCloseEvent *event)
     emit this->ZSignalCloseEvent("TemplateEditor");
     QFrame::closeEvent(event);
 }
+void PTemplateEditor::resizeEvent(QResizeEvent *event)
+{
+    for(qint32 i=0;i<this->m_templateWidget->m_treeWidget->columnCount();i++)
+    {
+        this->m_templateWidget->m_treeWidget->resizeColumnToContents(i);
+    }
+    for(qint32 i=0;i<this->m_templateWidget->m_treeVarSource->columnCount();i++)
+    {
+        this->m_templateWidget->m_treeVarSource->resizeColumnToContents(i);
+    }
+    QFrame::resizeEvent(event);
+}
 void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraList,qint32 ackNetRetCode)
 {
     if(item=="template")
@@ -476,12 +488,8 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 connect(sheetWidget->m_sheet,SIGNAL(ZSignalBindVar()),this,SLOT(ZSlotCellBindVar()));
                 connect(sheetWidget->m_sheet,SIGNAL(ZSignalUnbindVar()),this,SLOT(ZSlotCellUnbindVar()));
                 connect(sheetWidget,SIGNAL(ZSignalAlignmentChanged(qint32)),this,SLOT(ZSlotAlignmentChanged(qint32)));
-                connect(sheetWidget,SIGNAL(ZSignalFontChanged(QString,qint32,bool,bool)),this,SLOT(ZSlotFontChanged(QString,qint32,bool,bool)));
                 connect(sheetWidget,SIGNAL(ZSignalMergeCell()),this,SLOT(ZSlotMergeCell()));
                 connect(sheetWidget,SIGNAL(ZSignalSplitCell()),this,SLOT(ZSlotSplitCell()));
-                connect(sheetWidget,SIGNAL(ZSignalAddPic()),this,SLOT(ZSlotInsertPic()));
-                connect(sheetWidget,SIGNAL(ZSignalDelPic()),this,SLOT(ZSlotRemovePic()));
-
                 this->ZAddLogMsg(tr("add template [%1] success.").arg(templateName));
             }
         }else if(cmd=="del")
@@ -552,11 +560,8 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 connect(sheetWidget->m_sheet,SIGNAL(ZSignalBindVar()),this,SLOT(ZSlotCellBindVar()));
                 connect(sheetWidget->m_sheet,SIGNAL(ZSignalUnbindVar()),this,SLOT(ZSlotCellUnbindVar()));
                 connect(sheetWidget,SIGNAL(ZSignalAlignmentChanged(qint32)),this,SLOT(ZSlotAlignmentChanged(qint32)));
-                connect(sheetWidget,SIGNAL(ZSignalFontChanged(QString,qint32,bool,bool)),this,SLOT(ZSlotFontChanged(QString,qint32,bool,bool)));
                 connect(sheetWidget,SIGNAL(ZSignalMergeCell()),this,SLOT(ZSlotMergeCell()));
                 connect(sheetWidget,SIGNAL(ZSignalSplitCell()),this,SLOT(ZSlotSplitCell()));
-                connect(sheetWidget,SIGNAL(ZSignalAddPic()),this,SLOT(ZSlotInsertPic()));
-                connect(sheetWidget,SIGNAL(ZSignalDelPic()),this,SLOT(ZSlotRemovePic()));
                 this->ZAddLogMsg(tr("get template [%1] success,fileSize:%2.").arg(templateName).arg(fileSize));
             }
         }else if(cmd=="save")
@@ -1441,6 +1446,7 @@ void PTemplateEditor::ZSlotFontChanged(QString fontFamily,qint32 fontSize,bool b
 
         for(qint32 i=0;i<tSelectedItems.count();i++)
         {
+            qDebug()<<"setFont:"<<fontFamily<<","<<fontSize;
             ZCell* tCell=static_cast<ZCell*>(tSelectedItems.at(i));
             //cell font.
             QFont tFont(fontFamily,fontSize);
@@ -2265,30 +2271,8 @@ ZSheetWidget::ZSheetWidget()
 
 #define ICON_W  24
 #define ICON_H  24
-    //line 1.
-    this->m_cbFontFamily=new QComboBox;
-    this->m_cbFontFamily->setEditable(false);
-    this->m_cbFontSize=new QComboBox;
-    this->m_cbFontSize->setEditable(false);
-    this->m_tbBold=new QToolButton;
-    this->m_tbBold->setToolTip(tr("加粗"));
-    this->m_tbBold->setIconSize(QSize(ICON_W,ICON_H));
-    this->m_tbBold->setIcon(QIcon(":/alignment/images/alignment/Bold.png"));
-    this->m_tbBold->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    this->m_tbBold->setCheckable(true);
-    this->m_tbItalic=new QToolButton;
-    this->m_tbItalic->setToolTip(tr("斜体"));
-    this->m_tbItalic->setIconSize(QSize(ICON_W,ICON_H));
-    this->m_tbItalic->setIcon(QIcon(":/alignment/images/alignment/Italic.png"));
-    this->m_tbItalic->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     //line2.
-    this->m_tbAlignCenter=new QToolButton;
-    this->m_tbAlignCenter->setToolTip(tr("水平垂直居中"));
-    this->m_tbAlignCenter->setIconSize(QSize(ICON_W,ICON_H));
-    this->m_tbAlignCenter->setIcon(QIcon(":/alignment/images/alignment/AlignCenter.png"));
-    this->m_tbAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
-
     this->m_tbAlignLeft=new QToolButton;
     this->m_tbAlignLeft->setToolTip(tr("左对齐"));
     this->m_tbAlignLeft->setIconSize(QSize(ICON_W,ICON_H));
@@ -2328,6 +2312,12 @@ ZSheetWidget::ZSheetWidget()
     this->m_tbAlignBottom->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     //line3.
+    this->m_tbAlignCenter=new QToolButton;
+    this->m_tbAlignCenter->setToolTip(tr("水平垂直居中"));
+    this->m_tbAlignCenter->setIconSize(QSize(ICON_W,ICON_H));
+    this->m_tbAlignCenter->setIcon(QIcon(":/alignment/images/alignment/AlignCenter.png"));
+    this->m_tbAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
     this->m_tbMerge=new QToolButton;
     this->m_tbMerge->setToolTip(tr("合并单元格"));
     this->m_tbMerge->setIconSize(QSize(ICON_W,ICON_H));
@@ -2338,16 +2328,17 @@ ZSheetWidget::ZSheetWidget()
     this->m_tbSplit->setIconSize(QSize(ICON_W,ICON_H));
     this->m_tbSplit->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/Split.png"));
     this->m_tbSplit->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    this->m_tbAddPic=new QToolButton;
-    this->m_tbAddPic->setToolTip(tr("插入图片"));
-    this->m_tbAddPic->setIconSize(QSize(ICON_W,ICON_H));
-    this->m_tbAddPic->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/InsertPic.png"));
-    this->m_tbAddPic->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    this->m_tbDelPic=new QToolButton;
-    this->m_tbDelPic->setToolTip(tr("移除图片"));
-    this->m_tbDelPic->setIconSize(QSize(ICON_W,ICON_H));
-    this->m_tbDelPic->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/RemovePic.png"));
-    this->m_tbDelPic->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    this->m_tbSplit=new QToolButton;
+    this->m_tbSplit->setToolTip(tr("拆分单元格"));
+    this->m_tbSplit->setIconSize(QSize(ICON_W,ICON_H));
+    this->m_tbSplit->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/Split.png"));
+    this->m_tbSplit->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    this->m_tbAutoAdjust=new QToolButton;
+    this->m_tbAutoAdjust->setToolTip(tr("自动调整列宽和行高"));
+    this->m_tbAutoAdjust->setIconSize(QSize(ICON_W,ICON_H));
+    this->m_tbAutoAdjust->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/AutoAdjust.png"));
+    this->m_tbAutoAdjust->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
     this->m_leXY=new QLineEdit;
     this->m_leXY->setFocusPolicy(Qt::NoFocus);
     this->m_leXY->setAlignment(Qt::AlignCenter);
@@ -2355,32 +2346,20 @@ ZSheetWidget::ZSheetWidget()
     this->m_sheet->setCurrentCell(0,0);
 
     this->m_gLayoutBtn=new QGridLayout;
-    //line1.
-    this->m_gLayoutBtn->addWidget(this->m_cbFontFamily,0,0,1,3);
-    this->m_gLayoutBtn->addWidget(this->m_cbFontSize,0,3,1,2);
-    this->m_gLayoutBtn->addWidget(this->m_tbBold,0,5,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_tbItalic,0,6,1,1);
     //line2.
-    this->m_gLayoutBtn->addWidget(this->m_tbAlignCenter,1,0,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_tbAlignLeft,1,1,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_tbAlignHCenter,1,2,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_tbAlignRight,1,3,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_tbAlignTop,1,4,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_tbAlignVCenter,1,5,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_tbAlignBottom,1,6,1,1);
+    this->m_gLayoutBtn->addWidget(this->m_tbAlignLeft,0,0,1,1);
+    this->m_gLayoutBtn->addWidget(this->m_tbAlignHCenter,0,1,1,1);
+    this->m_gLayoutBtn->addWidget(this->m_tbAlignRight,0,2,1,1);
+    this->m_gLayoutBtn->addWidget(this->m_tbAlignTop,0,3,1,1);
+    this->m_gLayoutBtn->addWidget(this->m_tbAlignVCenter,0,4,1,1);
+    this->m_gLayoutBtn->addWidget(this->m_tbAlignBottom,0,5,1,1);
     //line3.
-    this->m_gLayoutBtn->addWidget(this->m_tbMerge,2,0,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_tbSplit,2,1,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_tbAddPic,2,2,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_tbDelPic,2,3,1,1);
-    this->m_gLayoutBtn->addWidget(this->m_leXY,2,4,1,3);
+    this->m_gLayoutBtn->addWidget(this->m_tbAlignCenter,1,0,1,1);
+    this->m_gLayoutBtn->addWidget(this->m_tbMerge,1,1,1,1);
+    this->m_gLayoutBtn->addWidget(this->m_tbSplit,1,2,1,1);
+    this->m_gLayoutBtn->addWidget(this->m_tbAutoAdjust,1,3,1,1);
+    this->m_gLayoutBtn->addWidget(this->m_leXY,1,4,1,2);
 
-    connect(this->m_cbFontFamily,SIGNAL(currentTextChanged(QString)),this,SLOT(ZSlotFontChanged()));
-    connect(this->m_cbFontSize,SIGNAL(currentTextChanged(QString)),this,SLOT(ZSlotFontChanged()));
-    connect(this->m_tbBold,SIGNAL(clicked(bool)),this,SLOT(ZSlotFontChanged()));
-    connect(this->m_tbItalic,SIGNAL(clicked(bool)),this,SLOT(ZSlotFontChanged()));
-
-    connect(this->m_tbAlignCenter,SIGNAL(clicked(bool)),this,SLOT(ZSlotAlignmentChanged()));
     connect(this->m_tbAlignLeft,SIGNAL(clicked(bool)),this,SLOT(ZSlotAlignmentChanged()));
     connect(this->m_tbAlignHCenter,SIGNAL(clicked(bool)),this,SLOT(ZSlotAlignmentChanged()));
     connect(this->m_tbAlignRight,SIGNAL(clicked(bool)),this,SLOT(ZSlotAlignmentChanged()));
@@ -2388,11 +2367,10 @@ ZSheetWidget::ZSheetWidget()
     connect(this->m_tbAlignVCenter,SIGNAL(clicked(bool)),this,SLOT(ZSlotAlignmentChanged()));
     connect(this->m_tbAlignBottom,SIGNAL(clicked(bool)),this,SLOT(ZSlotAlignmentChanged()));
 
-    connect(this->m_tbAddPic,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddDelPic()));
-    connect(this->m_tbDelPic,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddDelPic()));
-
+    connect(this->m_tbAlignCenter,SIGNAL(clicked(bool)),this,SLOT(ZSlotAlignmentChanged()));
     connect(this->m_tbMerge,SIGNAL(clicked(bool)),this,SLOT(ZSlotMergeSplitCell()));
     connect(this->m_tbSplit,SIGNAL(clicked(bool)),this,SLOT(ZSlotMergeSplitCell()));
+    connect(this->m_tbAutoAdjust,SIGNAL(clicked(bool)),this,SLOT(ZSlotCellAutoAdjust()));
     //bottom horizontal layout.
     this->m_hLayoutBottom=new QHBoxLayout;
     this->m_hLayoutBottom->addWidget(this->m_treeWidget);
@@ -2416,13 +2394,6 @@ ZSheetWidget::ZSheetWidget()
     connect(this->m_sheet,SIGNAL(cellClicked(int,int)),this,SLOT(ZSlotCellActivated(qint32,qint32)));
     connect(this->m_treeWidget,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(ZSlotVarDblClicked(QTreeWidgetItem*,int)));
 
-
-    //load all available font familys.
-    QFontDatabase tFontDb;
-    this->m_cbFontFamily->addItems(tFontDb.families());
-    this->m_cbFontFamily->setCurrentIndex(0);
-    connect(this->m_cbFontFamily,SIGNAL(currentTextChanged(QString)),this,SLOT(ZSlotUpdateFontSize(QString)));
-    this->ZSlotUpdateFontSize(this->m_cbFontFamily->currentText());
 }
 ZSheetWidget::~ZSheetWidget()
 {
@@ -2431,15 +2402,7 @@ ZSheetWidget::~ZSheetWidget()
     delete this->m_generalVarItem;
     delete this->m_autoVarItem;
     delete this->m_treeWidget;
-
-    //line1.
-    delete this->m_cbFontFamily;
-    delete this->m_cbFontSize;
-    delete this->m_tbBold;
-    delete this->m_tbItalic;
-
     //line2.
-    delete this->m_tbAlignCenter;
     delete this->m_tbAlignLeft;
     delete this->m_tbAlignHCenter;
     delete this->m_tbAlignRight;
@@ -2448,10 +2411,10 @@ ZSheetWidget::~ZSheetWidget()
     delete this->m_tbAlignBottom;
     delete this->m_gLayoutBtn;
     //line3.
+    delete this->m_tbAlignCenter;
     delete this->m_tbMerge;
     delete this->m_tbSplit;
-    delete this->m_tbAddPic;
-    delete this->m_tbDelPic;
+    delete this->m_tbAutoAdjust;
     delete this->m_leXY;
 
     delete this->m_hLayoutBottom;
@@ -2459,14 +2422,6 @@ ZSheetWidget::~ZSheetWidget()
 
     delete this->m_spliter;
     delete this->m_vLayout;
-}
-void ZSheetWidget::ZSlotFontChanged()
-{
-    QString fontFamily=this->m_cbFontFamily->currentText();
-    qint32 fontSize=this->m_cbFontSize->currentText().toInt();
-    bool fontBold=this->m_tbBold->isChecked();
-    bool fontItalic=this->m_tbItalic->isChecked();
-    emit this->ZSignalFontChanged(fontFamily,fontSize,fontBold,fontItalic);
 }
 void ZSheetWidget::ZSlotAlignmentChanged()
 {
@@ -2503,17 +2458,6 @@ void ZSheetWidget::ZSlotMergeSplitCell()
     }else if(srcBtn==this->m_tbSplit)
     {
         emit this->ZSignalSplitCell();
-    }
-}
-void ZSheetWidget::ZSlotAddDelPic()
-{
-    QToolButton *srcBtn=qobject_cast<QToolButton*>(this->sender());
-    if(srcBtn==this->m_tbAddPic)
-    {
-        emit this->ZSignalAddPic();
-    }else if(srcBtn==this->m_tbDelPic)
-    {
-        emit this->ZSignalDelPic();
     }
 }
 QString ZSheetWidget::ZGetWidgetTypeName()
@@ -3120,47 +3064,13 @@ void ZSheetWidget::ZPutVarSourceXmlData(QString xmlData)
         }//StarElement.
     }//while().
 }
-void ZSheetWidget::ZSlotUpdateFontSize(QString fontFamily)
-{
-    if(fontFamily.isEmpty())
-    {
-        return;
-    }
-    //clear first.
-    this->m_cbFontSize->clear();
 
-    //get all supported font sizes.
-    QFontDatabase tFontDb;
-    QList<int>  tFontSizeList=tFontDb.pointSizes(fontFamily);
-    //if the font family does not contains font size information.
-    //we only set the default size 16.
-    if(tFontSizeList.count()<=0)
-    {
-        this->m_cbFontSize->addItem(QString("16"));
-        return;
-    }
-
-    for(qint32 i=0;i<tFontSizeList.count();i++)
-    {
-        this->m_cbFontSize->addItem(QString("%1").arg(tFontSizeList.at(i)));
-    }
-}
 void ZSheetWidget::ZSlotCellActivated(qint32 x,qint32 y)
 {
     this->m_leXY->setText(QString("(%1,%2)").arg(x+1).arg(y+1));
-
-    //only fetch the first cell's attribute.
-    QList<QTableWidgetItem*> tSelectedItems=this->m_sheet->selectedItems();
-    if(tSelectedItems.count()<=0)
-    {
-        return;
-    }
-    ZCell* tLeftTopCell=static_cast<ZCell*>(tSelectedItems.at(0));
-    if(!tLeftTopCell)
-    {
-        return;
-    }
-    this->m_cbFontFamily->setCurrentText(tLeftTopCell->ZGetFont().family());
-    this->m_cbFontSize->setCurrentText(QString::number(tLeftTopCell->ZGetFont().pointSize(),10));
-    qDebug()<<tLeftTopCell->ZGetFont().family()<<","<<tLeftTopCell->ZGetFont().pointSize();
+}
+void ZSheetWidget::ZSlotCellAutoAdjust(void)
+{
+    this->m_sheet->resizeRowsToContents();
+    this->m_sheet->resizeColumnsToContents();
 }

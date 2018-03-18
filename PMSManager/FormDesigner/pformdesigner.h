@@ -129,8 +129,6 @@ protected:
 signals:
     void ZSignalCloseEvent(QString widget);
     void ZSignalLogMsg(QString logMsg);
-
-
 private slots:
     void ZSlotNewForm();
     void ZSlotOpenForm();
@@ -154,7 +152,7 @@ private slots:
     void ZSlotPrint();
     void ZSlotPrintView();
     void ZSlotDoPrinter(QPrinter *printer);
-
+    void ZSlotHelp();
     void ZSlotFormChanged();
     void ZSlotCloseTab(qint32 index);
     void ZSlotOpenForm(QModelIndex index);
@@ -191,6 +189,7 @@ private:
 
     QToolButton *m_tbPrintView;
     QToolButton *m_tbPrint;
+    QToolButton *m_btnHelp;
 
     QVBoxLayout *m_vLayoutTb;
     //right.

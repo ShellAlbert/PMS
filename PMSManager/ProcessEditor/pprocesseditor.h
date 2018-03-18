@@ -67,6 +67,7 @@ public:
     void ZProcessAckNetFrm(QString item,QString cmd,QStringList paraList,qint32 ackNetRetCode);
 protected:
     void closeEvent(QCloseEvent *event);
+    void resizeEvent(QResizeEvent *event);
 signals:
     void ZSignalCloseEvent(QString widget);
     void ZSignalLogMsg(QString logMsg);

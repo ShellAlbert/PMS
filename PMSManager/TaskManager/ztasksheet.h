@@ -44,7 +44,8 @@ signals:
 private slots:
     void ZSlotCellChanged(int row,int col);
     void ZSlotCellClicked(QTableWidgetItem*);
-
+protected:
+    void paintEvent(QPaintEvent *e);
 public:
     ZCellDelegate *m_cellDelegate;
 private:

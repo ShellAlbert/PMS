@@ -484,7 +484,17 @@ void ZTaskSheet::ZSlotCellClicked(QTableWidgetItem*item)
         }
     }
 }
-
+void ZTaskSheet::paintEvent(QPaintEvent *e)
+{
+//    QPainter painter(this);
+//    QFont tFont=painter.font();
+//    tFont.setPointSize(48);
+//    painter.setFont(tFont);
+//    painter.setBrush(QBrush(Qt::red));
+//    painter.drawText(QRectF(0,0,100,100),tr("已审核"));
+//    painter.drawText(QRectF(0,0,100,100),tr("已审核"));
+    QTableWidget::paintEvent(e);
+}
 ZCellDataCheckReportDialog::ZCellDataCheckReportDialog(QWidget *parent):QDialog(parent)
 {
     this->setWindowTitle(tr("数据检查报告"));
@@ -595,6 +605,7 @@ ZTaskWidget::~ZTaskWidget()
 }
 void ZTaskWidget::ZSlotVarDblClicked(QModelIndex index)
 {
+    Q_UNUSED(index);
     QTreeWidgetItem *item=this->m_treeVar->currentItem();
     if(item==NULL)
     {
@@ -916,9 +927,12 @@ bool ZTaskWidget::ZCheckCellDataValidation()
         }
     }
     //show cell data check report dialog.
-    ZCellDataCheckReportDialog dia(this);
-    dia.ZAddReportLog(checkLog);
-    dia.exec();
+    if(!checkLog.isEmpty())
+    {
+        ZCellDataCheckReportDialog dia(this);
+        dia.ZAddReportLog(checkLog);
+        dia.exec();
+    }
     return bCheckOkay;
 }
 
@@ -927,20 +941,22 @@ void ZTaskWidget::ZSetTaskState(qint32 state)
     this->m_sheet->ZSetTaskState(state);
     this->m_TaskState=state;
     this->m_llTaskStateText->setText(ZGetTaskStateString(state));
-    this->m_llTaskStateIcon->setPixmap(QPixmap(ZGetTaskStateIconName(state)).scaled(10,10));
+    this->m_llTaskStateIcon->setPixmap(QPixmap(ZGetTaskStateIconName(state)).scaled(24,24));
     switch(state)
     {
     case Task_Type_New:
     case Task_Type_Save:
     case Task_Type_Check_Failed:
         this->ZSetGeVarBindCellEditable(true);
-        this->m_sheet->setEnabled(true);
+        //this->m_sheet->setEnabled(true);
+        this->m_sheet->setEditTriggers(QAbstractItemView::AllEditTriggers);
         break;
     case Task_Type_Submit:
     case Task_Type_Check_Okay:
     case Task_Type_Archieve:
         this->ZSetGeVarBindCellEditable(false);
-        this->m_sheet->setEnabled(false);
+        //this->m_sheet->setEnabled(false);
+        this->m_sheet->setEditTriggers(QAbstractItemView::NoEditTriggers);
         break;
     }
     this->m_autoVarItem->setExpanded(true);

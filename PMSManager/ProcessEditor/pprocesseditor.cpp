@@ -236,9 +236,9 @@ PProcessEditor::PProcessEditor()
 {
     this->setWindowTitle(tr("工序管理器-Process Editor"));
     this->setWindowIcon(QIcon(":/TaskBar/images/ProcessEditor.png"));
-//    this->setStyleSheet("QToolButton{background-color:#cce5f9;font:color #eaf7ff;padding: 6px 12px 6px 12p}"
-//                        "QToolButton::hover{background-color:#eaf7ff;}"
-//                        "");
+    //    this->setStyleSheet("QToolButton{background-color:#cce5f9;font:color #eaf7ff;padding: 6px 12px 6px 12p}"
+    //                        "QToolButton::hover{background-color:#eaf7ff;}"
+    //                        "");
     this->setStyleSheet("QToolButton{background-color:#cce5f9;border:none;font:color #eaf7ff;}"
                         "QToolButton::hover{background-color:#eaf7ff;}"
                         "");
@@ -516,6 +516,17 @@ void PProcessEditor::closeEvent(QCloseEvent *event)
 {
     emit this->ZSignalCloseEvent("ProcessEditor");
     QFrame::closeEvent(event);
+}
+void PProcessEditor::resizeEvent(QResizeEvent *event)
+{
+    if(this->m_tabWidget->currentWidget()==this->m_processManager)
+    {
+        for(qint32 i=0;i<this->m_processManager->m_treeWidget->columnCount();i++)
+        {
+            this->m_processManager->m_treeWidget->resizeColumnToContents(i);
+        }
+    }
+    QFrame::resizeEvent(event);
 }
 void PProcessEditor::ZSlotAddProcess()
 {
