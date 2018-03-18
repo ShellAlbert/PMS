@@ -45,6 +45,7 @@ PUserManagerWin::PUserManagerWin()
     this->m_llSummaryInfo=new QLabel;
     this->m_cbPage=new QComboBox;
     this->m_hLayoutRightTop=new QHBoxLayout;
+    this->m_hLayoutRightTop->addStretch(1);
     this->m_hLayoutRightTop->addWidget(this->m_llSummaryInfo);
     this->m_hLayoutRightTop->addStretch(1);
     this->m_hLayoutRightTop->addWidget(this->m_tbTurnPage[0]);
@@ -70,8 +71,9 @@ PUserManagerWin::PUserManagerWin()
     this->m_treeWidget->setHeaderLabels(headerList);
 
     this->m_vLayoutRight=new QVBoxLayout;
-    this->m_vLayoutRight->addLayout(this->m_hLayoutRightTop);
     this->m_vLayoutRight->addWidget(this->m_treeWidget);
+    this->m_vLayoutRight->addLayout(this->m_hLayoutRightTop);
+
 
     //left.
     this->m_vLayoutBtn=new QVBoxLayout;
@@ -1179,7 +1181,7 @@ void PUserManagerWin::ZUpdateGrpUserInfo(void)
         QTreeWidgetItem *grpItem=this->m_treeWidget->topLevelItem(i);
         nUserNum+=grpItem->childCount();
     }
-    this->m_llSummaryInfo->setText(tr("共有%1个角色,%2个用户").arg(nRoleNum).arg(nUserNum));
+    this->m_llSummaryInfo->setText(tr("共有%1个角色  共有%2个用户").arg(nRoleNum).arg(nUserNum));
     this->m_cbPage->clear();
     this->m_cbPage->addItem(tr("1/1"));
 }

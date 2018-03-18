@@ -19,6 +19,21 @@ class ZTabWidget:public QFrame
 public:
     virtual QString ZGetWidgetTypeName()=0;
 };
+class ZTemplateVarSrcView:public QFrame
+{
+    Q_OBJECT
+public:
+    ZTemplateVarSrcView(QWidget *parent=0);
+    ~ZTemplateVarSrcView();
+
+    void ZSetData(QString templateName,QString varSrcName);
+protected:
+    void paintEvent(QPaintEvent *event);
+private:
+    QToolButton *m_tbTemplate;
+    QToolButton *m_tbVarSrc;
+    QVBoxLayout *m_vLayout;
+};
 class ZTemplateWidget:public ZTabWidget
 {
     Q_OBJECT
@@ -33,10 +48,18 @@ signals:
 private slots:
     void ZSlotTemplateTreeDoubleClicked(QModelIndex index);
     void ZSlotVarSourceTreeDoubleClicked(QModelIndex index);
+
+    void ZSlotUpdateView(QModelIndex index);
 public:
     QTreeWidget *m_treeWidget;
     QTreeWidget *m_treeVarSource;
-    QSplitter *m_splitter;
+    QSplitter *m_splitterV;
+    QVBoxLayout *m_vLayoutLeft;
+    QFrame *m_frmLeft;
+
+
+    ZTemplateVarSrcView *m_view;
+    QSplitter *m_splitterH;
     QVBoxLayout *m_vLayout;
 };
 

@@ -26,18 +26,57 @@
 #include <QTextDocument>
 #include <QFontDatabase>
 #include <QDebug>
+#include <QPainter>
 #include <QtXlsx/QtXlsx>
 #include <QInputDialog>
+ZTemplateVarSrcView::ZTemplateVarSrcView(QWidget *parent):QFrame(parent)
+{
+    this->setStyleSheet("QFrame{background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+                        "stop: 0 #2B416E, stop: 0.4 #5B5F79,"
+                        "stop: 0.6 #998575, stop: 1.0 #F3C364);}"
+                        "");
+    this->m_tbTemplate=new QToolButton;
+    this->m_tbTemplate->setVisible(false);
+    this->m_tbVarSrc=new QToolButton;
+    this->m_tbVarSrc->setVisible(false);
+    this->m_vLayout=new QVBoxLayout;
+    this->m_vLayout->addWidget(this->m_tbTemplate);
+    this->m_vLayout->addWidget(this->m_tbVarSrc);
+    this->setLayout(this->m_vLayout);
+}
+ZTemplateVarSrcView::~ZTemplateVarSrcView()
+{
+    delete this->m_tbTemplate;
+    delete this->m_tbVarSrc;
+    delete this->m_vLayout;
+}
+void ZTemplateVarSrcView::ZSetData(QString templateName,QString varSrcName)
+{
+    this->m_tbTemplate->setVisible(!templateName.isEmpty());
+    this->m_tbVarSrc->setVisible(!varSrcName.isEmpty());
+    this->m_tbTemplate->setText(templateName);
+    this->m_tbVarSrc->setText(varSrcName);
+    this->update();
+}
+void ZTemplateVarSrcView::paintEvent(QPaintEvent *event)
+{
+    if(this->m_tbTemplate->isVisible() && this->m_tbVarSrc->isVisible())
+    {
+        qint32 nTemplateX=this->m_tbTemplate->x()+this->m_tbTemplate->width()/2;
+        qint32 nTemplateY=this->m_tbTemplate->y()+this->m_tbTemplate->height();
+        qint32 nVarSrcX=this->m_tbVarSrc->x()+this->m_tbVarSrc->width()/2;
+        qint32 nVarSrcY=this->m_tbVarSrc->y()+this->m_tbVarSrc->height()/2;
+
+        QPainter painter(this);
+        painter.setPen(QPen(Qt::darkGreen,3));
+        painter.drawLine(QPoint(nTemplateX,nTemplateY),QPoint(nVarSrcX,nVarSrcY));
+    }
+    QFrame::paintEvent(event);
+}
 PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
 {
     this->setWindowTitle(tr("模板设计器-Template Designer"));
     this->setWindowIcon(QIcon(":/TaskBar/images/TemplateEditor.png"));
-#if 0
-    this->setStyleSheet("QToolButton{background-color:#cce5f9;color #eaf7ff;padding: 6px 12px 6px 12p}"
-                        "QToolButton::hover{background-color:#eaf7ff;}"
-                        "QToolButton::menu-indicator{image: none;}"
-                        "");
-#endif
     this->setStyleSheet("QToolButton{background-color:#cce5f9;border:none;font:color #eaf7ff;}"
                         "QToolButton::hover{background-color:#eaf7ff;}"
                         "");
@@ -2188,8 +2227,9 @@ void PTemplateEditor::ZAddLogMsg(QString logMsg)
 }
 ZTemplateWidget::ZTemplateWidget()
 {
-    this->m_splitter=new QSplitter(Qt::Vertical);
-    this->m_treeWidget=new QTreeWidget(this->m_splitter);
+    //left part.
+    this->m_splitterV=new QSplitter(Qt::Vertical);
+    this->m_treeWidget=new QTreeWidget(this->m_splitterV);
     this->m_treeWidget->setIconSize(QSize(24,24));
     this->m_treeWidget->setColumnCount(5);
     QStringList headerList;
@@ -2199,7 +2239,7 @@ ZTemplateWidget::ZTemplateWidget()
     headerList<<tr("创建者");
     headerList<<tr("创建时间");
     this->m_treeWidget->setHeaderLabels(headerList);
-    this->m_treeVarSource=new QTreeWidget(this->m_splitter);
+    this->m_treeVarSource=new QTreeWidget(this->m_splitterV);
     this->m_treeVarSource->setColumnCount(4);
     QStringList varSourceHeaderList;
     varSourceHeaderList<<tr("变量源");
@@ -2207,20 +2247,41 @@ ZTemplateWidget::ZTemplateWidget()
     varSourceHeaderList<<tr("创建者");
     varSourceHeaderList<<tr("创建时间");
     this->m_treeVarSource->setHeaderLabels(varSourceHeaderList);
-    this->m_splitter->setStretchFactor(0,1);
-    this->m_splitter->setStretchFactor(1,1);
+    this->m_splitterV->setStretchFactor(0,1);
+    this->m_splitterV->setStretchFactor(1,1);
+    this->m_vLayoutLeft=new QVBoxLayout;
+    this->m_vLayoutLeft->addWidget(this->m_splitterV);
+    this->m_frmLeft=new QFrame;
+    this->m_frmLeft->setLayout(this->m_vLayoutLeft);
+
+    //right part.
+    this->m_view=new ZTemplateVarSrcView;
+    this->m_splitterH=new QSplitter(Qt::Horizontal);
+    this->m_splitterH->addWidget(this->m_frmLeft);
+    this->m_splitterH->addWidget(this->m_view);
+    this->m_splitterH->setStretchFactor(0,3);
+    this->m_splitterH->setStretchFactor(1,2);
+
+    //main layout.
     this->m_vLayout=new QVBoxLayout;
-    this->m_vLayout->addWidget(this->m_splitter);
+    this->m_vLayout->addWidget(this->m_splitterH);
     this->setLayout(this->m_vLayout);
 
     connect(this->m_treeWidget,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(ZSlotTemplateTreeDoubleClicked(QModelIndex)));
     connect(this->m_treeVarSource,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(ZSlotVarSourceTreeDoubleClicked(QModelIndex)));
+    connect(this->m_treeWidget,SIGNAL(clicked(QModelIndex)),this,SLOT(ZSlotUpdateView(QModelIndex)));
 }
 ZTemplateWidget::~ZTemplateWidget()
 {
     delete this->m_treeWidget;
     delete this->m_treeVarSource;
-    delete this->m_splitter;
+    delete this->m_splitterV;
+    delete this->m_vLayoutLeft;
+    delete this->m_frmLeft;
+
+    delete this->m_view;
+    delete this->m_splitterH;
+
     delete this->m_vLayout;
 }
 
@@ -2238,6 +2299,14 @@ void ZTemplateWidget::ZSlotVarSourceTreeDoubleClicked(QModelIndex index)
     if(item)
     {
         emit this->ZSignalOpenVarSource(item->text(0));
+    }
+}
+void ZTemplateWidget::ZSlotUpdateView(QModelIndex index)
+{
+    QTreeWidgetItem *item=this->m_treeWidget->topLevelItem(index.row());
+    if(item)
+    {
+        this->m_view->ZSetData(item->text(0),item->text(1));
     }
 }
 QString ZTemplateWidget::ZGetWidgetTypeName()
