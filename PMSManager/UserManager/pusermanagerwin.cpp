@@ -15,6 +15,8 @@
 #include "pwaitingdia.h"
 #include <QDebug>
 #include <KDReports/KDReports.h>
+#include <QtXlsx/QtXlsx>
+#include <QInputDialog>
 PUserManagerWin::PUserManagerWin()
 {
     this->setWindowTitle(tr("用户管理器-User Manager"));
@@ -125,8 +127,19 @@ PUserManagerWin::PUserManagerWin()
         this->m_btnImport->setText(tr("导入"));
         this->m_btnImport->setIcon(QIcon(":/UserManager/images/UserManager/Import.png"));
         this->m_btnImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+        this->m_menuImport=new QMenu;
+        this->m_actImportXML=new QAction(QIcon(":/UserManager/images/UserManager/XML.png"),tr("导入XML..."));
+        this->m_actImportExcel=new QAction(QIcon(":/UserManager/images/UserManager/Excel.png"),tr("导入Excel..."));
+        this->m_menuImport->addAction(this->m_actImportXML);
+        this->m_menuImport->addAction(this->m_actImportExcel);
+        this->m_btnImport->setMenu(this->m_menuImport);
+        this->m_btnImport->setPopupMode(QToolButton::InstantPopup);
+
+        connect(this->m_actImportXML,SIGNAL(triggered(bool)),this,SLOT(ZSlotImportXML()));
+        connect(this->m_actImportExcel,SIGNAL(triggered(bool)),this,SLOT(ZSlotImportExcel()));
+
         this->m_vLayoutBtn->addWidget(this->m_btnImport);
-        connect(this->m_btnImport,SIGNAL(clicked(bool)),this,SLOT(ZSlotImport()));
     }
 
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_Export)
@@ -136,8 +149,19 @@ PUserManagerWin::PUserManagerWin()
         this->m_btnExport->setText(tr("导出"));
         this->m_btnExport->setIcon(QIcon(":/UserManager/images/UserManager/Export.png"));
         this->m_btnExport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+        this->m_menuExport=new QMenu;
+        this->m_actExportXML=new QAction(QIcon(":/UserManager/images/UserManager/XML.png"),tr("导出XML..."));
+        this->m_actExportExcel=new QAction(QIcon(":/UserManager/images/UserManager/Excel.png"),tr("导出Excel..."));
+        this->m_menuExport->addAction(this->m_actExportXML);
+        this->m_menuExport->addAction(this->m_actExportExcel);
+        this->m_btnExport->setMenu(this->m_menuExport);
+        this->m_btnExport->setPopupMode(QToolButton::InstantPopup);
+
+        connect(this->m_actExportXML,SIGNAL(triggered(bool)),this,SLOT(ZSlotExportXML()));
+        connect(this->m_actExportExcel,SIGNAL(triggered(bool)),this,SLOT(ZSlotExportExcel()));
+
         this->m_vLayoutBtn->addWidget(this->m_btnExport);
-        connect(this->m_btnExport,SIGNAL(clicked(bool)),this,SLOT(ZSlotExport()));
     }
 
     //print.
@@ -202,10 +226,16 @@ PUserManagerWin::~PUserManagerWin()
     delete this->m_btnExpand;
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_Import)
     {
+        delete this->m_actImportExcel;
+        delete this->m_actImportXML;
+        delete this->m_menuImport;
         delete this->m_btnImport;
     }
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_Export)
     {
+        delete this->m_actExportExcel;
+        delete this->m_actExportXML;
+        delete this->m_menuExport;
         delete this->m_btnExport;
     }
     delete this->m_btnPrint;
@@ -645,7 +675,7 @@ void PUserManagerWin::ZSlotExpand()
 {
     this->m_treeWidget->expandAll();
 }
-void PUserManagerWin::ZSlotImport()
+void PUserManagerWin::ZSlotImportXML()
 {
     QString fileName=QFileDialog::getOpenFileName(this,tr("Import User List"),".",tr("xml(*.xml)"));
     if(fileName.isEmpty())
@@ -741,7 +771,63 @@ void PUserManagerWin::ZSlotImport()
     dia->ZExecuteImportOp(roleList,userList);
     dia->ZShowWaitingDialog();
 }
-void PUserManagerWin::ZSlotExport()
+void PUserManagerWin::ZSlotImportExcel()
+{
+    QString fileName=QFileDialog::getOpenFileName(this,tr("从Excel导入用户列表"),".",tr("Microsoft Excel(*.xlsx)"));
+    if(fileName.isEmpty())
+    {
+        return;
+    }
+    QFile xlsxFile(fileName);
+    if(!xlsxFile.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("打开文件失败!"));
+        return;
+    }
+    xlsxFile.close();
+
+    QXlsx::Document xlsx(fileName);
+    qint32 nTotalRow=xlsx.read(1,2).toInt();
+    if(nTotalRow<=0)
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("读取总行数出错!"));
+        return;
+    }else if(nTotalRow>1000)
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("单次最大支持1000条记录!"));
+        return;
+    }
+    //read user data.
+    QList<ZRoleInfo> roleList;
+    QList<ZUserInfo> userList;
+    qint32 nRowIndex=3;
+    for(qint32 i=0;i<nTotalRow;i++)
+    {
+        ZUserInfo newUser;
+        newUser.m_userName=xlsx.read(nRowIndex,1).toString();
+        newUser.m_realName=xlsx.read(nRowIndex,2).toString();
+        newUser.m_sex=xlsx.read(nRowIndex,3).toString();
+        newUser.m_mobile=xlsx.read(nRowIndex,4).toString();
+        newUser.m_Creator=xlsx.read(nRowIndex,5).toString();
+        QString roleName=xlsx.read(nRowIndex,8).toString();
+        newUser.m_roleName=roleName;
+        newUser.m_password="123456";
+        userList.append(newUser);
+
+        //add role to list.
+        if(!roleList.contains(roleName))
+        {
+            roleList.append(roleName);
+        }
+        nRowIndex++;//next row.
+    }
+
+    ZImportRoleUserInfoDia *dia=new ZImportRoleUserInfoDia(this);
+    dia->ZSetAckNetFrmProcessWidget(this);
+    dia->ZExecuteImportOp(roleList,userList);
+    dia->ZShowWaitingDialog();
+}
+void PUserManagerWin::ZSlotExportXML()
 {
     QString fileName=QFileDialog::getSaveFileName(this,tr("Export User List"),".",tr("Xml(*.xml)"));
     if(fileName.isEmpty())
@@ -801,6 +887,78 @@ void PUserManagerWin::ZSlotExport()
     file.close();
     this->ZAddLogMsg(tr("export user list success,[%1] records in total.").arg(nUserCnt));
     QMessageBox::information(this,tr("操作提示"),tr("导出用户成功,总计[%1]个权限组,[%2]个用户!").arg(nRoleCnt).arg(nUserCnt));
+}
+void PUserManagerWin::ZSlotExportExcel()
+{
+    QString fileName=QFileDialog::getSaveFileName(this,tr("Export User List to Excel"),".",tr("Microsoft Excel(*.xlsx)"));
+    if(fileName.isEmpty())
+    {
+        return;
+    }
+    QFile file(fileName);
+    if(!file.open(QIODevice::WriteOnly))
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("打开文件失败!"));
+        return;
+    }
+    //export to excel.
+    qint32 nX=0,nY=0;
+    //
+    QXlsx::Document xlsx;
+    QXlsx::Format fmt;
+    fmt.setBorderStyle(QXlsx::Format::BorderThin);
+    fmt.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
+    fmt.setVerticalAlignment(QXlsx::Format::AlignVCenter);
+
+    //write count.
+    xlsx.write(nX+1,nY+1,tr("总行数"),fmt);//总行数
+    xlsx.write(nX+1,nY+2,tr("0"),fmt);//数量
+    nX++;//next row.
+
+
+    //write header.
+    xlsx.write(nX+1,nY+1,tr("用户名"),fmt);//用户名
+    xlsx.write(nX+1,nY+2,tr("真实姓名"),fmt);//真实姓名
+    xlsx.write(nX+1,nY+3,tr("性别"),fmt);//性别
+    xlsx.write(nX+1,nY+4,tr("手机号码"),fmt);//手机号码
+    xlsx.write(nX+1,nY+5,tr("创建者"),fmt);//创建者
+    xlsx.write(nX+1,nY+6,tr("创建时间"),fmt);//末次登录时间
+    xlsx.write(nX+1,nY+7,tr("末次登录时间"),fmt);//末次登录时间
+    xlsx.write(nX+1,nY+8,tr("所属组"),fmt);//所属组
+    nX++;//next row.
+
+    //total row counter.
+    qint32 nRowCounter=0;
+
+    //write data.
+    for(qint32 i=0;i<this->m_treeWidget->topLevelItemCount();i++)
+    {
+        QTreeWidgetItem *grpItem=this->m_treeWidget->topLevelItem(i);
+        for(qint32 j=0;j<grpItem->childCount();j++)
+        {
+            QTreeWidgetItem *userItem=grpItem->child(j);
+            //because QTableWidget start from (0,0).
+            //but Excel start from (1,1)
+            //so here we add 1 to x&y.
+            xlsx.write(nX+1,nY+1,userItem->text(0),fmt);//用户名
+            xlsx.write(nX+1,nY+2,userItem->text(1),fmt);//真实姓名
+            xlsx.write(nX+1,nY+3,userItem->text(2),fmt);//性别
+            xlsx.write(nX+1,nY+4,userItem->text(3),fmt);//手机号码
+            xlsx.write(nX+1,nY+5,userItem->text(4),fmt);//创建者
+            xlsx.write(nX+1,nY+6,userItem->text(5),fmt);//创建时间
+            xlsx.write(nX+1,nY+7,userItem->text(6),fmt);//末次登录时间
+            xlsx.write(nX+1,nY+8,grpItem->text(0),fmt);//所属组
+            nX++;//next row.
+            nRowCounter++;//row counter.
+        }
+    }
+    xlsx.write(1,2,QString::number(nRowCounter,10),fmt);//数量
+    if(!xlsx.saveAs(fileName))
+    {
+        QMessageBox::information(this,tr("失败提示"),tr("用户列表导出Excel文件%1失败!").arg(fileName));
+        return;
+    }
+    QMessageBox::information(this,tr("成功提示"),tr("用户列表导出Excel文件成功!\n%1").arg(fileName));
 }
 void PUserManagerWin::ZSlotPrint()
 {
@@ -891,28 +1049,28 @@ void PUserManagerWin::ZSlotPrint()
             nIndexNo++;//next index.
         }
     }
-//    // Normal header in row 1
+    //    // Normal header in row 1
 
-//    // This would look better if centered vertically. This feature is only available since
-//    // Qt-4.3 though (QTextCharFormat::AlignMiddle)
-//    QPixmap systemPixmap( ":/LoginManager/images/LoginManager/User.png" );
-//    headerCell1.addElement( KDReports::ImageElement( systemPixmap ) );
-//    headerCell1.addInlineElement( KDReports::TextElement( " Item" ) );
-//    KDReports::Cell& headerCell2 = tableElement.cell( 1, 1 );
-//    headerCell2.setBackground( headerColor );
-//    KDReports::TextElement expected( "Expected" );
-//    expected.setItalic( true );
-//    expected.setBackground( QColor("#999999") ); // note that this background only applies to this element
-//    headerCell2.addElement( expected );
-//    headerCell2.addInlineElement( KDReports::TextElement( " shipping time" ) );
+    //    // This would look better if centered vertically. This feature is only available since
+    //    // Qt-4.3 though (QTextCharFormat::AlignMiddle)
+    //    QPixmap systemPixmap( ":/LoginManager/images/LoginManager/User.png" );
+    //    headerCell1.addElement( KDReports::ImageElement( systemPixmap ) );
+    //    headerCell1.addInlineElement( KDReports::TextElement( " Item" ) );
+    //    KDReports::Cell& headerCell2 = tableElement.cell( 1, 1 );
+    //    headerCell2.setBackground( headerColor );
+    //    KDReports::TextElement expected( "Expected" );
+    //    expected.setItalic( true );
+    //    expected.setBackground( QColor("#999999") ); // note that this background only applies to this element
+    //    headerCell2.addElement( expected );
+    //    headerCell2.addInlineElement( KDReports::TextElement( " shipping time" ) );
 
     //set footer.
     QString footerString;
-    footerString+=QObject::tr("打印日期:");
-    footerString+=QDateTime::currentDateTime().toString("yyyy年MM月dd日 hh时mm分ss秒");
-    footerString+=QString("   ");
     footerString+=QObject::tr("制表人:");
     footerString+=MyUserInfo::ZGetInstance()->m_UserInfo.m_realName;
+    footerString+=QString("   ");
+    footerString+=QObject::tr("制表日期:");
+    footerString+=QDateTime::currentDateTime().toString("yyyy年MM月dd日 hh时mm分ss秒");
 
     KDReports::Footer &footer=report.footer();
     footer.addElement(KDReports::TextElement(footerString),Qt::AlignHCenter);

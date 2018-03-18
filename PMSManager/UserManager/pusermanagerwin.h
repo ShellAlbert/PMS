@@ -8,6 +8,8 @@
 #include <QTreeWidget>
 #include <QTextEdit>
 #include <QSplitter>
+#include <QMenu>
+#include <QAction>
 #include "pgblpara.h"
 class PUserManagerWin : public QFrame,public ZAckNetFrmWidget
 {
@@ -30,8 +32,10 @@ private slots:
     void ZSlotMdyUser();
     void ZSlotDelUser();
     void ZSlotExpand();
-    void ZSlotImport();
-    void ZSlotExport();
+    void ZSlotImportXML();
+    void ZSlotImportExcel();
+    void ZSlotExportXML();
+    void ZSlotExportExcel();
     void ZSlotPrint();
     void ZSlotHelp();
     void ZSlotTreeDblClicked(QModelIndex index);
@@ -50,7 +54,15 @@ private:
 
     QToolButton *m_btnExpand;
     QToolButton *m_btnImport;
+    QMenu *m_menuImport;
+    QAction *m_actImportXML;
+    QAction *m_actImportExcel;
+
     QToolButton *m_btnExport;
+    QMenu *m_menuExport;
+    QAction *m_actExportXML;
+    QAction *m_actExportExcel;
+
     QToolButton *m_btnPrint;
     QToolButton *m_btnHelp;
     QVBoxLayout *m_vLayoutBtn;

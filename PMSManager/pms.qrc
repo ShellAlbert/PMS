@@ -137,6 +137,8 @@
         <file>images/UserManager/female.png</file>
         <file>images/UserManager/male.png</file>
         <file>images/UserManager/mobile.png</file>
+        <file>images/UserManager/Excel.png</file>
+        <file>images/UserManager/XML.png</file>
     </qresource>
     <qresource prefix="/FileManager">
         <file>images/FileManager/DelFile.png</file>
