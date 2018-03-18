@@ -8,6 +8,8 @@
 #include <QTreeWidget>
 #include <QTextEdit>
 #include <QSplitter>
+#include <QLabel>
+#include <QComboBox>
 #include <QMenu>
 #include <QAction>
 #include "pgblpara.h"
@@ -42,15 +44,20 @@ private slots:
     void ZSlotPopupMenu(const QPoint &pt);
 private:
     void ZAddLogMsg(QString logMsg);
+    void ZUpdateGrpUserInfo(void);
 private:
     //left.
-    QToolButton *m_btnAddGrp;
-    QToolButton *m_btnMdyGrp;
-    QToolButton *m_btnDelGrp;
+    QToolButton *m_btnGrpOp;
+    QMenu *m_menuGrp;
+    QAction *m_actAddGrp;
+    QAction *m_actMdyGrp;
+    QAction *m_actDelGrp;
 
-    QToolButton *m_btnAddUser;
-    QToolButton *m_btnMdyUser;
-    QToolButton *m_btnDelUser;
+    QToolButton *m_btnUsrOp;
+    QMenu *m_menuUsr;
+    QAction *m_actAddUser;
+    QAction *m_actMdyUser;
+    QAction *m_actDelUser;
 
     QToolButton *m_btnExpand;
     QToolButton *m_btnImport;
@@ -68,7 +75,12 @@ private:
     QVBoxLayout *m_vLayoutBtn;
 
     //right.
+    QHBoxLayout *m_hLayoutRightTop;
+    QToolButton *m_tbTurnPage[4];
+    QLabel *m_llSummaryInfo;
+    QComboBox *m_cbPage;
     QTreeWidget *m_treeWidget;
+    QVBoxLayout *m_vLayoutRight;
     //main.
     QHBoxLayout *m_hLayoutMain;
 

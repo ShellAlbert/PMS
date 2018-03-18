@@ -26,6 +26,33 @@ PUserManagerWin::PUserManagerWin()
                         "QToolButton::hover{background-color:#eaf7ff;}"
                         "");
     //right.
+    this->m_tbTurnPage[0]=new QToolButton;
+    this->m_tbTurnPage[0]->setText(tr("<<"));
+    this->m_tbTurnPage[0]->setToolTip(tr("第一页"));
+
+    this->m_tbTurnPage[1]=new QToolButton;
+    this->m_tbTurnPage[1]->setText(tr("<"));
+    this->m_tbTurnPage[1]->setToolTip(tr("前一页"));
+
+    this->m_tbTurnPage[2]=new QToolButton;
+    this->m_tbTurnPage[2]->setText(tr(">"));
+    this->m_tbTurnPage[2]->setToolTip(tr("后一页"));
+
+    this->m_tbTurnPage[3]=new QToolButton;
+    this->m_tbTurnPage[3]->setText(tr(">>"));
+    this->m_tbTurnPage[3]->setToolTip(tr("最后一页"));
+
+    this->m_llSummaryInfo=new QLabel;
+    this->m_cbPage=new QComboBox;
+    this->m_hLayoutRightTop=new QHBoxLayout;
+    this->m_hLayoutRightTop->addWidget(this->m_llSummaryInfo);
+    this->m_hLayoutRightTop->addStretch(1);
+    this->m_hLayoutRightTop->addWidget(this->m_tbTurnPage[0]);
+    this->m_hLayoutRightTop->addWidget(this->m_tbTurnPage[1]);
+    this->m_hLayoutRightTop->addWidget(this->m_cbPage);
+    this->m_hLayoutRightTop->addWidget(this->m_tbTurnPage[2]);
+    this->m_hLayoutRightTop->addWidget(this->m_tbTurnPage[3]);
+
     this->m_treeWidget=new QTreeWidget;
     this->m_treeWidget->setIconSize(QSize(24,24));
     this->m_treeWidget->setColumnCount(7);
@@ -42,73 +69,72 @@ PUserManagerWin::PUserManagerWin()
     headerList<<tr("末次登录时间");
     this->m_treeWidget->setHeaderLabels(headerList);
 
+    this->m_vLayoutRight=new QVBoxLayout;
+    this->m_vLayoutRight->addLayout(this->m_hLayoutRightTop);
+    this->m_vLayoutRight->addWidget(this->m_treeWidget);
+
     //left.
     this->m_vLayoutBtn=new QVBoxLayout;
 
+    this->m_btnGrpOp=new QToolButton;
+    this->m_btnGrpOp->setToolTip(tr("角色管理"));
+    this->m_btnGrpOp->setText(tr("角色"));
+    this->m_btnGrpOp->setIcon(QIcon(":/UserManager/images/UserManager/AddGrp.png"));
+    this->m_btnGrpOp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnGrpOp->setPopupMode(QToolButton::InstantPopup);
+    this->m_menuGrp=new QMenu;
+    this->m_btnGrpOp->setMenu(this->m_menuGrp);
+    this->m_vLayoutBtn->addWidget(this->m_btnGrpOp);
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_AddGrp)
     {
-        this->m_btnAddGrp=new QToolButton;
-        this->m_btnAddGrp->setToolTip(tr("创建角色"));
-        this->m_btnAddGrp->setText(tr("创建"));
-        this->m_btnAddGrp->setIcon(QIcon(":/UserManager/images/UserManager/AddGrp.png"));
-        this->m_btnAddGrp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        this->m_vLayoutBtn->addWidget(this->m_btnAddGrp);
-        connect(this->m_btnAddGrp,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddGrp()));
+        this->m_actAddGrp=new QAction(QIcon(":/UserManager/images/UserManager/AddGrp.png"),tr("创建角色"));
+        this->m_menuGrp->addAction(this->m_actAddGrp);
+        connect(this->m_actAddGrp,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddGrp()));
     }
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_MdyGrp)
     {
-        this->m_btnMdyGrp=new QToolButton;
-        this->m_btnMdyGrp->setToolTip(tr("编辑角色"));
-        this->m_btnMdyGrp->setText(tr("编辑"));
-        this->m_btnMdyGrp->setIcon(QIcon(":/UserManager/images/UserManager/MdyGrp.png"));
-        this->m_btnMdyGrp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        this->m_vLayoutBtn->addWidget(this->m_btnMdyGrp);
-        connect(this->m_btnMdyGrp,SIGNAL(clicked(bool)),this,SLOT(ZSlotMdyGrp()));
+        this->m_actMdyGrp=new QAction(QIcon(":/UserManager/images/UserManager/MdyGrp.png"),tr("编辑角色"));
+        this->m_menuGrp->addAction(this->m_actMdyGrp);
+        connect(this->m_actMdyGrp,SIGNAL(triggered(bool)),this,SLOT(ZSlotMdyGrp()));
     }
 
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_DelGrp)
     {
-        this->m_btnDelGrp=new QToolButton;
-        this->m_btnDelGrp->setToolTip(tr("删除角色"));
-        this->m_btnDelGrp->setText(tr("删除"));
-        this->m_btnDelGrp->setIcon(QIcon(":/UserManager/images/UserManager/DelGrp.png"));
-        this->m_btnDelGrp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        this->m_vLayoutBtn->addWidget(this->m_btnDelGrp);
-        connect(this->m_btnDelGrp,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelGrp()));
+        this->m_actDelGrp=new QAction(QIcon(":/UserManager/images/UserManager/DelGrp.png"),tr("删除角色"));
+        this->m_menuGrp->addAction(this->m_actDelGrp);
+        connect(this->m_actDelGrp,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelGrp()));
     }
+
+    this->m_btnUsrOp=new QToolButton;
+    this->m_btnUsrOp->setToolTip(tr("用户管理"));
+    this->m_btnUsrOp->setText(tr("用户"));
+    this->m_btnUsrOp->setIcon(QIcon(":/UserManager/images/UserManager/AddUser.png"));
+    this->m_btnUsrOp->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnUsrOp->setPopupMode(QToolButton::InstantPopup);
+    this->m_menuUsr=new QMenu;
+    this->m_btnUsrOp->setMenu(this->m_menuUsr);
+    this->m_vLayoutBtn->addWidget(this->m_btnUsrOp);
 
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_AddUser)
     {
-        this->m_btnAddUser=new QToolButton;
-        this->m_btnAddUser->setToolTip(tr("创建用户"));
-        this->m_btnAddUser->setText(tr("创建"));
-        this->m_btnAddUser->setIcon(QIcon(":/UserManager/images/UserManager/AddUser.png"));
-        this->m_btnAddUser->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        this->m_vLayoutBtn->addWidget(this->m_btnAddUser);
-        connect(this->m_btnAddUser,SIGNAL(clicked(bool)),this,SLOT(ZSlotAddUser()));
+        this->m_actAddUser=new QAction(QIcon(":/UserManager/images/UserManager/AddUser.png"),tr("创建用户"));
+        this->m_menuUsr->addAction(this->m_actAddUser);
+        connect(this->m_actAddUser,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddUser()));
     }
 
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_MdyUser)
     {
-        this->m_btnMdyUser=new QToolButton;
-        this->m_btnMdyUser->setToolTip(tr("编辑用户"));
-        this->m_btnMdyUser->setText(tr("编辑"));
-        this->m_btnMdyUser->setIcon(QIcon(":/UserManager/images/UserManager/MdyUser.png"));
-        this->m_btnMdyUser->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        this->m_vLayoutBtn->addWidget(this->m_btnMdyUser);
-        connect(this->m_btnMdyUser,SIGNAL(clicked(bool)),this,SLOT(ZSlotMdyUser()));
+        this->m_actMdyUser=new QAction(QIcon(":/UserManager/images/UserManager/MdyUser.png"),tr("编辑用户"));
+        this->m_menuUsr->addAction(this->m_actMdyUser);
+        connect(this->m_actMdyUser,SIGNAL(triggered(bool)),this,SLOT(ZSlotMdyUser()));
         connect(this->m_treeWidget,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(ZSlotTreeDblClicked(QModelIndex)));
     }
 
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_DelUser)
     {
-        this->m_btnDelUser=new QToolButton;
-        this->m_btnDelUser->setToolTip(tr("删除用户"));
-        this->m_btnDelUser->setText(tr("删除"));
-        this->m_btnDelUser->setIcon(QIcon(":/UserManager/images/UserManager/DelUser.png"));
-        this->m_btnDelUser->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        this->m_vLayoutBtn->addWidget(this->m_btnDelUser);
-        connect(this->m_btnDelUser,SIGNAL(clicked(bool)),this,SLOT(ZSlotDelUser()));
+        this->m_actDelUser=new QAction(QIcon(":/UserManager/images/UserManager/DelUser.png"),tr("删除用户"));
+        this->m_menuUsr->addAction(this->m_actDelUser);
+        connect(this->m_actDelUser,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelUser()));
     }
 
     this->m_btnExpand=new QToolButton;
@@ -185,8 +211,8 @@ PUserManagerWin::PUserManagerWin()
     //main.
     this->m_hLayoutMain=new QHBoxLayout;
     this->m_hLayoutMain->addLayout(this->m_vLayoutBtn);
-    this->m_hLayoutMain->addWidget(this->m_treeWidget);
-    this->m_hLayoutMain->setSpacing(10);
+    this->m_hLayoutMain->addLayout(this->m_vLayoutRight);
+    this->m_hLayoutMain->setSpacing(2);
     this->setLayout(this->m_hLayoutMain);
 
     //list all roles and users.
@@ -197,31 +223,36 @@ PUserManagerWin::PUserManagerWin()
 }
 PUserManagerWin::~PUserManagerWin()
 {
+
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_AddGrp)
     {
-        delete this->m_btnAddGrp;
+        delete this->m_actAddGrp;
     }
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_MdyGrp)
     {
-        delete this->m_btnMdyGrp;
+        delete this->m_actMdyGrp;
     }
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_DelGrp)
     {
-        delete this->m_btnDelGrp;
+        delete this->m_actDelGrp;
     }
+    delete this->m_menuGrp;
+    delete this->m_btnGrpOp;
 
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_AddUser)
     {
-        delete this->m_btnAddUser;
+        delete this->m_actAddUser;
     }
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_MdyUser)
     {
-        delete this->m_btnMdyUser;
+        delete this->m_actMdyUser;
     }
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_DelUser)
     {
-        delete this->m_btnDelUser;
+        delete this->m_actDelUser;
     }
+    delete this->m_menuUsr;
+    delete this->m_btnUsrOp;
 
     delete this->m_btnExpand;
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_Import)
@@ -242,7 +273,15 @@ PUserManagerWin::~PUserManagerWin()
     delete this->m_btnHelp;
     delete this->m_vLayoutBtn;
 
+    delete this->m_llSummaryInfo;
+    delete this->m_tbTurnPage[0];
+    delete this->m_tbTurnPage[1];
+    delete this->m_tbTurnPage[2];
+    delete this->m_tbTurnPage[3];
+    delete this->m_cbPage;
+    delete this->m_hLayoutRightTop;
     delete this->m_treeWidget;
+    delete this->m_vLayoutRight;
     delete this->m_hLayoutMain;
 }
 void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraList,qint32 ackNetRetCode)
@@ -280,6 +319,8 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 }
                 this->ZAddLogMsg(tr("add role [%1] success.").arg(roleName));
             }
+            //update the summary info.
+            this->ZUpdateGrpUserInfo();
         }else if(cmd=="mdy")
         {
             if(ackNetRetCode<0)
@@ -323,6 +364,8 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                     }
                 }
                 this->ZAddLogMsg(tr("delete role [%1] success.").arg(roleName));
+                //update the summary info.
+                this->ZUpdateGrpUserInfo();
             }
         }else if(cmd=="list")
         {
@@ -349,6 +392,8 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 this->m_roleMap.insert(roleName,rolePriData);
             }
             this->ZAddLogMsg(tr("list role [%1] success.").arg(roleName));
+            //update the summary info.
+            this->ZUpdateGrpUserInfo();
         }
     }else if(item=="user")
     {
@@ -398,6 +443,8 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                     }
                 }
                 this->ZAddLogMsg(tr("add user [%1] to role [%2] success.").arg(userName).arg(roleName));
+                //update the summary info.
+                this->ZUpdateGrpUserInfo();
             }
         }else if(cmd=="mdy")
         {
@@ -486,6 +533,8 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                     }
                 }
                 this->ZAddLogMsg(tr("delete user [%1] success.").arg(userName));
+                //update the summary info.
+                this->ZUpdateGrpUserInfo();
             }
         }else if(cmd=="list")
         {
@@ -530,6 +579,8 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
             {
                 this->m_treeWidget->resizeColumnToContents(i);
             }
+            //update the summary info.
+            this->ZUpdateGrpUserInfo();
         }
     }
 }
@@ -815,9 +866,27 @@ void PUserManagerWin::ZSlotImportExcel()
         userList.append(newUser);
 
         //add role to list.
-        if(!roleList.contains(roleName))
+        bool bExist=false;
+        for(qint32 k=0;k<roleList.size();k++)
         {
-            roleList.append(roleName);
+            if(roleList.at(k).m_roleName==roleName)
+            {
+                bExist=true;
+                break;
+            }
+        }
+        if(!bExist)
+        {
+            ZRoleInfo newRole;
+            newRole.m_roleName=roleName;
+            newRole.m_userManagerPerm=0;
+            newRole.m_templateEditPerm=0;
+            newRole.m_fileManagerPerm=0;
+            newRole.m_processEditPerm=0;
+            newRole.m_taskManagerPerm=0;
+            newRole.m_formDesignerPerm=0;
+            newRole.m_roleMemo="";
+            roleList.append(newRole);
         }
         nRowIndex++;//next row.
     }
@@ -1101,8 +1170,22 @@ void PUserManagerWin::ZAddLogMsg(QString logMsg)
 {
     emit this->ZSignalLogMsg(QString("<UserManager>:")+logMsg);
 }
+void PUserManagerWin::ZUpdateGrpUserInfo(void)
+{
+    qint32 nRoleNum=this->m_treeWidget->topLevelItemCount();
+    qint32 nUserNum=0;
+    for(qint32 i=0;i<this->m_treeWidget->topLevelItemCount();i++)
+    {
+        QTreeWidgetItem *grpItem=this->m_treeWidget->topLevelItem(i);
+        nUserNum+=grpItem->childCount();
+    }
+    this->m_llSummaryInfo->setText(tr("共有%1个角色,%2个用户").arg(nRoleNum).arg(nUserNum));
+    this->m_cbPage->clear();
+    this->m_cbPage->addItem(tr("1/1"));
+}
 void PUserManagerWin::ZSlotTreeDblClicked(QModelIndex index)
 {
+    Q_UNUSED(index);
     QTreeWidgetItem *item=this->m_treeWidget->currentItem();
     if(item->type()==0)
     {
