@@ -11,6 +11,9 @@
 #include <QLabel>
 #include <QDialog>
 #include <QMap>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QChartView>
+#include <QtCharts/QValueAxis>
 class ZTaskSheet : public QTableWidget
 {
     Q_OBJECT
@@ -103,6 +106,9 @@ signals:
     void ZSignalDataChanged(QString taskName);
 private slots:
     void ZSlotVarDblClicked(QModelIndex index);
+    void ZSlotPopupMenu(const QPoint &pt);
+    void ZSlotShowLineChart();
+    void ZSlotShowBarChart();
 public:
     ZTaskSheet* m_sheet;
     QTreeWidget *m_treeVar;
@@ -126,5 +132,70 @@ public:
     QString m_createTime;
     QString m_checker;
     QString m_checkTime;
+};
+#include <QComboBox>
+#include <QDateTimeEdit>
+using namespace QtCharts;
+class ZLineChartDialog:public QDialog
+{
+    Q_OBJECT
+public:
+    ZLineChartDialog(QWidget *parent=0);
+    ~ZLineChartDialog();
+    void ZSetVariableList(QStringList varList);
+protected:
+    QSize sizeHint() const;
+private:
+    QLabel *m_llVarList;
+    QComboBox *m_cbVarList;
+    QLabel *m_llDEStart;
+    QDateTimeEdit *m_deStart;
+    QLabel *m_llDEEnd;
+    QDateTimeEdit *m_deEnd;
+    QToolButton *m_tbAdd;
+    QToolButton *m_tbDraw;
+
+
+    QHBoxLayout *m_hLayout;
+
+    /////////////////////////////////
+    QList<QLineSeries*> m_lineSeriesList;
+    QChartView *m_chartView;
+    QChart *m_chart;
+    QValueAxis *m_xAxis;
+    QValueAxis *m_yAxis;
+    QVBoxLayout *m_vLayout;
+};
+#include <QBarSet>
+#include <QBarSeries>
+class ZBarChartDialog:public QDialog
+{
+    Q_OBJECT
+public:
+    ZBarChartDialog(QWidget *parent=0);
+    ~ZBarChartDialog();
+    void ZSetVariableList(QStringList varList);
+protected:
+    QSize sizeHint() const;
+private:
+    QLabel *m_llVarList;
+    QComboBox *m_cbVarList;
+    QLabel *m_llDEStart;
+    QDateTimeEdit *m_deStart;
+    QLabel *m_llDEEnd;
+    QDateTimeEdit *m_deEnd;
+    QToolButton *m_tbAdd;
+    QToolButton *m_tbDraw;
+
+    QHBoxLayout *m_hLayout;
+
+    /////////////////////////////////
+    QList<QBarSet*> m_barSetList;
+    QBarSeries *m_barSeries;
+    QChartView *m_chartView;
+    QChart *m_chart;
+    QValueAxis *m_xAxis;
+    QValueAxis *m_yAxis;
+    QVBoxLayout *m_vLayout;
 };
 #endif // ZTASKSHEET_H

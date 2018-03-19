@@ -204,6 +204,8 @@
         <file>images/TaskManager/WithdrawTask.png</file>
         <file>images/TaskManager/star_yellow.png</file>
         <file>images/TaskManager/Print.png</file>
+        <file>images/TaskManager/barChart.png</file>
+        <file>images/TaskManager/lineChart.png</file>
     </qresource>
     <qresource prefix="/LoginManager">
         <file>images/LoginManager/Lock.png</file>

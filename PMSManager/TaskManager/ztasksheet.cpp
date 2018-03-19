@@ -7,6 +7,8 @@
 #include <QPainter>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QMenu>
+#include <QAction>
 #include <QSpinBox>
 #include <QLabel>
 #include <QDateTimeEdit>
@@ -486,13 +488,13 @@ void ZTaskSheet::ZSlotCellClicked(QTableWidgetItem*item)
 }
 void ZTaskSheet::paintEvent(QPaintEvent *e)
 {
-//    QPainter painter(this);
-//    QFont tFont=painter.font();
-//    tFont.setPointSize(48);
-//    painter.setFont(tFont);
-//    painter.setBrush(QBrush(Qt::red));
-//    painter.drawText(QRectF(0,0,100,100),tr("已审核"));
-//    painter.drawText(QRectF(0,0,100,100),tr("已审核"));
+    //    QPainter painter(this);
+    //    QFont tFont=painter.font();
+    //    tFont.setPointSize(48);
+    //    painter.setFont(tFont);
+    //    painter.setBrush(QBrush(Qt::red));
+    //    painter.drawText(QRectF(0,0,100,100),tr("已审核"));
+    //    painter.drawText(QRectF(0,0,100,100),tr("已审核"));
     QTableWidget::paintEvent(e);
 }
 ZCellDataCheckReportDialog::ZCellDataCheckReportDialog(QWidget *parent):QDialog(parent)
@@ -588,6 +590,9 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
 
     connect(this->m_treeVar,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(ZSlotVarDblClicked(QModelIndex)));
     connect(this->m_sheet,SIGNAL(ZSignalDataChanged(QString)),this,SIGNAL(ZSignalDataChanged(QString)));
+
+    this->m_sheet->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this->m_sheet,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotPopupMenu(QPoint)));
 }
 ZTaskWidget::~ZTaskWidget()
 {
@@ -602,6 +607,52 @@ ZTaskWidget::~ZTaskWidget()
     delete this->m_rightSpliter;
     delete this->m_leftSpliter;
     delete this->m_hLayout;
+}
+void ZTaskWidget::ZSlotPopupMenu(const QPoint &pt)
+{
+    Q_UNUSED(pt);
+    QMenu popMenu;
+    QAction actLineChart(QIcon(":/TaskManager/images/TaskManager/lineChart.png"),tr("折线趋势图"));
+    QAction actBarChart(QIcon(":/TaskManager/images/TaskManager/barChart.png"),tr("柱状汇总图"));
+    QAction actExportExcel(QIcon(":/UserManager/images/UserManager/Excel.png"),tr("导出Excel..."));
+    QAction actReport(QIcon(":/common/images/common/print.png"),tr("导出报表..."));
+    popMenu.addAction(&actLineChart);
+    popMenu.addAction(&actBarChart);
+    popMenu.addAction(&actExportExcel);
+    popMenu.addAction(&actReport);
+    connect(&actLineChart,SIGNAL(triggered(bool)),this,SLOT(ZSlotShowLineChart()));
+    connect(&actBarChart,SIGNAL(triggered(bool)),this,SLOT(ZSlotShowBarChart()));
+    popMenu.exec(QCursor::pos());
+}
+void ZTaskWidget::ZSlotShowLineChart()
+{
+    QStringList varList;
+    for(qint32 i=0;i<this->m_geVarItem->childCount();i++)
+    {
+        QTreeWidgetItem *item=this->m_geVarItem->child(i);
+        if(item->text(2)==QString("Digital"))
+        {
+            varList.append(item->text(1));
+        }
+    }
+    ZLineChartDialog dia(this);
+    dia.ZSetVariableList(varList);
+    dia.exec();
+}
+void ZTaskWidget::ZSlotShowBarChart()
+{
+    QStringList varList;
+    for(qint32 i=0;i<this->m_geVarItem->childCount();i++)
+    {
+        QTreeWidgetItem *item=this->m_geVarItem->child(i);
+        if(item->text(2)==QString("Digital"))
+        {
+            varList.append(item->text(1));
+        }
+    }
+    ZBarChartDialog dia(this);
+    dia.ZSetVariableList(varList);
+    dia.exec();
 }
 void ZTaskWidget::ZSlotVarDblClicked(QModelIndex index)
 {
@@ -965,4 +1016,231 @@ void ZTaskWidget::ZSetTaskState(qint32 state)
 qint32 ZTaskWidget::ZGetTaskState()
 {
     return this->m_TaskState;
+}
+ZLineChartDialog::ZLineChartDialog(QWidget *parent):QDialog(parent)
+{
+    this->setWindowTitle(tr("折线趋势图"));
+    this->m_llVarList=new QLabel(tr("变量列表"));
+    this->m_cbVarList=new QComboBox;
+    this->m_cbVarList->setEditable(false);
+    this->m_llDEStart=new QLabel(tr("起始时间"));
+    this->m_deStart=new QDateTimeEdit;
+    this->m_deStart->setCalendarPopup(true);
+    this->m_llDEEnd=new QLabel(tr("结束时间"));
+    this->m_deEnd=new QDateTimeEdit;
+    this->m_deEnd->setCalendarPopup(true);
+    this->m_tbAdd=new QToolButton;
+    this->m_tbAdd->setIcon(QIcon(":/common/images/common/add.png"));
+    this->m_tbDraw=new QToolButton;
+    this->m_tbDraw->setIcon(QIcon(":/common/images/common/okay.png"));
+    this->m_hLayout=new QHBoxLayout;
+    this->m_hLayout->addWidget(this->m_llVarList);
+    this->m_hLayout->addWidget(this->m_cbVarList);
+    this->m_hLayout->addWidget(this->m_llDEStart);
+    this->m_hLayout->addWidget(this->m_deStart);
+    this->m_hLayout->addWidget(this->m_llDEEnd);
+    this->m_hLayout->addWidget(this->m_deEnd);
+    this->m_hLayout->addWidget(this->m_tbAdd);
+    this->m_hLayout->addStretch(1);
+    this->m_hLayout->addWidget(this->m_tbDraw);
+    //////////////////////////////////////////////
+    QLineSeries *series1=new QLineSeries;
+    series1->setName(tr("宽度值"));
+    series1->setPen(QPen(Qt::blue,1,Qt::SolidLine));
+    series1->append(QPointF(1,10));
+    series1->append(QPointF(2,20));
+    series1->append(QPointF(3,15));
+    series1->append(QPointF(4,33));
+    series1->append(QPointF(5,50));
+    series1->append(QPointF(6,31));
+    series1->append(QPointF(7,12));
+
+    QLineSeries *series2=new QLineSeries;
+    series2->setName(tr("高度值"));
+    series2->setPen(QPen(Qt::green,1,Qt::SolidLine));
+    series2->append(QPointF(1,53));
+    series2->append(QPointF(2,33));
+    series2->append(QPointF(3,46));
+    series2->append(QPointF(4,80));
+    series2->append(QPointF(5,23));
+    series2->append(QPointF(6,13));
+    series2->append(QPointF(7,25));
+
+    this->m_lineSeriesList.append(series1);
+    this->m_lineSeriesList.append(series2);
+
+    this->m_chart=new QChart;
+    this->m_chart->setTitle(tr("变量趋势图"));
+//    this->m_chart->setTheme(QChart::ChartThemeBlueCerulean);
+    this->m_chart->legend()->setAlignment(Qt::AlignRight);
+
+    //create Y axis.
+    this->m_yAxis=new QValueAxis;
+    this->m_yAxis->setTitleText(tr("变量取值/Value"));
+    this->m_yAxis->setLabelFormat("%d");
+    this->m_yAxis->setRange(0,100);
+    this->m_yAxis->setTickCount(10);
+    this->m_chart->setAxisY(this->m_yAxis);
+
+    this->m_xAxis=new QValueAxis;
+    this->m_xAxis->setTitleText(tr("时间点/Time"));
+    this->m_xAxis->setLabelFormat("%d");
+    this->m_xAxis->setRange(0,100);
+    this->m_xAxis->setTickCount((10));
+    this->m_chart->setAxisX(this->m_xAxis);
+
+    series1->attachAxis(this->m_yAxis);
+    series2->attachAxis(this->m_yAxis);
+
+
+    this->m_chart->addSeries(series1);
+    this->m_chart->addSeries(series2);
+
+
+    this->m_chartView=new QChartView(this->m_chart);
+    this->m_chartView->setRenderHint(QPainter::Antialiasing);
+
+    this->m_vLayout=new QVBoxLayout;
+    this->m_vLayout->setContentsMargins(2,2,2,2);
+    this->m_vLayout->addLayout(this->m_hLayout);
+    this->m_vLayout->addWidget(this->m_chartView);
+    this->setLayout(this->m_vLayout);
+}
+ZLineChartDialog::~ZLineChartDialog()
+{
+    delete this->m_cbVarList;
+    delete this->m_deStart;
+    delete this->m_deEnd;
+    delete this->m_tbAdd;
+    delete this->m_tbDraw;
+    delete this->m_hLayout;
+    ///////////////////////////////
+    delete this->m_xAxis;
+    delete this->m_yAxis;
+    for(qint32 i=0;i<this->m_lineSeriesList.size();i++)
+    {
+        delete this->m_lineSeriesList.at(i);
+    }
+    this->m_lineSeriesList.clear();
+    delete this->m_chart;
+    delete this->m_chartView;
+    delete this->m_vLayout;
+}
+QSize ZLineChartDialog::sizeHint() const
+{
+    return QSize(800,500);
+}
+void ZLineChartDialog::ZSetVariableList(QStringList varList)
+{
+    this->m_cbVarList->clear();
+    for(qint32 i=0;i<varList.size();i++)
+    {
+        this->m_cbVarList->addItem(varList.at(i));
+    }
+}
+/////////////////////////////
+ZBarChartDialog::ZBarChartDialog(QWidget *parent):QDialog(parent)
+{
+    this->setWindowTitle(tr("柱状汇总图"));
+    this->m_llVarList=new QLabel(tr("变量列表"));
+    this->m_cbVarList=new QComboBox;
+    this->m_cbVarList->setEditable(false);
+    this->m_llDEStart=new QLabel(tr("起始时间"));
+    this->m_deStart=new QDateTimeEdit;
+    this->m_deStart->setCalendarPopup(true);
+    this->m_llDEEnd=new QLabel(tr("结束时间"));
+    this->m_deEnd=new QDateTimeEdit;
+    this->m_deEnd->setCalendarPopup(true);
+    this->m_tbAdd=new QToolButton;
+    this->m_tbAdd->setIcon(QIcon(":/common/images/common/add.png"));
+    this->m_tbDraw=new QToolButton;
+    this->m_tbDraw->setIcon(QIcon(":/common/images/common/okay.png"));
+    this->m_hLayout=new QHBoxLayout;
+    this->m_hLayout->addWidget(this->m_llVarList);
+    this->m_hLayout->addWidget(this->m_cbVarList);
+    this->m_hLayout->addWidget(this->m_llDEStart);
+    this->m_hLayout->addWidget(this->m_deStart);
+    this->m_hLayout->addWidget(this->m_llDEEnd);
+    this->m_hLayout->addWidget(this->m_deEnd);
+    this->m_hLayout->addWidget(this->m_tbAdd);
+    this->m_hLayout->addStretch(1);
+    this->m_hLayout->addWidget(this->m_tbDraw);
+    //////////////////////////////////////////////
+    this->m_barSeries=new QBarSeries;
+    for(qint32 i=0;i<10;i++)
+    {
+        QBarSet *set=new QBarSet(tr("变量%1").arg(i));
+        set->append(10);
+        set->append(20);
+        set->append(15.3);
+        set->append(33.9);
+        set->append(11.2);
+        this->m_barSeries->append(set);
+        this->m_barSetList.append(set);
+    }
+
+    this->m_chart=new QChart;
+    this->m_chart->setTitle(tr("变量趋势图"));
+//    this->m_chart->setTheme(QChart::ChartThemeBlueCerulean);
+    this->m_chart->legend()->setAlignment(Qt::AlignRight);
+
+    //create Y axis.
+    this->m_yAxis=new QValueAxis;
+    this->m_yAxis->setTitleText(tr("变量取值/Value"));
+    this->m_yAxis->setLabelFormat("%d");
+    this->m_yAxis->setRange(0,100);
+    this->m_yAxis->setTickCount(10);
+    this->m_chart->setAxisY(this->m_yAxis);
+
+    this->m_xAxis=new QValueAxis;
+    this->m_xAxis->setTitleText(tr("时间点/Time"));
+    this->m_xAxis->setLabelFormat("%d");
+    this->m_xAxis->setRange(0,100);
+    this->m_xAxis->setTickCount((10));
+    this->m_chart->setAxisX(this->m_xAxis);
+
+
+    this->m_chart->addSeries(this->m_barSeries);
+
+    this->m_chartView=new QChartView(this->m_chart);
+    this->m_chartView->setRenderHint(QPainter::Antialiasing);
+
+    this->m_vLayout=new QVBoxLayout;
+    this->m_vLayout->setContentsMargins(2,2,2,2);
+    this->m_vLayout->addLayout(this->m_hLayout);
+    this->m_vLayout->addWidget(this->m_chartView);
+    this->setLayout(this->m_vLayout);
+}
+ZBarChartDialog::~ZBarChartDialog()
+{
+    delete this->m_cbVarList;
+    delete this->m_deStart;
+    delete this->m_deEnd;
+    delete this->m_tbAdd;
+    delete this->m_tbDraw;
+    delete this->m_hLayout;
+    ///////////////////////////////
+    delete this->m_xAxis;
+    delete this->m_yAxis;
+    for(qint32 i=0;i<this->m_barSetList.size();i++)
+    {
+        delete this->m_barSetList.at(i);
+    }
+    this->m_barSetList.clear();
+    delete this->m_barSeries;
+    delete this->m_chart;
+    delete this->m_chartView;
+    delete this->m_vLayout;
+}
+QSize ZBarChartDialog::sizeHint() const
+{
+    return QSize(800,500);
+}
+void ZBarChartDialog::ZSetVariableList(QStringList varList)
+{
+    this->m_cbVarList->clear();
+    for(qint32 i=0;i<varList.size();i++)
+    {
+        this->m_cbVarList->addItem(varList.at(i));
+    }
 }
