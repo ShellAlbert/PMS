@@ -26,6 +26,8 @@ protected:
 signals:
     void ZSignalCloseEvent(QString widget);
     void ZSignalLogMsg(QString logMsg);
+    void ZSignalAatch(QString moduleName);
+    void ZSignalDetch(QString moduleName);
 private slots:
     void ZSlotAddGrp();
     void ZSlotMdyGrp();
@@ -42,6 +44,8 @@ private slots:
     void ZSlotHelp();
     void ZSlotTreeDblClicked(QModelIndex index);
     void ZSlotPopupMenu(const QPoint &pt);
+
+    void ZSlotAatchDetch();
 private:
     void ZAddLogMsg(QString logMsg);
     void ZUpdateGrpUserInfo(void);
@@ -59,7 +63,12 @@ private:
     QAction *m_actMdyUser;
     QAction *m_actDelUser;
 
-    QToolButton *m_btnExpand;
+    QToolButton *m_btnDisplay;
+    QMenu *m_menuDisplay;
+    QAction *m_actExpand;
+    QAction *m_actDetch;
+    QAction *m_actAatch;
+
     QToolButton *m_btnImport;
     QMenu *m_menuImport;
     QAction *m_actImportXML;

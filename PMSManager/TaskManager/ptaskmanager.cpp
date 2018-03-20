@@ -280,6 +280,10 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
                 item->setIcon(8,QIcon(":/common/images/common/Calendar.png"));
                 this->m_taskList->m_tree->addTopLevelItem(item);
                 this->m_taskList->m_tree->setCurrentItem(item);
+                for(qint32 i=0;i<this->m_taskList->m_tree->columnCount();i++)
+                {
+                    this->m_taskList->m_tree->resizeColumnToContents(i);
+                }
                 this->ZAddLogMsg(tr("create task [%1] from template [%2] success.").arg(taskName).arg(refTemplate));
             }
         }else if(cmd=="list")

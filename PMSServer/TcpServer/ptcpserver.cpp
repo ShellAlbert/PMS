@@ -94,7 +94,6 @@ void PTcpThread::run()
 void PTcpThread::ZSlotDisconnected()
 {
     qDebug()<<"client disconnected:"<<this->m_sockFd;
-    this->m_tcpSocket->deleteLater();
     //cause exec() to exit.
     this->exit(0);
 }

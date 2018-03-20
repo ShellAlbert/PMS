@@ -35,6 +35,7 @@ ZTemplateVarSrcView::ZTemplateVarSrcView(QWidget *parent):QFrame(parent)
                         "stop: 0 #2B416E, stop: 0.4 #5B5F79,"
                         "stop: 0.6 #998575, stop: 1.0 #F3C364);}"
                         "");
+    this->setMinimumWidth(200);
     this->m_tbTemplate=new QToolButton;
     this->m_tbTemplate->setVisible(false);
     this->m_tbVarSrc=new QToolButton;
@@ -279,26 +280,46 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
     this->m_btnVarSourceOp->setMenu(this->m_menuVarSourceOp);
     this->m_btnVarSourceOp->setPopupMode(QToolButton::InstantPopup);
 
-    this->m_tbPrintHtml=new QToolButton;
-    this->m_tbPrintHtml->setToolTip(tr("打印Html"));
-    this->m_tbPrintHtml->setText(tr("HTML"));
-    connect(this->m_tbPrintHtml,SIGNAL(clicked(bool)),this,SLOT(ZSlotPrintHtml()));
-    this->m_tbPrintHtml->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/PrintHtml.png"));
-    this->m_tbPrintHtml->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
-    this->m_tbPrintPdf=new QToolButton;
-    this->m_tbPrintPdf->setToolTip(tr("打印PDF"));
-    this->m_tbPrintPdf->setText(tr("PDF"));
-    connect(this->m_tbPrintPdf,SIGNAL(clicked(bool)),this,SLOT(ZSlotPrintPdf()));
-    this->m_tbPrintPdf->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/PrintPdf.png"));
-    this->m_tbPrintPdf->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnDisplay=new QToolButton;
+    this->m_btnDisplay->setToolTip(tr("显示功能"));
+    this->m_btnDisplay->setText(tr("显示"));
+    this->m_btnDisplay->setIcon(QIcon(":/UserManager/images/UserManager/Expand.png"));
+    this->m_btnDisplay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnDisplay->setPopupMode(QToolButton::InstantPopup);
+    this->m_menuDisplay=new QMenu;
+    this->m_btnDisplay->setMenu(this->m_menuDisplay);
 
+    this->m_actDetach=new QAction(QIcon(":/UserManager/images/UserManager/Expand.png"),tr("分离"));
+    this->m_menuDisplay->addAction(this->m_actDetach);
+    connect(this->m_actDetach,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetach()));
+
+    this->m_actAatch=new QAction(QIcon(":/UserManager/images/UserManager/Expand.png"),tr("附属"));
+    this->m_menuDisplay->addAction(this->m_actAatch);
+    connect(this->m_actAatch,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetach()));
+
+
+    /////////////////////////////////////////////////////////
     this->m_tbPrint=new QToolButton;
-    this->m_tbPrint->setToolTip(tr("打印..."));
+    this->m_tbPrint->setToolTip(tr("打印功能"));
     this->m_tbPrint->setText(tr("打印"));
-    connect(this->m_tbPrint,SIGNAL(clicked(bool)),this,SLOT(ZSlotPrint()));
     this->m_tbPrint->setIcon(QIcon(":/TemplateEditor/images/TemplateEditor/Print.png"));
     this->m_tbPrint->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_tbPrint->setPopupMode(QToolButton::InstantPopup);
+    this->m_menuPrint=new QMenu;
+    this->m_tbPrint->setMenu(this->m_menuPrint);
+
+    this->m_actPrint=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Print.png"),tr("打印..."));
+    this->m_menuPrint->addAction(this->m_actPrint);
+    connect(this->m_actPrint,SIGNAL(triggered(bool)),this,SLOT(ZSlotPrint()));
+
+    this->m_actPrintHtml=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/PrintHtml.png"),tr("打印Html"));
+    this->m_menuPrint->addAction(this->m_actPrintHtml);
+    connect(this->m_actPrintHtml,SIGNAL(triggered(bool)),this,SLOT(ZSlotPrintHtml()));
+
+    this->m_actPrintPdf=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/PrintPdf.png"),tr("打印PDF"));
+    this->m_menuPrint->addAction(this->m_actPrintPdf);
+    connect(this->m_actPrintPdf,SIGNAL(triggered(bool)),this,SLOT(ZSlotPrintPdf()));
 
 
     //help.
@@ -318,8 +339,7 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
     this->m_vLayoutBtns->addWidget(this->m_btnSysComponent);
     this->m_vLayoutBtns->addStretch(1);
     this->m_vLayoutBtns->addWidget(this->m_btnVarSourceOp);
-    this->m_vLayoutBtns->addWidget(this->m_tbPrintHtml);
-    this->m_vLayoutBtns->addWidget(this->m_tbPrintPdf);
+    this->m_vLayoutBtns->addWidget(this->m_btnDisplay);
     this->m_vLayoutBtns->addWidget(this->m_tbPrint);
     this->m_vLayoutBtns->addWidget(this->m_tbHelp);
 
@@ -465,8 +485,14 @@ PTemplateEditor::~PTemplateEditor()
     delete this->m_menuVarSourceOp;
     delete this->m_btnVarSourceOp;
 
-    delete this->m_tbPrintHtml;
-    delete this->m_tbPrintPdf;
+    delete this->m_actDetach;
+    delete this->m_actAatch;
+    delete this->m_menuDisplay;
+    delete this->m_btnDisplay;
+    delete this->m_actPrint;
+    delete this->m_actPrintHtml;
+    delete this->m_actPrintPdf;
+    delete this->m_menuPrint;
     delete this->m_tbPrint;
     delete this->m_tbHelp;
 
@@ -2079,6 +2105,17 @@ void PTemplateEditor::ZSlotSheetDataChanged(QString templateName)
             this->m_tabWidget->setTabText(i,"<*>"+templateName);
             break;
         }
+    }
+}
+void PTemplateEditor::ZSlotAatchDetach()
+{
+    QAction *src=qobject_cast<QAction*>(this->sender());
+    if(src==this->m_actDetach)
+    {
+        emit this->ZSignalDetach("TemplateEditor");
+    }else if(src==this->m_actAatch)
+    {
+        emit this->ZSignalAatch("TemplateEditor");
     }
 }
 void PTemplateEditor::ZSlotPrintHtml()

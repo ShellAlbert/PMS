@@ -132,6 +132,8 @@ protected:
 signals:
     void ZSignalCloseEvent(QString widget);
     void ZSignalLogMsg(QString logMsg);
+    void ZSignalDetach(QString mdlName);
+    void ZSignalAatch(QString mdlName);
 public slots:
     void ZSlotNewTemplate();
     void ZSlotOpenTemplate();
@@ -185,6 +187,7 @@ public slots:
     void ZSlotRemoveTab(qint32 index);
     void ZSlotSheetDataChanged(QString templateName);
 
+    void ZSlotAatchDetach();
     void ZSlotPrintHtml();
     void ZSlotPrintPdf();
     void ZSlotPrint();
@@ -261,9 +264,17 @@ private:
     QAction *m_actExportVarSourceTemplate;
     QAction *m_actImportVarSource;
 
-    QToolButton *m_tbPrintHtml;
-    QToolButton *m_tbPrintPdf;
+    QToolButton *m_btnDisplay;
+    QMenu *m_menuDisplay;
+    QAction *m_actDetach;
+    QAction *m_actAatch;
+
     QToolButton *m_tbPrint;
+    QMenu *m_menuPrint;
+    QAction *m_actPrint;
+    QAction *m_actPrintHtml;
+    QAction *m_actPrintPdf;
+
     QToolButton *m_tbHelp;
 
     //right.

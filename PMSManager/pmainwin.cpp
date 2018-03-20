@@ -832,6 +832,32 @@ void PMainWin::ZSlotLatchModule(qint32 moduleNo)
         break;
     }
 }
+void PMainWin::ZSlotSubWindowDetach(QString mdlName)
+{
+    if(mdlName=="UserManager")
+    {
+        this->m_midArea->removeSubWindow(this->m_userManager);
+        delete this->m_mdiUserManager;
+        this->m_userManager->showMaximized();
+    }else if(mdlName=="TemplateEditor")
+    {
+        this->m_midArea->removeSubWindow(this->m_templateEditor);
+        delete this->m_mdiTemplateEditor;
+        this->m_templateEditor->showMaximized();
+    }
+}
+void PMainWin::ZSlotSubWindowAatch(QString mdlName)
+{
+    if(mdlName=="UserManager")
+    {
+        this->m_mdiUserManager=this->m_midArea->addSubWindow(this->m_userManager);
+        this->m_userManager->showMaximized();
+    }else if(mdlName=="TemplateEditor")
+    {
+        this->m_mdiTemplateEditor=this->m_midArea->addSubWindow(this->m_templateEditor);
+        this->m_templateEditor->showMaximized();
+    }
+}
 void PMainWin::ZSlotUpdateStatusBarTime()
 {
     this->m_runCounter++;
@@ -881,6 +907,8 @@ void PMainWin::ZSlotShowUserManager()
         this->m_userManager=new PUserManagerWin;
         connect(this->m_userManager,SIGNAL(ZSignalLogMsg(QString)),this->m_logManager,SLOT(ZSlotAddLogMsg(QString)));
         connect(this->m_userManager,SIGNAL(ZSignalCloseEvent(QString)),this,SLOT(ZSlotCloseSubWidget(QString)));
+        connect(this->m_userManager,SIGNAL(ZSignalAatch(QString)),this,SLOT(ZSlotSubWindowAatch(QString)));
+        connect(this->m_userManager,SIGNAL(ZSignalDetch(QString)),this,SLOT(ZSlotSubWindowDetach(QString)));
         this->m_mdiUserManager=this->m_midArea->addSubWindow(this->m_userManager);
     }else{
         this->m_midArea->setActiveSubWindow(this->m_mdiUserManager);
@@ -899,6 +927,8 @@ void PMainWin::ZSlotShowTemplateEditor()
         this->m_templateEditor=new PTemplateEditor;
         connect(this->m_templateEditor,SIGNAL(ZSignalLogMsg(QString)),this->m_logManager,SLOT(ZSlotAddLogMsg(QString)));
         connect(this->m_templateEditor,SIGNAL(ZSignalCloseEvent(QString)),this,SLOT(ZSlotCloseSubWidget(QString)));
+        connect(this->m_templateEditor,SIGNAL(ZSignalAatch(QString)),this,SLOT(ZSlotSubWindowAatch(QString)));
+        connect(this->m_templateEditor,SIGNAL(ZSignalDetach(QString)),this,SLOT(ZSlotSubWindowDetach(QString)));
         this->m_mdiTemplateEditor=this->m_midArea->addSubWindow(this->m_templateEditor);
     }else{
         this->m_midArea->setActiveSubWindow(this->m_mdiTemplateEditor);

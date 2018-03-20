@@ -139,14 +139,30 @@ PUserManagerWin::PUserManagerWin()
         connect(this->m_actDelUser,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelUser()));
     }
 
-    this->m_btnExpand=new QToolButton;
-    this->m_btnExpand->setToolTip(tr("全部展开"));
-    this->m_btnExpand->setText(tr("展开"));
-    this->m_btnExpand->setIcon(QIcon(":/UserManager/images/UserManager/Expand.png"));
-    this->m_btnExpand->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    connect(this->m_btnExpand,SIGNAL(clicked(bool)),this,SLOT(ZSlotExpand()));
+
+    this->m_btnDisplay=new QToolButton;
+    this->m_btnDisplay->setToolTip(tr("显示功能"));
+    this->m_btnDisplay->setText(tr("显示"));
+    this->m_btnDisplay->setIcon(QIcon(":/UserManager/images/UserManager/Expand.png"));
+    this->m_btnDisplay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnDisplay->setPopupMode(QToolButton::InstantPopup);
+    this->m_menuDisplay=new QMenu;
+    this->m_btnDisplay->setMenu(this->m_menuDisplay);
+
+    this->m_actExpand=new QAction(QIcon(":/UserManager/images/UserManager/Expand.png"),tr("展开列表"));
+    this->m_menuDisplay->addAction(this->m_actExpand);
+    connect(this->m_actExpand,SIGNAL(triggered(bool)),this,SLOT(ZSlotExpand()));
+
+    this->m_actDetch=new QAction(QIcon(":/UserManager/images/UserManager/Expand.png"),tr("分离"));
+    this->m_menuDisplay->addAction(this->m_actDetch);
+    connect(this->m_actDetch,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetch()));
+
+    this->m_actAatch=new QAction(QIcon(":/UserManager/images/UserManager/Expand.png"),tr("附属"));
+    this->m_menuDisplay->addAction(this->m_actAatch);
+    connect(this->m_actAatch,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetch()));
+
     this->m_vLayoutBtn->addStretch(1);
-    this->m_vLayoutBtn->addWidget(this->m_btnExpand);
+    this->m_vLayoutBtn->addWidget(this->m_btnDisplay);
 
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_Import)
     {
@@ -256,7 +272,11 @@ PUserManagerWin::~PUserManagerWin()
     delete this->m_menuUsr;
     delete this->m_btnUsrOp;
 
-    delete this->m_btnExpand;
+    delete this->m_actExpand;
+    delete this->m_actAatch;
+    delete this->m_actDetch;
+    delete this->m_menuDisplay;
+    delete this->m_btnDisplay;
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_Import)
     {
         delete this->m_actImportExcel;
@@ -1219,6 +1239,7 @@ void PUserManagerWin::ZSlotTreeDblClicked(QModelIndex index)
 }
 void PUserManagerWin::ZSlotPopupMenu(const QPoint &pt)
 {
+    Q_UNUSED(pt);
     QTreeWidgetItem *item=this->m_treeWidget->currentItem();
     if(NULL==item)
     {
@@ -1251,4 +1272,18 @@ void PUserManagerWin::ZSlotPopupMenu(const QPoint &pt)
     popMenu.addAction(&actImport);
     popMenu.addAction(&actExport);
     popMenu.exec(QCursor::pos());
+}
+void PUserManagerWin::ZSlotAatchDetch()
+{
+    QAction *src=qobject_cast<QAction*>(this->sender());
+    if(src)
+    {
+        if(src==this->m_actDetch)
+        {
+            emit this->ZSignalDetch("UserManager");
+        }else if(src==this->m_actAatch)
+        {
+            emit this->ZSignalAatch("UserManager");
+        }
+    }
 }

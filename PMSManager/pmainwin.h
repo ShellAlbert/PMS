@@ -142,6 +142,9 @@ public slots:
     void ZSlotShowTaskBar(bool bShow);
     void ZSlotShowLogBar(bool bShow);
     void ZSlotLatchModule(qint32 moduleNo);
+
+    void ZSlotSubWindowDetach(QString mdlName);
+    void ZSlotSubWindowAatch(QString mdlName);
 private slots:
     void ZSlotUpdateStatusBarTime();
     void ZSlotShowUserManager();
