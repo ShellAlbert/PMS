@@ -37,6 +37,7 @@ void PNetProtocol::ZSlotWriteData()
     if(MyUserInfo::ZGetInstance()->m_bExitFlag)
     {
         this->m_timer->stop();
+        MyUserInfo::ZGetInstance()->m_bPNetProtocolExitFlag=true;
         emit this->ZSignalExit();
         return;
     }
@@ -260,7 +261,9 @@ void PNetProTimeout::ZSlotScanWaitAckQueue()
     if(MyUserInfo::ZGetInstance()->m_bExitFlag)
     {
         this->m_timer->stop();
+        MyUserInfo::ZGetInstance()->m_bPNetTimeoutExitFlag=true;
         emit this->ZSignalExit();
+        return;
     }
 }
 

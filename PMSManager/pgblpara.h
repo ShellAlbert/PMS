@@ -106,6 +106,8 @@ private:
         this->m_bOnLine=false;
         this->m_bCheckNewVersion=true;
         this->m_bExitFlag=false;
+        this->m_bPNetProtocolExitFlag=false;
+        this->m_bPNetTimeoutExitFlag=false;
     }
     static MyUserInfo* m_pInstance;
 public:
@@ -150,6 +152,8 @@ public:
 
 public:
     bool m_bExitFlag;
+    bool m_bPNetProtocolExitFlag;
+    bool m_bPNetTimeoutExitFlag;
 };
 
 extern int QBytes2Int(QByteArray bytes);

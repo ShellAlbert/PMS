@@ -44,6 +44,8 @@ protected:
 signals:
     void ZSignalCloseEvent(QString widget);
     void ZSignalLogMsg(QString logMsg);
+    void ZSignalAatch(QString moduleName);
+    void ZSignalDetch(QString moduleName);
 private slots:
     void ZSlotAddTask();
     void ZSlotSaveTask();
@@ -64,6 +66,8 @@ private slots:
     void ZSlotRefreshTaskList(qint32 index);
 
     void ZSlotPopupMenu(const QPoint &pt);
+
+    void ZSlotAatchDetch();
 private:
     void ZAddLogMsg(QString logMsg);
 private:
@@ -80,6 +84,11 @@ private:
     QAction *m_actWithdrawTask;
     QAction *m_actCheckOkay;
     QAction *m_actCheckFailed;
+
+    QToolButton *m_btnDisplay;
+    QMenu *m_menuDisplay;
+    QAction *m_actDetch;
+    QAction *m_actAatch;
 
     QToolButton *m_btnPrint;
     QMenu *m_menuPrint;

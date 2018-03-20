@@ -143,7 +143,7 @@ PUserManagerWin::PUserManagerWin()
     this->m_btnDisplay=new QToolButton;
     this->m_btnDisplay->setToolTip(tr("显示功能"));
     this->m_btnDisplay->setText(tr("显示"));
-    this->m_btnDisplay->setIcon(QIcon(":/UserManager/images/UserManager/Expand.png"));
+    this->m_btnDisplay->setIcon(QIcon(":/common/images/common/Display.png"));
     this->m_btnDisplay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_btnDisplay->setPopupMode(QToolButton::InstantPopup);
     this->m_menuDisplay=new QMenu;
@@ -153,11 +153,11 @@ PUserManagerWin::PUserManagerWin()
     this->m_menuDisplay->addAction(this->m_actExpand);
     connect(this->m_actExpand,SIGNAL(triggered(bool)),this,SLOT(ZSlotExpand()));
 
-    this->m_actDetch=new QAction(QIcon(":/UserManager/images/UserManager/Expand.png"),tr("分离"));
+    this->m_actDetch=new QAction(QIcon(":/common/images/common/Detach.png"),tr("分离"));
     this->m_menuDisplay->addAction(this->m_actDetch);
     connect(this->m_actDetch,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetch()));
 
-    this->m_actAatch=new QAction(QIcon(":/UserManager/images/UserManager/Expand.png"),tr("附属"));
+    this->m_actAatch=new QAction(QIcon(":/common/images/common/Attach.png"),tr("附属"));
     this->m_menuDisplay->addAction(this->m_actAatch);
     connect(this->m_actAatch,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetch()));
 

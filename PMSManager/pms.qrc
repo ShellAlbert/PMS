@@ -183,6 +183,9 @@
         <file>images/common/Calendar.png</file>
         <file>images/common/help.png</file>
         <file>images/common/print.png</file>
+        <file>images/common/Attach.png</file>
+        <file>images/common/Detach.png</file>
+        <file>images/common/Display.png</file>
     </qresource>
     <qresource prefix="/background">
         <file>images/background/background_main.png</file>

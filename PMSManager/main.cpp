@@ -36,8 +36,6 @@ int main(int argc, char *argv[])
     //used to process network communication protocols.
     PNetProcessor netProcess;
 
-
-
     //the main windows.
     PMainWin mainWin;
 

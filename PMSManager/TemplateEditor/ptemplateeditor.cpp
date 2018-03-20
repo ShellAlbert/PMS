@@ -31,25 +31,33 @@
 #include <QInputDialog>
 ZTemplateVarSrcView::ZTemplateVarSrcView(QWidget *parent):QFrame(parent)
 {
-    this->setStyleSheet("QFrame{background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-                        "stop: 0 #2B416E, stop: 0.4 #5B5F79,"
-                        "stop: 0.6 #998575, stop: 1.0 #F3C364);}"
-                        "");
+    this->setStyleSheet("QFrame{background-color:#3F93A8;}");
     this->setMinimumWidth(200);
+
+    QString tbQSS("QToolButton{font-size:20px;font-weight:bold;color:black;}");
+
     this->m_tbTemplate=new QToolButton;
     this->m_tbTemplate->setVisible(false);
+    this->m_tbTemplate->setStyleSheet(tbQSS);
     this->m_tbVarSrc=new QToolButton;
     this->m_tbVarSrc->setVisible(false);
+    this->m_tbVarSrc->setStyleSheet(tbQSS);
     this->m_vLayout=new QVBoxLayout;
     this->m_vLayout->addWidget(this->m_tbTemplate);
     this->m_vLayout->addWidget(this->m_tbVarSrc);
-    this->setLayout(this->m_vLayout);
+
+    this->m_hLayout=new QHBoxLayout;
+    this->m_hLayout->addStretch(1);
+    this->m_hLayout->addLayout(this->m_vLayout);
+    this->m_hLayout->addStretch(1);
+    this->setLayout(this->m_hLayout);
 }
 ZTemplateVarSrcView::~ZTemplateVarSrcView()
 {
     delete this->m_tbTemplate;
     delete this->m_tbVarSrc;
     delete this->m_vLayout;
+    delete this->m_hLayout;
 }
 void ZTemplateVarSrcView::ZSetData(QString templateName,QString varSrcName)
 {
@@ -284,17 +292,17 @@ PTemplateEditor::PTemplateEditor(QWidget *parent) : QFrame(parent)
     this->m_btnDisplay=new QToolButton;
     this->m_btnDisplay->setToolTip(tr("显示功能"));
     this->m_btnDisplay->setText(tr("显示"));
-    this->m_btnDisplay->setIcon(QIcon(":/UserManager/images/UserManager/Expand.png"));
+    this->m_btnDisplay->setIcon(QIcon(":/common/images/common/Display.png"));
     this->m_btnDisplay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_btnDisplay->setPopupMode(QToolButton::InstantPopup);
     this->m_menuDisplay=new QMenu;
     this->m_btnDisplay->setMenu(this->m_menuDisplay);
 
-    this->m_actDetach=new QAction(QIcon(":/UserManager/images/UserManager/Expand.png"),tr("分离"));
+    this->m_actDetach=new QAction(QIcon(":/common/images/common/Detach.png"),tr("分离"));
     this->m_menuDisplay->addAction(this->m_actDetach);
     connect(this->m_actDetach,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetach()));
 
-    this->m_actAatch=new QAction(QIcon(":/UserManager/images/UserManager/Expand.png"),tr("附属"));
+    this->m_actAatch=new QAction(QIcon(":/common/images/common/Attach.png"),tr("附属"));
     this->m_menuDisplay->addAction(this->m_actAatch);
     connect(this->m_actAatch,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetach()));
 

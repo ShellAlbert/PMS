@@ -23,6 +23,8 @@ public:
     void ZSetVarSourceXmlData(QString xmlData);
 
     void ZParseAckNetFrmXmlData();
+protected:
+    QSize sizeHint() const;
 private slots:
     void ZSlotOkay();
     void ZSlotCancel();

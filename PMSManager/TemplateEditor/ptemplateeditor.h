@@ -33,6 +33,7 @@ private:
     QToolButton *m_tbTemplate;
     QToolButton *m_tbVarSrc;
     QVBoxLayout *m_vLayout;
+    QHBoxLayout *m_hLayout;
 };
 class ZTemplateWidget:public ZTabWidget
 {

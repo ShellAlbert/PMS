@@ -628,7 +628,6 @@ PMainWin::PMainWin(QWidget *parent)
 PMainWin::~PMainWin()
 {
     //taskbar.
-    delete this->m_lblLogo;
     delete this->m_btnUserManager;
     delete this->m_btnTemplateEditor;
     delete this->m_btnFileManager;
@@ -689,6 +688,10 @@ PMainWin::~PMainWin()
 QSize PMainWin::sizeHint() const
 {
     return QSize(800,600);
+}
+void PMainWin::closeEvent(QCloseEvent *event)
+{
+
 }
 void PMainWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraList,qint32 ackNetRetCode)
 {
@@ -844,6 +847,11 @@ void PMainWin::ZSlotSubWindowDetach(QString mdlName)
         this->m_midArea->removeSubWindow(this->m_templateEditor);
         delete this->m_mdiTemplateEditor;
         this->m_templateEditor->showMaximized();
+    }else if(mdlName=="TaskManager")
+    {
+        this->m_midArea->removeSubWindow(this->m_taskManager);
+        delete this->m_mdiTaskManager;
+        this->m_taskManager->showMaximized();
     }
 }
 void PMainWin::ZSlotSubWindowAatch(QString mdlName)
@@ -856,6 +864,10 @@ void PMainWin::ZSlotSubWindowAatch(QString mdlName)
     {
         this->m_mdiTemplateEditor=this->m_midArea->addSubWindow(this->m_templateEditor);
         this->m_templateEditor->showMaximized();
+    }else if(mdlName=="TaskManager")
+    {
+        this->m_mdiTaskManager=this->m_midArea->addSubWindow(this->m_taskManager);
+        this->m_taskManager->showMaximized();
     }
 }
 void PMainWin::ZSlotUpdateStatusBarTime()
@@ -983,6 +995,9 @@ void PMainWin::ZSlotShowTaskManager()
         this->m_taskManager=new PTaskManager;
         connect(this->m_taskManager,SIGNAL(ZSignalLogMsg(QString)),this->m_logManager,SLOT(ZSlotAddLogMsg(QString)));
         connect(this->m_taskManager,SIGNAL(ZSignalCloseEvent(QString)),this,SLOT(ZSlotCloseSubWidget(QString)));
+        connect(this->m_taskManager,SIGNAL(ZSignalAatch(QString)),this,SLOT(ZSlotSubWindowAatch(QString)));
+        connect(this->m_taskManager,SIGNAL(ZSignalDetch(QString)),this,SLOT(ZSlotSubWindowDetach(QString)));
+
         this->m_mdiTaskManager=this->m_midArea->addSubWindow(this->m_taskManager);
     }else{
         this->m_midArea->setActiveSubWindow(this->m_mdiTaskManager);
@@ -1055,6 +1070,14 @@ void PMainWin::ZSlotExitSys()
     if(QMessageBox::question(this,tr("操作确认"),tr("您确认要退出PMS系统吗?"),QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Ok)
     {
         MyUserInfo::ZGetInstance()->m_bExitFlag=true;
+        QTimer::singleShot(1000,this,SLOT(ZSlotDoExitClean()));
+    }
+}
+void PMainWin::ZSlotDoExitClean()
+{
+    QToolTip::showText(QPoint(100,100),tr("PMS系统正在退出..."),0,QRect(0,0,300,300),500);
+    if(MyUserInfo::ZGetInstance()->m_bPNetProtocolExitFlag && MyUserInfo::ZGetInstance()->m_bPNetTimeoutExitFlag)
+    {
         qApp->exit(0);
     }
 }

@@ -140,6 +140,26 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_tbTaskManage->setMenu(this->m_menuTaskManage);
     this->m_tbTaskManage->setPopupMode(QToolButton::InstantPopup);
 
+    //display.
+    this->m_btnDisplay=new QToolButton;
+    this->m_btnDisplay->setToolTip(tr("显示功能"));
+    this->m_btnDisplay->setText(tr("显示"));
+    this->m_btnDisplay->setIcon(QIcon(":/common/images/common/Display.png"));
+    this->m_btnDisplay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_btnDisplay->setPopupMode(QToolButton::InstantPopup);
+    this->m_menuDisplay=new QMenu;
+    this->m_btnDisplay->setMenu(this->m_menuDisplay);
+
+    this->m_actDetch=new QAction(QIcon(":/common/images/common/Detach.png"),tr("分离"));
+    this->m_menuDisplay->addAction(this->m_actDetch);
+    connect(this->m_actDetch,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetch()));
+
+    this->m_actAatch=new QAction(QIcon(":/common/images/common/Attach.png"),tr("附属"));
+    this->m_menuDisplay->addAction(this->m_actAatch);
+    connect(this->m_actAatch,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetch()));
+
+
+    //print.
     this->m_btnPrint=new QToolButton;
     this->m_btnPrint->setToolTip(tr("打印..."));
     this->m_btnPrint->setText(tr("打印"));
@@ -166,6 +186,7 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_vLayoutBtn->addWidget(this->m_btnArchieve);
     this->m_vLayoutBtn->addWidget(this->m_tbTaskManage);
     this->m_vLayoutBtn->addStretch(1);
+    this->m_vLayoutBtn->addWidget(this->m_btnDisplay);
     this->m_vLayoutBtn->addWidget(this->m_btnPrint);
     this->m_vLayoutBtn->addWidget(this->m_tbHelp);
 
@@ -228,6 +249,10 @@ PTaskManager::~PTaskManager()
     delete this->m_actPrintPdf;
     delete this->m_menuPrint;
     delete this->m_btnPrint;
+    delete this->m_actAatch;
+    delete this->m_actDetch;
+    delete this->m_menuDisplay;
+    delete this->m_btnDisplay;
     delete this->m_tbHelp;
     delete this->m_vLayoutBtn;
 
@@ -1092,4 +1117,18 @@ void PTaskManager::ZSlotPopupMenu(const QPoint &pt)
     popMenu.addSeparator();
     popMenu.addMenu(&subMenu);
     popMenu.exec(QCursor::pos());
+}
+void PTaskManager::ZSlotAatchDetch()
+{
+    QAction *src=qobject_cast<QAction*>(this->sender());
+    if(src)
+    {
+        if(src==this->m_actDetch)
+        {
+            emit this->ZSignalDetch("TaskManager");
+        }else if(src==this->m_actAatch)
+        {
+            emit this->ZSignalAatch("TaskManager");
+        }
+    }
 }

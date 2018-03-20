@@ -137,6 +137,7 @@ public:
     void ZUpdateUserInfo();
 protected:
     QSize sizeHint() const;
+    void closeEvent(QCloseEvent *event);
 public slots:
     void ZSlotCloseWaitingDialog(qint32 netFrmSerialNo,qint32 retCode);
     void ZSlotShowTaskBar(bool bShow);
@@ -162,6 +163,8 @@ private slots:
     void ZSlotExitSys();
     void ZSlotCloseSubWidget(QString widget);
     void ZSlotHearBeat();
+
+    void ZSlotDoExitClean();
 private:
     void ZFuncRefreshStatusBar();
 private:
@@ -170,8 +173,6 @@ private:
     QFrame *m_statusBarWidget;
 
     //taskbar.
-    QLabel *m_lblLogo;
-    QLabel *m_lblName;
     QToolButton *m_btnUserManager;
     QToolButton *m_btnTemplateEditor;
     QToolButton *m_btnFileManager;
