@@ -24,7 +24,8 @@ public:
 
     void ZSetXmlData(QString xmlData);
     QString ZGetXmlData();
-
+protected:
+    QSize sizeHint() const;
 private slots:
     void ZSlotAddGeneralVar();
     void ZSlotDelGeneralVar();

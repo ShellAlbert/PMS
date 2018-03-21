@@ -9,7 +9,7 @@
 #include <QDir>
 #include <AES/TAesClass.h>
 #include "pgblpara.h"
-
+#include <QDateTime>
 //type:0,encrypt,1:decrypt.
 QString AesEncryptBase64(int type,char *inData,int inDataSize)
 {
@@ -115,6 +115,31 @@ int main(int argc, char *argv[])
         return -1;
     }
     qDebug()<<"check RoleInfo table is okay.";
+
+    //if admin role is not exist then create it.
+    QString strCheckAdminRole("SELECT * FROM `pms`.`roleinfo` WHERE `RoleName`='admin'");
+    if(!query.exec(strCheckAdminRole))
+    {
+        qDebug()<<query.lastError().text();
+        return -1;
+    }else{
+        if(query.next())
+        {
+            qDebug()<<"check Admin role is okay.";
+        }else{
+            //admin role is not exist.create it now.
+            query.prepare("INSERT  INTO `pms`.`roleinfo`(`RoleName`,`PermBits`,`RoleMemo`,`Creator`,`CreateTime`) VALUES ('admin','255,255,255,255,255,255','PMS Initial Created','admin',:CreateTime)");
+            query.bindValue(":CreateTime",QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+            if(!query.exec())
+            {
+                qDebug()<<query.lastError().text();
+                return -1;
+            }else{
+                qDebug()<<"create admin role okay.";
+            }
+        }
+    }
+
     //check userinfo table.
     QString strCheckUserInfoTable(
                 "CREATE TABLE IF NOT EXISTS `pms`.`userinfo` ("
@@ -137,6 +162,30 @@ int main(int argc, char *argv[])
     }
     qDebug()<<"check UserInfo table is okay.";
 
+    //if admin user is not exist then create it.
+    QString strCheckAdminUser("SELECT *FROM `pms`.`userinfo` WHERE `UserName`='admin'");
+    if(!query.exec(strCheckAdminUser))
+    {
+        qDebug()<<query.lastError().text();
+        return -1;
+    }else{
+        if(query.next())
+        {
+            qDebug()<<"check Admin user is okay.";
+        }else{
+            //admin user is not exist.create it now.
+            query.prepare("INSERT  INTO `pms`.`userinfo`(`UserName`,`RealName`,`RoleName`,`Sex`,`LockBit`,`Password`,`Mobile`,`Creator`,`CreateTime`,`LastLoginTime`) VALUES ('admin','超级管理员','admin','male',0,'MTIzNDU2','13522296239','PMS',:CreateTime,:LastLoginTime)");
+            query.bindValue(":CreateTime",QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+            query.bindValue(":LastLoginTime",QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+            if(!query.exec())
+            {
+                qDebug()<<query.lastError().text();
+                return -1;
+            }else{
+                qDebug()<<"create admin user okay.";
+            }
+        }
+    }
     //check templateinfo table.
     QString strCheckTemplateInfoTable(
                 "CREATE TABLE IF NOT EXISTS `pms`.`templateinfo` ("
@@ -249,6 +298,10 @@ int main(int argc, char *argv[])
                 "  `CreateTime` datetime DEFAULT NULL,"
                 "  `Checker` varchar(64) DEFAULT NULL,"
                 "  `CheckTime` datetime DEFAULT NULL,"
+                " `MachineNo` varchar(64) DEFAULT NULL,"
+                "  `ClassNo` varchar(64) DEFAULT NULL,"
+                "  `OrderNo` varchar(64) DEFAULT NULL,"
+                "  `ProductNo` varchar(64) DEFAULT NULL,"
                 "  PRIMARY KEY (`TaskName`)"
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     if(!query.exec(strCheckTaskInfoTable))

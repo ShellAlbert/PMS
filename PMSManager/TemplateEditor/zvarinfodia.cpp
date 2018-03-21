@@ -9,7 +9,6 @@
 #include <QFileDialog>
 ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
 {
-    this->setMinimumSize(600,400);
     this->setWindowTitle(tr("正在编辑变量源[%1]").arg(varSourceName));
     this->m_varSourceName=varSourceName;
 
@@ -125,6 +124,10 @@ ZVarInfoDia::~ZVarInfoDia()
     delete this->m_hLayoutAutoVar;
     delete this->m_hLayoutBtn;
     delete this->m_vLayoutMain;
+}
+QSize ZVarInfoDia::sizeHint() const
+{
+    return QSize(800,400);
 }
 void ZVarInfoDia::ZSlotAddGeneralVar()
 {

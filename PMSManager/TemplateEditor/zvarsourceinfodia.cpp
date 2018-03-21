@@ -147,10 +147,6 @@ void ZVarSourceInfoDia::ZParseAckNetFrmXmlData()
         }//StarElement.
     }//while().
 }
-QSize ZVarSourceInfoDia::sizeHint() const
-{
-    return QSize(800,400);
-}
 void ZVarSourceInfoDia::ZSlotOkay()
 {
     if(MyUserInfo::ZGetInstance()->m_bOnLine==false)

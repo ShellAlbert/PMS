@@ -138,7 +138,7 @@ public:
     void ZListTask(qint32 taskState);
     void ZNewTask(QString taskName,QString refTemplateName,QString refProcess,QString refStep);
     void ZOpenTask(QString taskName,QString refTemplateName);
-    void ZSaveTask(QString taskName,QString refTemplateName,QString taskValueXmlData);
+    void ZSaveTask(QString taskName,QString refTemplateName,QString taskValueXmlData,QStringList auxList);
     void ZDelTask(QString taskName,QString refTemplateName);
     void ZSubmitTask(QString taskName,QString refTemplateName);
     void ZWithdrawTask(QString taskName,QString refTemplateName);

@@ -18,7 +18,7 @@ public:
     void ZListTask(QString creator,qint32 taskState);
     void ZAddTask(QString taskName,QString refTemplate,QString refProcess,QString refStep,QString creator,QString checker);
     void ZOpenTask(QString taskName,QString refTemplate);
-    void ZSaveTask(QString taskName,QString refTemplate,QString taskValueXmlData);
+    void ZSaveTask(QString taskName,QString refTemplate,QString taskValueXmlData,QStringList auxData);
     void ZDelTask(QString taskName,QString refTemplate);
     void ZSubmitTask(QString taskName,QString refTemplate);
     void ZWithdrawTask(QString taskName,QString refTemplate);

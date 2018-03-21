@@ -16,6 +16,7 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <QAction>
+#include <QInputDialog>
 PTaskList::PTaskList(QWidget *parent):QFrame(parent)
 {
     this->m_llTaskFilter=new QLabel(tr("过滤条件"));
@@ -31,10 +32,18 @@ PTaskList::PTaskList(QWidget *parent):QFrame(parent)
     this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_yellow.png"),tr("我审核通过的任务"));
     this->m_cbTaskFilter->addItem(QIcon(":/TaskManager/images/TaskManager/star_yellow.png"),tr("我审核驳回的任务"));
     connect(this->m_cbTaskFilter,SIGNAL(currentIndexChanged(int)),this,SIGNAL(ZSignalFilterChanged(qint32)));
+
+    this->m_tbSearch=new QToolButton;
+    this->m_tbSearch->setText(tr("高级"));
+    this->m_tbSearch->setIcon(QIcon(":/TaskManager/images/TaskManager/search.png"));
+    this->m_tbSearch->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    connect(this->m_tbSearch,SIGNAL(clicked(bool)),this,SIGNAL(ZSignalAdvancedSearch()));
+
     this->m_hLayoutFilter=new QHBoxLayout;
     this->m_hLayoutFilter->addStretch(1);
     this->m_hLayoutFilter->addWidget(this->m_llTaskFilter);
     this->m_hLayoutFilter->addWidget(this->m_cbTaskFilter);
+    this->m_hLayoutFilter->addWidget(this->m_tbSearch);
 
     this->m_tree=new QTreeWidget;
     this->m_tree->setColumnCount(9);
@@ -58,6 +67,7 @@ PTaskList::~PTaskList()
 {
     delete this->m_llTaskFilter;
     delete this->m_cbTaskFilter;
+    delete this->m_tbSearch;
     delete this->m_hLayoutFilter;
     delete this->m_tree;
     delete this->m_vLayout;
@@ -158,6 +168,27 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_menuDisplay->addAction(this->m_actAatch);
     connect(this->m_actAatch,SIGNAL(triggered(bool)),this,SLOT(ZSlotAatchDetch()));
 
+    //options.
+    this->m_tbOption=new QToolButton;
+    this->m_tbOption->setToolTip(tr("任务管理器选项"));
+    this->m_tbOption->setText(tr("选项"));
+    this->m_tbOption->setIcon(QIcon(":/TaskBar/images/SystemSetup.png"));
+    this->m_tbOption->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_tbOption->setPopupMode(QToolButton::InstantPopup);
+    this->m_menuOption=new QMenu;
+    this->m_tbOption->setMenu(this->m_menuOption);
+    this->m_actProductLine=new QAction(QIcon(":/TaskManager/images/TaskManager/ProductLine.png"),tr("生产线/机器号预置"));
+    this->m_menuOption->addAction(this->m_actProductLine);
+    connect(this->m_actProductLine,SIGNAL(triggered(bool)),this,SLOT(ZSlotInputPreset()));
+    this->m_actClass=new QAction(QIcon(":/TaskManager/images/TaskManager/Class.png"),tr("班组预置"));
+    this->m_menuOption->addAction(this->m_actClass);
+    connect(this->m_actClass,SIGNAL(triggered(bool)),this,SLOT(ZSlotInputPreset()));
+    this->m_actOrderNo=new QAction(QIcon(":/TaskManager/images/TaskManager/OrderNo.png"),tr("订单预置"));
+    this->m_menuOption->addAction(this->m_actOrderNo);
+    connect(this->m_actOrderNo,SIGNAL(triggered(bool)),this,SLOT(ZSlotInputPreset()));
+    this->m_actProductNo=new QAction(QIcon(":/TaskManager/images/TaskManager/ProductNo.png"),tr("产品号预置"));
+    this->m_menuOption->addAction(this->m_actProductNo);
+    connect(this->m_actProductNo,SIGNAL(triggered(bool)),this,SLOT(ZSlotInputPreset()));
 
     //print.
     this->m_btnPrint=new QToolButton;
@@ -187,6 +218,7 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_vLayoutBtn->addWidget(this->m_tbTaskManage);
     this->m_vLayoutBtn->addStretch(1);
     this->m_vLayoutBtn->addWidget(this->m_btnDisplay);
+    this->m_vLayoutBtn->addWidget(this->m_tbOption);
     this->m_vLayoutBtn->addWidget(this->m_btnPrint);
     this->m_vLayoutBtn->addWidget(this->m_tbHelp);
 
@@ -253,6 +285,14 @@ PTaskManager::~PTaskManager()
     delete this->m_actDetch;
     delete this->m_menuDisplay;
     delete this->m_btnDisplay;
+
+    delete this->m_actProductLine;
+    delete this->m_actClass;
+    delete this->m_actOrderNo;
+    delete this->m_actProductNo;
+    delete this->m_menuOption;
+    delete this->m_tbOption;
+
     delete this->m_tbHelp;
     delete this->m_vLayoutBtn;
 
@@ -355,15 +395,26 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
             QString refTemplate=paraList.at(1);
             QString refProcess=paraList.at(2);
             QString refStep=paraList.at(3);
-            QString templatedata=paraList.at(4);
-            QString varsrcdata=paraList.at(5);
-            QString vardata=paraList.at(6);
-            qint32 taskState=paraList.at(7).toInt();
+            QString machineNo=paraList.at(4);
+            QString classNo=paraList.at(5);
+            QString orderNo=paraList.at(6);
+            QString productNo=paraList.at(7);
+            QString templatedata=paraList.at(8);
+            QString varsrcdata=paraList.at(9);
+            QString vardata=paraList.at(10);
+            qint32 taskState=paraList.at(11).toInt();
             ZTaskWidget *task=new ZTaskWidget;
             task->m_sheet->ZSetTaskName(taskName);
             task->m_sheet->ZSetRefTemplateName(refTemplate);
             task->m_sheet->ZSetProcessName(refProcess);
             task->m_sheet->ZSetStepName(refStep);
+            //生产线/机器号，班组，订单号，产品号
+            QStringList auxList;
+            auxList.append(machineNo);
+            auxList.append(classNo);
+            auxList.append(orderNo);
+            auxList.append(productNo);
+            task->ZSetTaskAuxData(auxList);
             QString templateXmlData=QString(QByteArray::fromBase64(templatedata.toUtf8()));
             QString varSrcData=QString(QByteArray::fromBase64(varsrcdata.toUtf8()));
             task->m_sheet->ZSetTemplateXmlDataAndVarSourceXmlData(templateXmlData,varSrcData);
@@ -671,6 +722,8 @@ void PTaskManager::ZSlotSaveTask()
         dia->ZSetTaskName(task->m_sheet->ZGetTaskName());
         dia->ZSetRefTemplateName(task->m_sheet->ZGetRefTemplateName());
         dia->ZSetTaskValueXmlData(task->ZGetTaskVarValueXmlData());
+        //辅助数据，生产线/机器号，班组，订单号，产品号
+        dia->ZSetTaskAuxData(task->ZGetTaskAuxData());
         if(dia->exec()==QDialog::Accepted)
         {
             dia->ZShowWaitingDialog();
@@ -1131,4 +1184,640 @@ void PTaskManager::ZSlotAatchDetch()
             emit this->ZSignalAatch("TaskManager");
         }
     }
+}
+void PTaskManager::ZSlotInputPreset()
+{
+    QAction *src=qobject_cast<QAction*>(this->sender());
+    if(src==this->m_actProductLine)
+    {
+        ZProductLinePresetDialog dia;
+        dia.exec();
+    }else if(src==this->m_actClass)
+    {
+        ZClassPresetDialog dia;
+        dia.exec();
+    }else if(src==this->m_actOrderNo)
+    {
+        ZOrderNoPresetDialog dia;
+        dia.exec();
+    }else if(src==this->m_actProductNo)
+    {
+        ZProductNoPresetDialog dia;
+        dia.exec();
+    }
+}
+ZProductLinePresetDialog::ZProductLinePresetDialog(QWidget *parent):QDialog(parent)
+{
+    this->setWindowTitle(tr("生产线/机器号-输入预置列表"));
+
+    this->m_tbAdd=new QToolButton;
+    this->m_tbAdd->setText(tr("增加"));
+    this->m_tbAdd->setIcon(QIcon(":/common/images/common/add.png"));
+    this->m_tbAdd->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbDel=new QToolButton;
+    this->m_tbDel->setText(tr("移除"));
+    this->m_tbDel->setIcon(QIcon(":/common/images/common/del.png"));
+    this->m_tbDel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbReset=new QToolButton;
+    this->m_tbReset->setText(tr("清空"));
+    this->m_tbReset->setIcon(QIcon(":/common/images/common/Clear.png"));
+    this->m_tbReset->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbImport=new QToolButton;
+    this->m_tbImport->setText(tr("导入"));
+    this->m_tbImport->setIcon(QIcon(":/UserManager/images/UserManager/Import.png"));
+    this->m_tbImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbExport=new QToolButton;
+    this->m_tbExport->setText(tr("导出"));
+    this->m_tbExport->setIcon(QIcon(":/UserManager/images/UserManager/Export.png"));
+    this->m_tbExport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_vLayoutBtn=new QVBoxLayout;
+    this->m_vLayoutBtn->addWidget(this->m_tbAdd);
+    this->m_vLayoutBtn->addWidget(this->m_tbDel);
+    this->m_vLayoutBtn->addWidget(this->m_tbReset);
+    this->m_vLayoutBtn->addWidget(this->m_tbImport);
+    this->m_vLayoutBtn->addWidget(this->m_tbExport);
+    this->m_vLayoutBtn->addStretch(1);
+    ///////////////////////////////////////
+    this->m_list=new QListWidget;
+    this->m_hLayout=new QHBoxLayout;
+    this->m_hLayout->addWidget(this->m_list);
+    this->m_hLayout->addLayout(this->m_vLayoutBtn);
+    this->setLayout(this->m_hLayout);
+
+    connect(this->m_tbAdd,SIGNAL(clicked(bool)),this,SLOT(ZSlotAdd()));
+    connect(this->m_tbDel,SIGNAL(clicked(bool)),this,SLOT(ZSlotDel()));
+    connect(this->m_tbReset,SIGNAL(clicked(bool)),this,SLOT(ZSlotReset()));
+    connect(this->m_tbImport,SIGNAL(clicked(bool)),this,SLOT(ZSlotImport()));
+    connect(this->m_tbExport,SIGNAL(clicked(bool)),this,SLOT(ZSlotExport()));
+
+    //read exist file data.
+    QStringList itemList=this->ZReadList();
+    for(qint32 i=0;i<itemList.count();i++)
+    {
+        QString itemText=itemList.at(i);
+        QListWidgetItem *newItem=new QListWidgetItem(QIcon(":/TaskManager/images/TaskManager/ProductLine.png"),itemText);
+        this->m_list->addItem(newItem);
+    }
+}
+ZProductLinePresetDialog::~ZProductLinePresetDialog()
+{
+    delete this->m_tbAdd;
+    delete this->m_tbDel;
+    delete this->m_tbReset;
+    delete this->m_tbImport;
+    delete this->m_tbExport;
+    delete this->m_vLayoutBtn;
+    delete this->m_list;
+    delete this->m_hLayout;
+}
+QSize ZProductLinePresetDialog::sizeHint() const
+{
+    return QSize(600,300);
+}
+QStringList ZProductLinePresetDialog::ZReadList()
+{
+    QStringList itemList;
+    QFile productLineFile(QDir::currentPath()+"/cfg/PL.dat");
+    if(productLineFile.open(QFile::ReadOnly|QIODevice::Text))
+    {
+        while(!productLineFile.atEnd())
+        {
+            QByteArray baLine=productLineFile.readLine();
+            if(!baLine.isEmpty())
+            {
+                QString newText(baLine);
+                newText.remove("\n");
+                if(!newText.isEmpty())
+                {
+                    itemList.append(newText);
+                }
+            }
+        }
+        productLineFile.close();
+    }
+    return itemList;
+}
+QStringList ZProductLinePresetDialog::ZGetList()
+{
+    QStringList itemList;
+    for(qint32 i=0;i<this->m_list->count();i++)
+    {
+        itemList.append(this->m_list->item(i)->text());
+    }
+    return itemList;
+}
+void ZProductLinePresetDialog::closeEvent(QCloseEvent *e)
+{
+    //write to dat file.
+    QFile productLineFile(QDir::currentPath()+"/cfg/PL.dat");
+    if(productLineFile.open(QFile::WriteOnly|QIODevice::Truncate|QIODevice::Text))
+    {
+        for(qint32 i=0;i<this->m_list->count();i++)
+        {
+            QByteArray baWrite=this->m_list->item(i)->text().toLatin1();
+            baWrite.append("\n");
+            productLineFile.write(baWrite);
+        }
+        productLineFile.close();
+    }
+    /////////////////
+    e->accept();
+}
+void ZProductLinePresetDialog::ZSlotAdd()
+{
+    QString newText=QInputDialog::getText(this,tr("新增项"),tr("请输入新项目"));
+    if(newText.isEmpty())
+    {
+        return;
+    }
+    QListWidgetItem *newItem=new QListWidgetItem(QIcon(":/TaskManager/images/TaskManager/ProductLine.png"),newText);
+    this->m_list->addItem(newItem);
+}
+void ZProductLinePresetDialog::ZSlotDel()
+{
+    QListWidgetItem *item=this->m_list->currentItem();
+    if(item)
+    {
+        this->m_list->removeItemWidget(item);
+        delete item;
+    }
+}
+void ZProductLinePresetDialog::ZSlotReset()
+{
+    this->m_list->clear();
+}
+void ZProductLinePresetDialog::ZSlotImport()
+{
+
+}
+void ZProductLinePresetDialog::ZSlotExport()
+{
+
+}
+////////////////////////////////////////////
+ZClassPresetDialog::ZClassPresetDialog(QWidget *parent):QDialog(parent)
+{
+    this->setWindowTitle(tr("班组-输入预置列表"));
+
+    this->m_tbAdd=new QToolButton;
+    this->m_tbAdd->setText(tr("增加"));
+    this->m_tbAdd->setIcon(QIcon(":/common/images/common/add.png"));
+    this->m_tbAdd->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbDel=new QToolButton;
+    this->m_tbDel->setText(tr("移除"));
+    this->m_tbDel->setIcon(QIcon(":/common/images/common/del.png"));
+    this->m_tbDel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbReset=new QToolButton;
+    this->m_tbReset->setText(tr("清空"));
+    this->m_tbReset->setIcon(QIcon(":/common/images/common/Clear.png"));
+    this->m_tbReset->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbImport=new QToolButton;
+    this->m_tbImport->setText(tr("导入"));
+    this->m_tbImport->setIcon(QIcon(":/UserManager/images/UserManager/Import.png"));
+    this->m_tbImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbExport=new QToolButton;
+    this->m_tbExport->setText(tr("导出"));
+    this->m_tbExport->setIcon(QIcon(":/UserManager/images/UserManager/Export.png"));
+    this->m_tbExport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_vLayoutBtn=new QVBoxLayout;
+    this->m_vLayoutBtn->addWidget(this->m_tbAdd);
+    this->m_vLayoutBtn->addWidget(this->m_tbDel);
+    this->m_vLayoutBtn->addWidget(this->m_tbReset);
+    this->m_vLayoutBtn->addWidget(this->m_tbImport);
+    this->m_vLayoutBtn->addWidget(this->m_tbExport);
+    this->m_vLayoutBtn->addStretch(1);
+    ///////////////////////////////////////
+    this->m_list=new QListWidget;
+    this->m_hLayout=new QHBoxLayout;
+    this->m_hLayout->addWidget(this->m_list);
+    this->m_hLayout->addLayout(this->m_vLayoutBtn);
+    this->setLayout(this->m_hLayout);
+
+    connect(this->m_tbAdd,SIGNAL(clicked(bool)),this,SLOT(ZSlotAdd()));
+    connect(this->m_tbDel,SIGNAL(clicked(bool)),this,SLOT(ZSlotDel()));
+    connect(this->m_tbReset,SIGNAL(clicked(bool)),this,SLOT(ZSlotReset()));
+    connect(this->m_tbImport,SIGNAL(clicked(bool)),this,SLOT(ZSlotImport()));
+    connect(this->m_tbExport,SIGNAL(clicked(bool)),this,SLOT(ZSlotExport()));
+
+    //read exist file data.
+    QStringList itemList=this->ZReadList();
+    for(qint32 i=0;i<itemList.count();i++)
+    {
+        QString itemText=itemList.at(i);
+        QListWidgetItem *newItem=new QListWidgetItem(QIcon(":/TaskManager/images/TaskManager/Class.png"),itemText);
+        this->m_list->addItem(newItem);
+    }
+}
+ZClassPresetDialog::~ZClassPresetDialog()
+{
+    delete this->m_tbAdd;
+    delete this->m_tbDel;
+    delete this->m_tbReset;
+    delete this->m_tbImport;
+    delete this->m_tbExport;
+    delete this->m_vLayoutBtn;
+    delete this->m_list;
+    delete this->m_hLayout;
+}
+QSize ZClassPresetDialog::sizeHint() const
+{
+    return QSize(600,300);
+}
+QStringList ZClassPresetDialog::ZReadList()
+{
+    QStringList itemList;
+    QFile productLineFile(QDir::currentPath()+"/cfg/CLASS.dat");
+    if(productLineFile.open(QFile::ReadOnly|QIODevice::Text))
+    {
+        while(!productLineFile.atEnd())
+        {
+            QByteArray baLine=productLineFile.readLine();
+            if(!baLine.isEmpty())
+            {
+                QString newText(baLine);
+                newText.remove("\n");
+                if(!newText.isEmpty())
+                {
+                    itemList.append(newText);
+                }
+            }
+        }
+        productLineFile.close();
+    }
+    return itemList;
+}
+QStringList ZClassPresetDialog::ZGetList()
+{
+    QStringList itemList;
+    for(qint32 i=0;i<this->m_list->count();i++)
+    {
+        itemList.append(this->m_list->item(i)->text());
+    }
+    return itemList;
+}
+void ZClassPresetDialog::closeEvent(QCloseEvent *e)
+{
+    //write to dat file.
+    QFile productLineFile(QDir::currentPath()+"/cfg/CLASS.dat");
+    if(productLineFile.open(QFile::WriteOnly|QIODevice::Truncate|QIODevice::Text))
+    {
+        for(qint32 i=0;i<this->m_list->count();i++)
+        {
+            QByteArray baWrite=this->m_list->item(i)->text().toLatin1();
+            baWrite.append("\n");
+            productLineFile.write(baWrite);
+        }
+        productLineFile.close();
+    }
+    /////////////////
+    e->accept();
+}
+void ZClassPresetDialog::ZSlotAdd()
+{
+    QString newText=QInputDialog::getText(this,tr("新增项"),tr("请输入新项目"));
+    if(newText.isEmpty())
+    {
+        return;
+    }
+    QListWidgetItem *newItem=new QListWidgetItem(QIcon(":/TaskManager/images/TaskManager/Class.png"),newText);
+    this->m_list->addItem(newItem);
+}
+void ZClassPresetDialog::ZSlotDel()
+{
+    QListWidgetItem *item=this->m_list->currentItem();
+    if(item)
+    {
+        this->m_list->removeItemWidget(item);
+        delete item;
+    }
+}
+void ZClassPresetDialog::ZSlotReset()
+{
+    this->m_list->clear();
+}
+void ZClassPresetDialog::ZSlotImport()
+{
+
+}
+void ZClassPresetDialog::ZSlotExport()
+{
+
+}
+//订单号输入预置对话框
+ZOrderNoPresetDialog::ZOrderNoPresetDialog(QWidget *parent):QDialog(parent)
+{
+    this->setWindowTitle(tr("订单号-输入预置列表"));
+
+    this->m_tbAdd=new QToolButton;
+    this->m_tbAdd->setText(tr("增加"));
+    this->m_tbAdd->setIcon(QIcon(":/common/images/common/add.png"));
+    this->m_tbAdd->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbDel=new QToolButton;
+    this->m_tbDel->setText(tr("移除"));
+    this->m_tbDel->setIcon(QIcon(":/common/images/common/del.png"));
+    this->m_tbDel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbReset=new QToolButton;
+    this->m_tbReset->setText(tr("清空"));
+    this->m_tbReset->setIcon(QIcon(":/common/images/common/Clear.png"));
+    this->m_tbReset->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbImport=new QToolButton;
+    this->m_tbImport->setText(tr("导入"));
+    this->m_tbImport->setIcon(QIcon(":/UserManager/images/UserManager/Import.png"));
+    this->m_tbImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbExport=new QToolButton;
+    this->m_tbExport->setText(tr("导出"));
+    this->m_tbExport->setIcon(QIcon(":/UserManager/images/UserManager/Export.png"));
+    this->m_tbExport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_vLayoutBtn=new QVBoxLayout;
+    this->m_vLayoutBtn->addWidget(this->m_tbAdd);
+    this->m_vLayoutBtn->addWidget(this->m_tbDel);
+    this->m_vLayoutBtn->addWidget(this->m_tbReset);
+    this->m_vLayoutBtn->addWidget(this->m_tbImport);
+    this->m_vLayoutBtn->addWidget(this->m_tbExport);
+    this->m_vLayoutBtn->addStretch(1);
+    ///////////////////////////////////////
+    this->m_list=new QListWidget;
+    this->m_hLayout=new QHBoxLayout;
+    this->m_hLayout->addWidget(this->m_list);
+    this->m_hLayout->addLayout(this->m_vLayoutBtn);
+    this->setLayout(this->m_hLayout);
+
+    connect(this->m_tbAdd,SIGNAL(clicked(bool)),this,SLOT(ZSlotAdd()));
+    connect(this->m_tbDel,SIGNAL(clicked(bool)),this,SLOT(ZSlotDel()));
+    connect(this->m_tbReset,SIGNAL(clicked(bool)),this,SLOT(ZSlotReset()));
+    connect(this->m_tbImport,SIGNAL(clicked(bool)),this,SLOT(ZSlotImport()));
+    connect(this->m_tbExport,SIGNAL(clicked(bool)),this,SLOT(ZSlotExport()));
+
+    //read exist file data.
+    QStringList itemList=this->ZReadList();
+    for(qint32 i=0;i<itemList.count();i++)
+    {
+        QString itemText=itemList.at(i);
+        QListWidgetItem *newItem=new QListWidgetItem(QIcon(":/TaskManager/images/TaskManager/OrderNo.png"),itemText);
+        this->m_list->addItem(newItem);
+    }
+}
+ZOrderNoPresetDialog::~ZOrderNoPresetDialog()
+{
+    delete this->m_tbAdd;
+    delete this->m_tbDel;
+    delete this->m_tbReset;
+    delete this->m_tbImport;
+    delete this->m_tbExport;
+    delete this->m_vLayoutBtn;
+    delete this->m_list;
+    delete this->m_hLayout;
+}
+QSize ZOrderNoPresetDialog::sizeHint() const
+{
+    return QSize(600,300);
+}
+QStringList ZOrderNoPresetDialog::ZReadList()
+{
+    QStringList itemList;
+    QFile productLineFile(QDir::currentPath()+"/cfg/ORDER.dat");
+    if(productLineFile.open(QFile::ReadOnly|QIODevice::Text))
+    {
+        while(!productLineFile.atEnd())
+        {
+            QByteArray baLine=productLineFile.readLine();
+            if(!baLine.isEmpty())
+            {
+                QString newText(baLine);
+                newText.remove("\n");
+                if(!newText.isEmpty())
+                {
+                    itemList.append(newText);
+                }
+            }
+        }
+        productLineFile.close();
+    }
+    return itemList;
+}
+QStringList ZOrderNoPresetDialog::ZGetList()
+{
+    QStringList itemList;
+    for(qint32 i=0;i<this->m_list->count();i++)
+    {
+        itemList.append(this->m_list->item(i)->text());
+    }
+    return itemList;
+}
+void ZOrderNoPresetDialog::closeEvent(QCloseEvent *e)
+{
+    //write to dat file.
+    QFile productLineFile(QDir::currentPath()+"/cfg/ORDER.dat");
+    if(productLineFile.open(QFile::WriteOnly|QIODevice::Truncate|QIODevice::Text))
+    {
+        for(qint32 i=0;i<this->m_list->count();i++)
+        {
+            QByteArray baWrite=this->m_list->item(i)->text().toLatin1();
+            baWrite.append("\n");
+            productLineFile.write(baWrite);
+        }
+        productLineFile.close();
+    }
+    /////////////////
+    e->accept();
+}
+void ZOrderNoPresetDialog::ZSlotAdd()
+{
+    QString newText=QInputDialog::getText(this,tr("新增项"),tr("请输入新项目"));
+    if(newText.isEmpty())
+    {
+        return;
+    }
+    QListWidgetItem *newItem=new QListWidgetItem(QIcon(":/TaskManager/images/TaskManager/OrderNo.png"),newText);
+    this->m_list->addItem(newItem);
+}
+void ZOrderNoPresetDialog::ZSlotDel()
+{
+    QListWidgetItem *item=this->m_list->currentItem();
+    if(item)
+    {
+        this->m_list->removeItemWidget(item);
+        delete item;
+    }
+}
+void ZOrderNoPresetDialog::ZSlotReset()
+{
+    this->m_list->clear();
+}
+void ZOrderNoPresetDialog::ZSlotImport()
+{
+
+}
+void ZOrderNoPresetDialog::ZSlotExport()
+{
+
+}
+///产品编号预置输入对话框
+ZProductNoPresetDialog::ZProductNoPresetDialog(QWidget *parent):QDialog(parent)
+{
+    this->setWindowTitle(tr("产品编号-输入预置列表"));
+
+    this->m_tbAdd=new QToolButton;
+    this->m_tbAdd->setText(tr("增加"));
+    this->m_tbAdd->setIcon(QIcon(":/common/images/common/add.png"));
+    this->m_tbAdd->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbDel=new QToolButton;
+    this->m_tbDel->setText(tr("移除"));
+    this->m_tbDel->setIcon(QIcon(":/common/images/common/del.png"));
+    this->m_tbDel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbReset=new QToolButton;
+    this->m_tbReset->setText(tr("清空"));
+    this->m_tbReset->setIcon(QIcon(":/common/images/common/Clear.png"));
+    this->m_tbReset->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbImport=new QToolButton;
+    this->m_tbImport->setText(tr("导入"));
+    this->m_tbImport->setIcon(QIcon(":/UserManager/images/UserManager/Import.png"));
+    this->m_tbImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbExport=new QToolButton;
+    this->m_tbExport->setText(tr("导出"));
+    this->m_tbExport->setIcon(QIcon(":/UserManager/images/UserManager/Export.png"));
+    this->m_tbExport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_vLayoutBtn=new QVBoxLayout;
+    this->m_vLayoutBtn->addWidget(this->m_tbAdd);
+    this->m_vLayoutBtn->addWidget(this->m_tbDel);
+    this->m_vLayoutBtn->addWidget(this->m_tbReset);
+    this->m_vLayoutBtn->addWidget(this->m_tbImport);
+    this->m_vLayoutBtn->addWidget(this->m_tbExport);
+    this->m_vLayoutBtn->addStretch(1);
+    ///////////////////////////////////////
+    this->m_list=new QListWidget;
+    this->m_hLayout=new QHBoxLayout;
+    this->m_hLayout->addWidget(this->m_list);
+    this->m_hLayout->addLayout(this->m_vLayoutBtn);
+    this->setLayout(this->m_hLayout);
+
+    connect(this->m_tbAdd,SIGNAL(clicked(bool)),this,SLOT(ZSlotAdd()));
+    connect(this->m_tbDel,SIGNAL(clicked(bool)),this,SLOT(ZSlotDel()));
+    connect(this->m_tbReset,SIGNAL(clicked(bool)),this,SLOT(ZSlotReset()));
+    connect(this->m_tbImport,SIGNAL(clicked(bool)),this,SLOT(ZSlotImport()));
+    connect(this->m_tbExport,SIGNAL(clicked(bool)),this,SLOT(ZSlotExport()));
+
+    //read exist file data.
+    QStringList itemList=this->ZReadList();
+    for(qint32 i=0;i<itemList.count();i++)
+    {
+        QString itemText=itemList.at(i);
+        QListWidgetItem *newItem=new QListWidgetItem(QIcon(":/TaskManager/images/TaskManager/ProductNo.png"),itemText);
+        this->m_list->addItem(newItem);
+    }
+}
+ZProductNoPresetDialog::~ZProductNoPresetDialog()
+{
+    delete this->m_tbAdd;
+    delete this->m_tbDel;
+    delete this->m_tbReset;
+    delete this->m_tbImport;
+    delete this->m_tbExport;
+    delete this->m_vLayoutBtn;
+    delete this->m_list;
+    delete this->m_hLayout;
+}
+QSize ZProductNoPresetDialog::sizeHint() const
+{
+    return QSize(600,300);
+}
+QStringList ZProductNoPresetDialog::ZReadList()
+{
+    QStringList itemList;
+    QFile productLineFile(QDir::currentPath()+"/cfg/PRODUCT.dat");
+    if(productLineFile.open(QFile::ReadOnly|QIODevice::Text))
+    {
+        while(!productLineFile.atEnd())
+        {
+            QByteArray baLine=productLineFile.readLine();
+            if(!baLine.isEmpty())
+            {
+                QString newText(baLine);
+                newText.remove("\n");
+                if(!newText.isEmpty())
+                {
+                    itemList.append(newText);
+                }
+            }
+        }
+        productLineFile.close();
+    }
+    return itemList;
+}
+QStringList ZProductNoPresetDialog::ZGetList()
+{
+    QStringList itemList;
+    for(qint32 i=0;i<this->m_list->count();i++)
+    {
+        itemList.append(this->m_list->item(i)->text());
+    }
+    return itemList;
+}
+void ZProductNoPresetDialog::closeEvent(QCloseEvent *e)
+{
+    //write to dat file.
+    QFile productLineFile(QDir::currentPath()+"/cfg/PRODUCT.dat");
+    if(productLineFile.open(QFile::WriteOnly|QIODevice::Truncate|QIODevice::Text))
+    {
+        for(qint32 i=0;i<this->m_list->count();i++)
+        {
+            QByteArray baWrite=this->m_list->item(i)->text().toLatin1();
+            baWrite.append("\n");
+            productLineFile.write(baWrite);
+        }
+        productLineFile.close();
+    }
+    /////////////////
+    e->accept();
+}
+void ZProductNoPresetDialog::ZSlotAdd()
+{
+    QString newText=QInputDialog::getText(this,tr("新增项"),tr("请输入新项目"));
+    if(newText.isEmpty())
+    {
+        return;
+    }
+    QListWidgetItem *newItem=new QListWidgetItem(QIcon(":/TaskManager/images/TaskManager/ProductNo.png"),newText);
+    this->m_list->addItem(newItem);
+}
+void ZProductNoPresetDialog::ZSlotDel()
+{
+    QListWidgetItem *item=this->m_list->currentItem();
+    if(item)
+    {
+        this->m_list->removeItemWidget(item);
+        delete item;
+    }
+}
+void ZProductNoPresetDialog::ZSlotReset()
+{
+    this->m_list->clear();
+}
+void ZProductNoPresetDialog::ZSlotImport()
+{
+
+}
+void ZProductNoPresetDialog::ZSlotExport()
+{
+
 }

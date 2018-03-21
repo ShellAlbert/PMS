@@ -16,12 +16,18 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
     //check cache dir is exist or not.
-    QString cacheDir(QDir::currentPath()+"/cache");
     QDir dir;
+    QString cacheDir(QDir::currentPath()+"/cache");
     if(!dir.exists(cacheDir))
     {
         dir.mkdir(cacheDir);
     }
+    QString cfgDir(QDir::currentPath()+"/cfg");
+    if(!dir.exists(cfgDir))
+    {
+        dir.mkdir(cfgDir);
+    }
+    //load skin file.
     QFile file(":/Skin/DefaultUI.qss");
     if(file.open(QIODevice::ReadOnly))
     {

@@ -779,7 +779,7 @@ void PNetFrame_Task::ZOpenTask(QString taskName,QString refTemplateName)
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
 }
-void PNetFrame_Task::ZSaveTask(QString taskName,QString refTemplateName,QString taskValueXmlData)
+void PNetFrame_Task::ZSaveTask(QString taskName,QString refTemplateName,QString taskValueXmlData,QStringList auxList)
 {
     QXmlStreamWriter  tXmlWriter(&this->m_frmXmlData);
     tXmlWriter.setAutoFormatting(true);
@@ -789,6 +789,11 @@ void PNetFrame_Task::ZSaveTask(QString taskName,QString refTemplateName,QString 
     tXmlWriter.writeStartElement(QString("Task"));
     tXmlWriter.writeAttribute(QString("cmd"),QString("save"));
     tXmlWriter.writeAttribute(QString("refTemplate"),refTemplateName);
+    //辅助数据，生产线/机器号,班组，订单号，产品号
+    tXmlWriter.writeAttribute(QString("machineNo"),auxList.at(0));
+    tXmlWriter.writeAttribute(QString("classNo"),auxList.at(1));
+    tXmlWriter.writeAttribute(QString("orderNo"),auxList.at(2));
+    tXmlWriter.writeAttribute(QString("productNo"),auxList.at(3));
     tXmlWriter.writeAttribute(QString("data"),QString(taskValueXmlData.toUtf8().toBase64()));
     tXmlWriter.writeCharacters(taskName);
     tXmlWriter.writeEndElement();//Task.

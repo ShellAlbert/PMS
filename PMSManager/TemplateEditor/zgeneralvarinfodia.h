@@ -47,6 +47,7 @@ private:
     QLineEdit *m_letVarMin;
     QLabel *m_lblVarMax;
     QLineEdit *m_letVarMax;
+    QLabel *m_lblDigitalRefVal;
     QLineEdit *m_leDigitalRefVal;
 
     //for Datetime.

@@ -169,6 +169,10 @@ void ZTaskInfoDia::ZParseAckNetFrmXmlData()
                     QString refTemplate=attr.value(QString("refTemplate")).toString();
                     QString refProcess=attr.value(QString("refProcess")).toString();
                     QString refStep=attr.value(QString("refStep")).toString();
+                    QString machineNo=attr.value(QString("machineNo")).toString();
+                    QString classNo=attr.value(QString("classNo")).toString();
+                    QString orderNo=attr.value(QString("orderNo")).toString();
+                    QString productNo=attr.value(QString("productNo")).toString();
                     QString templatedata=attr.value(QString("templatedata")).toString();
                     QString varsrcdata=attr.value(QString("varsrcdata")).toString();
                     QString vardata=attr.value(QString("vardata")).toString();
@@ -179,6 +183,10 @@ void ZTaskInfoDia::ZParseAckNetFrmXmlData()
                     paraList.append(refTemplate);
                     paraList.append(refProcess);
                     paraList.append(refStep);
+                    paraList.append(machineNo);
+                    paraList.append(classNo);
+                    paraList.append(orderNo);
+                    paraList.append(productNo);
                     paraList.append(templatedata);
                     paraList.append(varsrcdata);
                     paraList.append(vardata);
@@ -320,7 +328,7 @@ void ZTaskInfoDia::ZSlotOkay()
         this->m_waitDia->ZSetTipsMsg(tr("正在打开任务[%1]").arg(this->ZGetTaskName()));
         break;
     case Type_SaveTask:
-        netFrm->ZSaveTask(this->ZGetTaskName(),this->ZGetRefTemplateName(),this->m_taskValueXmlData);
+        netFrm->ZSaveTask(this->ZGetTaskName(),this->ZGetRefTemplateName(),this->m_taskValueXmlData,this->m_auxList);
         this->m_waitDia->ZSetTipsMsg(tr("正在保存任务[%1]").arg(this->ZGetTaskName()));
         break;
     case Type_DelTask:
@@ -365,6 +373,10 @@ void ZTaskInfoDia::ZSlotCancel()
 void ZTaskInfoDia::ZSetTaskValueXmlData(QString xmlData)
 {
     this->m_taskValueXmlData=xmlData;
+}
+void ZTaskInfoDia::ZSetTaskAuxData(QStringList auxList)
+{
+    this->m_auxList=auxList;
 }
 QSize ZTaskInfoDia::sizeHint() const
 {

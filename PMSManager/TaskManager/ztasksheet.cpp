@@ -17,6 +17,11 @@
 #include <QMessageBox>
 #include "pgblpara.h"
 #include <QPaintEvent>
+#include "TaskManager/ptaskmanager.h"
+class ZProductLinePresetDialog;
+class ZClassPresetDialog;
+class ZOrderNoPresetDialog;
+class ZProductNoPresetDialog;
 ZTaskSheet::ZTaskSheet(QTreeWidget *varTree,QWidget *parent):QTableWidget(parent)
 {
     //used to hold var.
@@ -546,6 +551,70 @@ void ZCellDataCheckReportDialog::ZSlotCopy2Clipboard()
 }
 ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
 {
+    this->m_llProductLine=new QLabel(tr("生产线/机器号"));
+    this->m_llProductLine->setAlignment(Qt::AlignCenter);
+    this->m_cbProuctLine=new QComboBox;
+    this->m_cbProuctLine->setEditable(true);
+    this->m_cbProuctLine->setMinimumWidth(160);
+    //载入生产线预置值供用户选择，减少操作键盘次数。
+    ZProductLinePresetDialog PLDia;
+    QStringList lstPL=PLDia.ZReadList();
+    for(qint32 i=0;i<lstPL.size();i++)
+    {
+        this->m_cbProuctLine->addItem(QIcon(":/TaskManager/images/TaskManager/ProductLine.png"),lstPL.at(i));
+    }
+
+    this->m_llClass=new QLabel(tr("班组"));
+    this->m_llClass->setAlignment(Qt::AlignCenter);
+    this->m_cbClass=new QComboBox;
+    this->m_cbClass->setEditable(true);
+    this->m_cbClass->setMinimumWidth(160);
+    //载入班组预置值供用户选择，减少操作键盘次数。
+    ZClassPresetDialog classDia;
+    QStringList lstClass=classDia.ZReadList();
+    for(qint32 i=0;i<lstClass.size();i++)
+    {
+        this->m_cbClass->addItem(QIcon(":/TaskManager/images/TaskManager/Class.png"),lstClass.at(i));
+    }
+
+    this->m_llOrderNo=new QLabel(tr("订单号"));
+    this->m_llOrderNo->setAlignment(Qt::AlignCenter);
+    this->m_cbOrderNo=new QComboBox;
+    this->m_cbOrderNo->setEditable(true);
+    this->m_cbOrderNo->setMinimumWidth(160);
+    //载入订单号预置值供用户选择，减少操作键盘次数。
+    ZOrderNoPresetDialog orderNoDia;
+    QStringList lstOrderNo=orderNoDia.ZReadList();
+    for(qint32 i=0;i<lstOrderNo.size();i++)
+    {
+        this->m_cbOrderNo->addItem(QIcon(":/TaskManager/images/TaskManager/OrderNo.png"),lstOrderNo.at(i));
+    }
+
+    this->m_llProductNo=new QLabel(tr("产品号"));
+    this->m_llProductNo->setAlignment(Qt::AlignCenter);
+    this->m_cbProductNo=new QComboBox;
+    this->m_cbProductNo->setEditable(true);
+    this->m_cbProductNo->setMinimumWidth(160);
+    //载入产品号预置值供用户选择，减少操作键盘次数。
+    ZProductNoPresetDialog productNoDia;
+    QStringList lstProductNo=productNoDia.ZReadList();
+    for(qint32 i=0;i<lstProductNo.size();i++)
+    {
+        this->m_cbProductNo->addItem(QIcon(":/TaskManager/images/TaskManager/ProductNo.png"),lstProductNo.at(i));
+    }
+
+    this->m_hLayoutTop=new QHBoxLayout;
+    this->m_hLayoutTop->addWidget(this->m_llProductLine);
+    this->m_hLayoutTop->addWidget(this->m_cbProuctLine);
+    this->m_hLayoutTop->addWidget(this->m_llClass);
+    this->m_hLayoutTop->addWidget(this->m_cbClass);
+    this->m_hLayoutTop->addWidget(this->m_llOrderNo);
+    this->m_hLayoutTop->addWidget(this->m_cbOrderNo);
+    this->m_hLayoutTop->addWidget(this->m_llProductNo);
+    this->m_hLayoutTop->addWidget(this->m_cbProductNo);
+    this->m_hLayoutTop->addStretch(1);
+
+    /////////////////////////////////////////////////
     this->m_treeVar=new QTreeWidget;
     this->m_treeVar->setColumnCount(5);
     QStringList headerList;
@@ -584,9 +653,10 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
     this->m_leftSpliter->addWidget(this->m_rightSpliter);
     this->m_leftSpliter->setStretchFactor(0,8);
     this->m_leftSpliter->setStretchFactor(1,2);
-    this->m_hLayout=new QHBoxLayout;
-    this->m_hLayout->addWidget(this->m_leftSpliter);
-    this->setLayout(this->m_hLayout);
+    this->m_vLayoutMain=new QVBoxLayout;
+    this->m_vLayoutMain->addLayout(this->m_hLayoutTop);
+    this->m_vLayoutMain->addWidget(this->m_leftSpliter);
+    this->setLayout(this->m_vLayoutMain);
 
     connect(this->m_treeVar,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(ZSlotVarDblClicked(QModelIndex)));
     connect(this->m_sheet,SIGNAL(ZSignalDataChanged(QString)),this,SIGNAL(ZSignalDataChanged(QString)));
@@ -596,6 +666,16 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
 }
 ZTaskWidget::~ZTaskWidget()
 {
+    delete this->m_llProductLine;
+    delete this->m_cbProuctLine;
+    delete this->m_llClass;
+    delete this->m_cbClass;
+    delete this->m_llProductNo;
+    delete this->m_cbProductNo;
+    delete this->m_llOrderNo;
+    delete this->m_cbOrderNo;
+    delete this->m_hLayoutTop;
+    ///////////////////////////////////
     delete this->m_sheet;
     delete this->m_geVarItem;
     delete this->m_autoVarItem;
@@ -606,7 +686,7 @@ ZTaskWidget::~ZTaskWidget()
     delete this->m_widgetTaskState;
     delete this->m_rightSpliter;
     delete this->m_leftSpliter;
-    delete this->m_hLayout;
+    delete this->m_vLayoutMain;
 }
 void ZTaskWidget::ZSlotPopupMenu(const QPoint &pt)
 {
@@ -754,9 +834,28 @@ QString ZTaskWidget::ZGetTaskVarValueXmlData()
     }
     tXmlWriter.writeEndElement();//NetPro.
     tXmlWriter.writeEndDocument();
-    qDebug()<<"saveTask:";
-    qDebug()<<valXmlData;
+//    qDebug()<<"saveTask:";
+//    qDebug()<<valXmlData;
     return valXmlData;
+}
+QStringList ZTaskWidget::ZGetTaskAuxData()
+{
+    QStringList auxList;
+    auxList.append(this->m_cbProuctLine->currentText());
+    auxList.append(this->m_cbClass->currentText());
+    auxList.append(this->m_cbOrderNo->currentText());
+    auxList.append(this->m_cbProductNo->currentText());
+    return auxList;
+}
+void ZTaskWidget::ZSetTaskAuxData(QStringList auxData)
+{
+    if(auxData.size()==4)
+    {
+        this->m_cbProuctLine->setCurrentText(auxData.at(0));
+        this->m_cbClass->setCurrentText(auxData.at(1));
+        this->m_cbOrderNo->setCurrentText(auxData.at(2));
+        this->m_cbProductNo->setCurrentText(auxData.at(3));
+    }
 }
 void ZTaskWidget::ZSetGeVarBindCellEditable(bool bEditable)
 {
@@ -1008,6 +1107,10 @@ void ZTaskWidget::ZSetTaskState(qint32 state)
         this->ZSetGeVarBindCellEditable(false);
         //this->m_sheet->setEnabled(false);
         this->m_sheet->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        this->m_cbProuctLine->setEnabled(false);
+        this->m_cbClass->setEnabled(false);
+        this->m_cbOrderNo->setEnabled(false);
+        this->m_cbProductNo->setEnabled(false);
         break;
     }
     this->m_autoVarItem->setExpanded(true);

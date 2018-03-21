@@ -37,6 +37,8 @@ public:
 
     void ZSetTaskValueXmlData(QString xmlData);
 
+    void ZSetTaskAuxData(QStringList auxList);
+
     void ZParseAckNetFrmXmlData();
 protected:
     QSize sizeHint() const;
@@ -68,6 +70,7 @@ private:
     TaskInfoDiaType m_diaType;
 
     QString m_taskValueXmlData;
+    QStringList m_auxList;
 };
 
 #endif // ZTASKINFODIA_H

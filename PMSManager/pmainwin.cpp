@@ -465,8 +465,8 @@ PMainWin::PMainWin(QWidget *parent)
                                            "QLabel{color:#386487;}"
                                            "");
     //task bar.
-//    this->m_lblLogo=new QLabel;
-//    this->m_lblLogo->setPixmap(QPixmap(":/TaskBar/images/PMS.png").scaled(TOPBAR_ICON_W*2,TOPBAR_ICON_H));
+    //    this->m_lblLogo=new QLabel;
+    //    this->m_lblLogo->setPixmap(QPixmap(":/TaskBar/images/PMS.png").scaled(TOPBAR_ICON_W*2,TOPBAR_ICON_H));
     this->m_btnUserManager=new QToolButton;
     this->m_btnUserManager->setText(tr("用户管理"));
     this->m_btnUserManager->setIcon(QIcon(":/TaskBar/images/UserManager.png"));
@@ -549,7 +549,7 @@ PMainWin::PMainWin(QWidget *parent)
     this->m_btnExitSys->setIconSize(QSize(TOPBAR_ICON_W,TOPBAR_ICON_H));
     this->m_btnExitSys->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     this->m_hLayoutTaskBar=new QHBoxLayout;
-//    this->m_hLayoutTaskBar->addWidget(this->m_lblLogo);
+    //    this->m_hLayoutTaskBar->addWidget(this->m_lblLogo);
     this->m_hLayoutTaskBar->addWidget(this->m_btnUserManager);
     this->m_hLayoutTaskBar->addWidget(this->m_btnTemplateEditor);
     this->m_hLayoutTaskBar->addWidget(this->m_btnFileManager);
@@ -839,33 +839,57 @@ void PMainWin::ZSlotSubWindowDetach(QString mdlName)
 {
     if(mdlName=="UserManager")
     {
-        this->m_midArea->removeSubWindow(this->m_userManager);
-        delete this->m_mdiUserManager;
-        this->m_userManager->showMaximized();
+        if(this->m_midArea->subWindowList().contains(this->m_mdiUserManager))
+        {
+            this->m_midArea->removeSubWindow(this->m_userManager);
+            delete this->m_mdiUserManager;
+            this->m_mdiUserManager=NULL;
+            this->m_userManager->showMaximized();
+        }
     }else if(mdlName=="TemplateEditor")
     {
-        this->m_midArea->removeSubWindow(this->m_templateEditor);
-        delete this->m_mdiTemplateEditor;
-        this->m_templateEditor->showMaximized();
+        if(this->m_midArea->subWindowList().contains(this->m_mdiTemplateEditor))
+        {
+            this->m_midArea->removeSubWindow(this->m_templateEditor);
+            delete this->m_mdiTemplateEditor;
+            this->m_mdiTemplateEditor=NULL;
+            this->m_templateEditor->showMaximized();
+        }
     }else if(mdlName=="TaskManager")
     {
-        this->m_midArea->removeSubWindow(this->m_taskManager);
-        delete this->m_mdiTaskManager;
-        this->m_taskManager->showMaximized();
+        if(this->m_midArea->subWindowList().contains(this->m_mdiTaskManager))
+        {
+            this->m_midArea->removeSubWindow(this->m_taskManager);
+            delete this->m_mdiTaskManager;
+            this->m_mdiTaskManager=NULL;
+            this->m_taskManager->showMaximized();
+        }
     }
 }
 void PMainWin::ZSlotSubWindowAatch(QString mdlName)
 {
     if(mdlName=="UserManager")
     {
+        if(this->m_midArea->subWindowList().contains(this->m_mdiUserManager))
+        {
+            return;
+        }
         this->m_mdiUserManager=this->m_midArea->addSubWindow(this->m_userManager);
         this->m_userManager->showMaximized();
     }else if(mdlName=="TemplateEditor")
     {
+        if(this->m_midArea->subWindowList().contains(this->m_mdiTemplateEditor))
+        {
+            return;
+        }
         this->m_mdiTemplateEditor=this->m_midArea->addSubWindow(this->m_templateEditor);
         this->m_templateEditor->showMaximized();
     }else if(mdlName=="TaskManager")
     {
+        if(this->m_midArea->subWindowList().contains(this->m_mdiTaskManager))
+        {
+            return;
+        }
         this->m_mdiTaskManager=this->m_midArea->addSubWindow(this->m_taskManager);
         this->m_taskManager->showMaximized();
     }
@@ -1138,7 +1162,7 @@ PGuideWin::PGuideWin(QWidget *parent):QWidget(parent)
 {
     this->setWindowFlags(this->windowFlags()|Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
     this->setWindowOpacity(0);
-     this->resize(64,64);
+    this->resize(64,64);
 
     this->m_lblGuide=new QLabel;
     this->m_lblGuide->setStyleSheet("background:transparent");

@@ -294,9 +294,11 @@ void PNetFrmTask::ZOpenTask(QString taskName,QString refTemplate)
 
     QString refProcess,refStep;
 
-    //SELECT `TaskState` FROM pms.TaskInfo WHERE `TaskName`='abc';
+    QString machineNo,classNo,orderNo,productNo;
+
+    //SELECT `TaskState`,`MachineNo`,`ClassNo`,`OrderNo`,`ProductNo` FROM pms.TaskInfo WHERE `TaskName`='abc';
     QSqlQuery queryTaskState(this->m_db);
-    queryTaskState.prepare("SELECT `RefProcess`,`RefStep`,`TaskState` FROM pms.TaskInfo WHERE `TaskName`=:TaskName");
+    queryTaskState.prepare("SELECT `RefProcess`,`RefStep`,`TaskState`,`MachineNo`,`ClassNo`,`OrderNo`,`ProductNo` FROM `pms`.`TaskInfo` WHERE `TaskName`=:TaskName");
     queryTaskState.bindValue(":TaskName",taskName);
     if(queryTaskState.exec())
     {
@@ -305,6 +307,10 @@ void PNetFrmTask::ZOpenTask(QString taskName,QString refTemplate)
             refProcess=queryTaskState.value(0).toString();
             refStep=queryTaskState.value(1).toString();
             taskState=queryTaskState.value(2).toInt();
+            machineNo=queryTaskState.value(3).toString();
+            classNo=queryTaskState.value(4).toString();
+            orderNo=queryTaskState.value(5).toString();
+            productNo=queryTaskState.value(6).toString();
         }
         retCode=0;
     }else{
@@ -459,6 +465,10 @@ void PNetFrmTask::ZOpenTask(QString taskName,QString refTemplate)
     tXmlWriter.writeAttribute(QString("refTemplate"),refTemplate);
     tXmlWriter.writeAttribute(QString("refProcess"),refProcess);
     tXmlWriter.writeAttribute(QString("refStep"),refStep);
+    tXmlWriter.writeAttribute(QString("machineNo"),machineNo);
+    tXmlWriter.writeAttribute(QString("classNo"),classNo);
+    tXmlWriter.writeAttribute(QString("orderNo"),orderNo);
+    tXmlWriter.writeAttribute(QString("productNo"),productNo);
     tXmlWriter.writeAttribute(QString("templatedata"),QString(templateXmlData.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("varsrcdata"),QString(varSrcXmlData.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("vardata"),QString(varValXmlData.toUtf8().toBase64()));
@@ -468,7 +478,7 @@ void PNetFrmTask::ZOpenTask(QString taskName,QString refTemplate)
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
 }
-void PNetFrmTask::ZSaveTask(QString taskName,QString refTemplate,QString taskValueXmlData)
+void PNetFrmTask::ZSaveTask(QString taskName,QString refTemplate,QString taskValueXmlData,QStringList auxData)
 {
     //find out RefTemplate bind varSource to make sure the table varSource_Data.
     //then write data into varSource_Data table.
@@ -552,9 +562,13 @@ void PNetFrmTask::ZSaveTask(QString taskName,QString refTemplate,QString taskVal
     //update taskState from NewTask to SaveTask.
     //UPDATE `pms`.`TaskInfo` SET `TaskState`='2' WHERE `TaskName`='root-烟台璟言科技在职员工表-20170116213709';
     QSqlQuery query4(this->m_db);
-    query4.prepare("UPDATE `pms`.`TaskInfo` SET `TaskState`=:TaskState WHERE `TaskName`=:TaskName");
+    query4.prepare("UPDATE `pms`.`TaskInfo` SET `TaskState`=:TaskState,`MachineNo`=:MachineNo,`ClassNo`=:ClassNo,`OrderNo`=:OrderNo,`ProductNo`=:ProductNo WHERE `TaskName`=:TaskName");
     query4.bindValue(":TaskState",Task_Type_Save);
     query4.bindValue(":TaskName",taskName);
+    query4.bindValue(":MachineNo",auxData.at(0));
+    query4.bindValue(":ClassNo",auxData.at(1));
+    query4.bindValue(":OrderNo",auxData.at(2));
+    query4.bindValue(":ProductNo",auxData.at(3));
     if(!query4.exec())
     {
         retCode=-1;

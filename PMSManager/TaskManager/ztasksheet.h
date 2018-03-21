@@ -10,6 +10,7 @@
 #include <QSplitter>
 #include <QLabel>
 #include <QDialog>
+#include <QComboBox>
 #include <QMap>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChartView>
@@ -94,9 +95,15 @@ public:
     ZTaskWidget(QWidget *parent=0);
     ~ZTaskWidget();
 
-    QString ZGetTaskVarValueXmlData();
+
+    QStringList ZGetTaskAuxData();
+    void ZSetTaskAuxData(QStringList auxData);
+
     void ZSetGeVarBindCellEditable(bool bEditable);
+
+    QString ZGetTaskVarValueXmlData();
     void ZSetVarValueXmlData(QString xmlData);
+
     bool ZCheckCellDataValidation();
 
     qint32 ZGetTaskState();
@@ -110,6 +117,17 @@ private slots:
     void ZSlotShowLineChart();
     void ZSlotShowBarChart();
 public:
+    ///////////////////////////
+    QHBoxLayout *m_hLayoutTop;
+    QLabel *m_llProductLine;
+    QComboBox *m_cbProuctLine;
+    QLabel *m_llClass;
+    QComboBox *m_cbClass;
+    QLabel *m_llOrderNo;
+    QComboBox *m_cbOrderNo;
+    QLabel *m_llProductNo;
+    QComboBox *m_cbProductNo;
+    ///////////////////////////
     ZTaskSheet* m_sheet;
     QTreeWidget *m_treeVar;
     QTreeWidgetItem *m_geVarItem;
@@ -120,7 +138,7 @@ public:
     QWidget *m_widgetTaskState;
     QSplitter *m_rightSpliter;
     QSplitter *m_leftSpliter;
-    QHBoxLayout *m_hLayout;
+    QVBoxLayout *m_vLayoutMain;
 
     qint32 m_TaskState;
     ////////////////////////////////

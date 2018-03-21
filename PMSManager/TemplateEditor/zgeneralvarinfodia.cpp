@@ -24,23 +24,34 @@ ZGeneralVarInfoDia::ZGeneralVarInfoDia(QWidget *parent):QDialog(parent)
     this->m_letVarMin=new QLineEdit;
     this->m_lblVarMax=new QLabel(tr("最大值"));
     this->m_letVarMax=new QLineEdit;
+    this->m_lblDigitalRefVal=new QLabel(tr("参考值"));
+    this->m_leDigitalRefVal=new QLineEdit;
 
     //for String.
     this->m_lblRefValue=new QLabel(tr("参考值"));
+    this->m_lblRefValue->setVisible(false);
     this->m_leRefValue=new QLineEdit;
+    this->m_leRefValue->setVisible(false);
 
     //for Datetime.
     this->m_lblStartTime=new QLabel(tr("起始时间"));
+    this->m_lblStartTime->setVisible(false);
     this->m_dtStart=new QDateTimeEdit;
+    this->m_dtStart->setVisible(false);
     this->m_lblEndTime=new QLabel(tr("结束时间"));
+    this->m_lblEndTime->setVisible(false);
     this->m_dtEnd=new QDateTimeEdit;
+    this->m_dtEnd->setVisible(false);
 
     //for boolean.
     this->m_lblBoolean=new QLabel(tr("参考值"));
+    this->m_lblBoolean->setVisible(false);
     this->m_cbBoolean=new QComboBox;
+    this->m_cbBoolean->setVisible(false);
     this->m_cbBoolean->setEditable(false);
     this->m_cbBoolean->addItem(tr("true"));
     this->m_cbBoolean->addItem(tr("false"));
+
 
     this->m_btnOkay=new QToolButton;
     this->m_btnOkay->setText(tr("OKAY"));
@@ -64,23 +75,26 @@ ZGeneralVarInfoDia::ZGeneralVarInfoDia(QWidget *parent):QDialog(parent)
     this->m_gridLayout->addWidget(this->m_letVarMin,3,1,1,1);
     this->m_gridLayout->addWidget(this->m_lblVarMax,3,2,1,1);
     this->m_gridLayout->addWidget(this->m_letVarMax,3,3,1,1);
+    this->m_gridLayout->addWidget(this->m_lblDigitalRefVal,4,0,1,1);
+    this->m_gridLayout->addWidget(this->m_leDigitalRefVal,4,1,1,1);
+
 
     //for String.
-    this->m_gridLayout->addWidget(this->m_lblRefValue,4,0,1,1);
-    this->m_gridLayout->addWidget(this->m_leRefValue,4,1,1,3);
+    this->m_gridLayout->addWidget(this->m_lblRefValue,5,0,1,1);
+    this->m_gridLayout->addWidget(this->m_leRefValue,5,1,1,3);
 
     //for Datetime.
-    this->m_gridLayout->addWidget(this->m_lblStartTime,5,0,1,1);
-    this->m_gridLayout->addWidget(this->m_dtStart,5,1,1,1);
-    this->m_gridLayout->addWidget(this->m_lblEndTime,5,2,1,1);
-    this->m_gridLayout->addWidget(this->m_dtEnd,5,3,1,1);
+    this->m_gridLayout->addWidget(this->m_lblStartTime,6,0,1,1);
+    this->m_gridLayout->addWidget(this->m_dtStart,6,1,1,1);
+    this->m_gridLayout->addWidget(this->m_lblEndTime,6,2,1,1);
+    this->m_gridLayout->addWidget(this->m_dtEnd,6,3,1,1);
 
     //for boolean.
-    this->m_gridLayout->addWidget(this->m_lblBoolean,6,0,1,1);
-    this->m_gridLayout->addWidget(this->m_cbBoolean,6,1,1,1);
+    this->m_gridLayout->addWidget(this->m_lblBoolean,7,0,1,1);
+    this->m_gridLayout->addWidget(this->m_cbBoolean,7,1,1,1);
 
-    this->m_gridLayout->addWidget(this->m_btnOkay,7,2,1,1);
-    this->m_gridLayout->addWidget(this->m_btnCancel,7,3,1,1);
+    this->m_gridLayout->addWidget(this->m_btnOkay,8,2,1,1);
+    this->m_gridLayout->addWidget(this->m_btnCancel,8,3,1,1);
     this->setLayout(this->m_gridLayout);
 
     connect(this->m_btnOkay,SIGNAL(clicked(bool)),this,SLOT(ZSlotOkay()));
@@ -102,6 +116,8 @@ ZGeneralVarInfoDia::~ZGeneralVarInfoDia()
     delete this->m_letVarMin;
     delete this->m_lblVarMax;
     delete this->m_letVarMax;
+    delete this->m_lblDigitalRefVal;
+    delete this->m_leDigitalRefVal;
 
     //for String.
     delete this->m_lblRefValue;
@@ -132,6 +148,8 @@ void ZGeneralVarInfoDia::ZSlotDataTypeChanged(QString type)
         this->m_letVarMin->setVisible(true);
         this->m_lblVarMax->setVisible(true);
         this->m_letVarMax->setVisible(true);
+        this->m_lblDigitalRefVal->setVisible(true);
+        this->m_leDigitalRefVal->setVisible(true);
 
         //String hide.
         this->m_lblRefValue->setVisible(false);
@@ -153,6 +171,8 @@ void ZGeneralVarInfoDia::ZSlotDataTypeChanged(QString type)
         this->m_letVarMin->setVisible(false);
         this->m_lblVarMax->setVisible(false);
         this->m_letVarMax->setVisible(false);
+        this->m_lblDigitalRefVal->setVisible(false);
+        this->m_leDigitalRefVal->setVisible(false);
 
         //String show.
         this->m_lblRefValue->setVisible(true);
@@ -175,6 +195,8 @@ void ZGeneralVarInfoDia::ZSlotDataTypeChanged(QString type)
         this->m_letVarMin->setVisible(false);
         this->m_lblVarMax->setVisible(false);
         this->m_letVarMax->setVisible(false);
+        this->m_lblDigitalRefVal->setVisible(false);
+        this->m_leDigitalRefVal->setVisible(false);
 
         //String hide.
         this->m_lblRefValue->setVisible(false);
@@ -197,6 +219,8 @@ void ZGeneralVarInfoDia::ZSlotDataTypeChanged(QString type)
         this->m_letVarMin->setVisible(false);
         this->m_lblVarMax->setVisible(false);
         this->m_letVarMax->setVisible(false);
+        this->m_lblDigitalRefVal->setVisible(false);
+        this->m_leDigitalRefVal->setVisible(false);
 
         //String hide.
         this->m_lblRefValue->setVisible(false);
@@ -265,6 +289,7 @@ QString ZGeneralVarInfoDia::ZGetVarRule()
     {
         return QString("X");
     }
+    return QString("X");
 }
 void ZGeneralVarInfoDia::ZSetVarRule(QString rule)
 {

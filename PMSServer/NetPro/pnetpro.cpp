@@ -589,11 +589,22 @@ QString PNetPro::ZParseNetFrmXmlData(QString xmlData,QSqlDatabase db)
                 {
                     this->m_proType=ProType_Task_Save;
                     QString refTemplate=attr.value(QString("refTemplate")).toString();
+                    //生产线/机器号，班组,订单号，产品号
+                    QString machineNo=attr.value(QString("machineNo")).toString();
+                    QString classNo=attr.value(QString("classNo")).toString();
+                    QString orderNo=attr.value(QString("orderNo")).toString();
+                    QString productNo=attr.value(QString("productNo")).toString();
+                    QStringList auxList;
+                    auxList.append(machineNo);
+                    auxList.append(classNo);
+                    auxList.append(orderNo);
+                    auxList.append(productNo);
+                    ///////////////////////////////////////////////////////
                     QString taskData=attr.value(QString("data")).toString();
                     QString taskName=tXmlReader.readElementText();
                     PGblPara::ZGetInstance()->m_muxDB.lock();//lock DB.
                     PNetFrmTask netFrm(db);
-                    netFrm.ZSaveTask(taskName,refTemplate,taskData);
+                    netFrm.ZSaveTask(taskName,refTemplate,taskData,auxList);
                     ackNetFrmXmlData=netFrm.ZGetAckNetFrmXmlData();
                     emit this->ZSignalOpLog(netFrm.ZGetOpLogMsg());
                     PGblPara::ZGetInstance()->m_muxDB.unlock();//unlock DB.
