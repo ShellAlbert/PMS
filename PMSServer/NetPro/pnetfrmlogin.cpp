@@ -74,7 +74,7 @@ qint32 PNetFrmLogin::ZLogin(QString userName,QString password)
     tXmlWriter.writeEndElement();//Login.
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
-    qDebug()<<this->m_ackNetFrmXmlData;
+    //qDebug()<<this->m_ackNetFrmXmlData;
     return retCode;
 }
 qint32 PNetFrmLogin::ZLogout(QString userName)

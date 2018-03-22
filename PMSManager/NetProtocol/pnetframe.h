@@ -145,6 +145,8 @@ public:
     void ZCheckOkayTask(QString taskName,QString refTemplateName);
     void ZCheckFailedTask(QString taskName,QString refTemplateName);
     void ZArchieveTask(QString taskName,QString refTemplateName);
+
+    void ZFindTask(QString machineNo,QString classNo,QString orderNo,QString productNo,QString startTime,QString endTime);
 };
 class PNetFrame_Form:public PNetFrame
 {

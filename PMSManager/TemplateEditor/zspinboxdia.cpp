@@ -14,9 +14,14 @@ ZSpinBoxDia::ZSpinBoxDia(QWidget *parent):QDialog(parent)
     this->m_leDefaultValue=new QLineEdit;
 
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("Okay"));
+    this->m_tbOkay->setText(tr("确认"));
+    this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
+    this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("Cancel"));
+    this->m_tbCancel->setText(tr("取消"));
+    this->m_tbCancel->setIcon(QIcon(":/common/images/common/cancel.png"));
+    this->m_tbCancel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     this->m_gridLayout=new QGridLayout;
     this->m_gridLayout->addWidget(this->m_llMinValue,0,0,1,1);

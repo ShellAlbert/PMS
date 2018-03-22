@@ -17,5 +17,17 @@ private:
     QToolButton *m_tbOkay;
     QVBoxLayout *m_vLayout;
 };
+class ZFindTaskDia : public ZBaseInfoDia
+{
+public:
+    ZFindTaskDia(QWidget *parent=0);
+    ~ZFindTaskDia();
+    void ZExecuteFindOp(QString machineNo,QString classNo,QString orderNo,QString productNo,QString startTime,QString endTime);
+    void ZParseAckNetFrmXmlData();
 
+private:
+    QLabel *m_llMsg;
+    QToolButton *m_tbOkay;
+    QVBoxLayout *m_vLayout;
+};
 #endif // ZLISTTASKDIA_H

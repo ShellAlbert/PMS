@@ -3,13 +3,8 @@
 
 #include <QString>
 #include <QMutex>
-#define PMSSERVER_VERSION   "V3.0.0"
-#define TCP_PORT        6800
-#define MYSQL_IP        "127.0.0.1"
-#define MYSQL_PORT      3306
-#define MYSQL_DB        "PMS"
-#define MYSQL_USER      "root"
-#define MYSQL_PASS      "123456"
+#define PMSSERVER_VERSION   "V3.0.0" //2018/3/1
+
 class PGblPara
 {
 public:
@@ -32,6 +27,14 @@ public:
     qint32 m_remainBytes;
     //mutex for mysql.
     QMutex m_muxDB;
+
+public:
+    QString m_mysqlIP;
+    QString m_mysqlPort;
+    QString m_mysqlUser;
+    QString m_mysqlPass;
+
+    QString m_tcpPort;
 private:
     static PGblPara* m_pInstance;
 };

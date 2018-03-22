@@ -5,6 +5,7 @@
 #include <TaskManager/ztaskinfodia.h>
 #include <TaskManager/zlisttaskdia.h>
 #include <TaskManager/ztasksheet.h>
+#include <TaskManager/zadvancedfinddialog.h>
 #include <QMessageBox>
 #include <QDebug>
 #include <QPrinter>
@@ -132,7 +133,6 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_btnArchieve->setIcon(QIcon(":/TaskManager/images/TaskManager/WithdrawTask.png"));
     this->m_btnArchieve->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
-
     this->m_tbTaskManage=new QToolButton;
     this->m_tbTaskManage->setToolTip((tr("审核管理")));
     this->m_tbTaskManage->setText((tr("审核")));
@@ -227,6 +227,7 @@ PTaskManager::PTaskManager(QWidget *parent):QFrame(parent)
     this->m_tabWidget->setTabsClosable(true);
     this->m_taskList=new PTaskList;
     connect(this->m_taskList,SIGNAL(ZSignalFilterChanged(qint32)),this,SLOT(ZSlotRefreshTaskList(qint32)));
+    connect(this->m_taskList,SIGNAL(ZSignalAdvancedSearch()),this,SLOT(ZSlotAdvancedFind()));
     this->m_tabWidget->addTab(this->m_taskList,QIcon(":/TaskBar/images/TaskManager.png"),tr("任务管理 "));
     this->m_tabWidget->tabBar()->tabButton(0,QTabBar::RightSide)->hide();
     this->m_taskList->m_tree->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -1205,6 +1206,11 @@ void PTaskManager::ZSlotInputPreset()
         ZProductNoPresetDialog dia;
         dia.exec();
     }
+}
+void PTaskManager::ZSlotAdvancedFind()
+{
+    ZAdvancedFindDialog dia;
+    dia.exec();
 }
 ZProductLinePresetDialog::ZProductLinePresetDialog(QWidget *parent):QDialog(parent)
 {

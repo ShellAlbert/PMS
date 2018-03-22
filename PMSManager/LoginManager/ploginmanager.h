@@ -77,11 +77,14 @@ public:
 
     void ZParseAckNetFrmXmlData();
     void ZLockUserName(QString userName);
+protected:
+    void closeEvent(QCloseEvent *e);
 public slots:
     void ZSlotDoLogin();
     void ZSlotDoExit();
     void ZSlotLoginOpFinished(qint32 retCode);
     void ZSlotShowLoginPart();
+    void ZSlotDoExitClean();
 private:
     void ZLoadUserList();
     void ZSaveUserList();

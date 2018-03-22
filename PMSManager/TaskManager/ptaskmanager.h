@@ -73,6 +73,7 @@ private slots:
     void ZSlotAatchDetch();
 
     void ZSlotInputPreset();
+    void ZSlotAdvancedFind();
 private:
     void ZAddLogMsg(QString logMsg);
 private:

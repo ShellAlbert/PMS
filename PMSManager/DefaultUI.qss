@@ -38,11 +38,68 @@ QTreeView::item:selected:!active {
     background: rgb(63, 147, 168);
 }
 
-QCheckBox {
-        spacing: 5px;
+/*checkbox样式设置*/
+QCheckBox::indicator {
+    width: 40px;
+    height: 20px;
+}
+QCheckBox::indicator::unchecked {
+    image: url(:/common/images/common/checkbox-unchecked.png);
+}
+QCheckBox::indicator::checked {
+    image: url(:/common/images/common/checkbox-checked.png);
+}
+/*combobox设置*/
+QComboBox{border:1px solid gray;min-width:28px;}
+QComboBox QAbstractItemView::item{height:25px;}
+QComboBox::down-arrow{image:url(:/common/images/common/combobox-arrowdown.png);}
+QComboBox::drop-down{border:0px;}
+
+/*menu样式设置*/
+QMenu{
+    padding:5px;
+    background:white;
+    border:1px solid gray;
+ }
+QMenu::item{
+    padding:0px 40px 0px 30px;
+    height:25px;
+}
+QMenu::item:selected:enabled{
+    background:lightgray;
+    color:white;
+}
+QMenu::item:selected:!enabled{
+    background:transparent;
+}
+QMenu::separator{
+    height:1px;
+    background:lightgray;
+    margin:5px 0px 5px 0px;
 }
 
-QCheckBox::indicator {
-        width: 15px;
-        height: 15px;
+/**日期控件QDateEdit**/
+QCalendarWidget QMenu{width:80px;left:10px;}
+QCalendarWidget QToolButton {height: 18px; }
+QCalendarWidget QToolButton:hover {border-radius:0px;color:red;}
+QCalendarWidget QWidget{background-color: #fefbea;border:0px;}
+QCalendarWidget QAbstractItemView {selection-background-color: rgb(255, 174, 0);}
+
+/**QTabWidget**/
+QTabWidget{border:none;margin:0px;outline:none;}
+QTabWidget[showHeader='true']::pane{border:1px solid #55B023;border-radius:0px;position: absolute;top: -1px;}
+QTabWidget[showHeader='false']::pane{border:none;position: absolute;margin:0px;}
+QTabWidget[showHeader='true'] QTabBar::tab{alignment:left;color:white;padding:2px 16px;margin-top:3px;margin-left:5px;height:21px;border-top-left-radius: 5px;border-top-right-radius: 5px;background:#C9B084}
+QTabWidget[showHeader='true'] QTabBar::tab:selected{background:#55B023;margin-top:1px;height:23px;}
+
+/**GroupBox设置*/
+QGroupBox{
+border: 1px solid white;
+border-radius:8px;
+margin-top:6px;
+}
+QGroupBox:title{
+color:white;
+subcontrol-origin: margin;
+left: 10px;
 }

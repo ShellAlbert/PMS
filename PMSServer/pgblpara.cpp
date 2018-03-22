@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QDir>
 #include <QDebug>
+#include <QSettings>
 PGblPara* PGblPara::m_pInstance=NULL;
 PGblPara::PGblPara()
 {
@@ -28,6 +29,37 @@ void PGblPara::ZLoadCfgFile()
     qDebug()<<"PMSManager version file:"<<versionFileName;
     qDebug()<<"PMSManager binary file:"<<appFileName;
     qDebug()<<"PMSManager new version:"<<this->m_newVersionNo<<"totalBlock:"<<this->m_totalBlock<<"blockSize:"<<this->m_blockSize<<"remainSize:"<<this->m_remainBytes;
+
+    //load config file.
+    QString iniFileName(QDir::currentPath()+"/PMS.ini");
+    if(!QFile::exists(iniFileName))
+    {
+        //if ini file is not exist,create it and fill with default value.
+        QSettings iniFile(iniFileName,QSettings::IniFormat);
+        iniFile.setIniCodec("UTF8");
+        iniFile.beginGroup("MySQL");
+        iniFile.setValue("IP","127.0.0.1");
+        iniFile.setValue("PORT","3306");
+        iniFile.setValue("USER","root");
+        iniFile.setValue("PASS","123456");
+        iniFile.endGroup();
+
+        iniFile.beginGroup("TCP");
+        iniFile.setValue("PORT","6800");
+        iniFile.endGroup();
+    }
+    //read config file.
+    QSettings iniFile(iniFileName,QSettings::IniFormat);
+    iniFile.setIniCodec("UTF8");
+    iniFile.beginGroup("MySQL");
+    this->m_mysqlIP=iniFile.value("IP","127.0.0.1").toString();
+    this->m_mysqlPort=iniFile.value("PORT","3306").toString();
+    this->m_mysqlUser=iniFile.value("USER","root").toString();
+    this->m_mysqlPass=iniFile.value("PASS","123456").toString();
+    iniFile.endGroup();
+    iniFile.beginGroup("TCP");
+    this->m_tcpPort=iniFile.value("PORT","6800").toString();
+    iniFile.endGroup();
 }
 quint64 PGblPara::ZGetPathSize(QString path)
 {

@@ -10,6 +10,59 @@
 #include <AES/TAesClass.h>
 #include "pgblpara.h"
 #include <QDateTime>
+#include <QMutex>
+#include <QTextStream>
+#include <iostream>
+QMutex gMutexLogFile;
+void gDumpLog2File(QtMsgType type,const QMessageLogContext &context,const QString &msg)
+{
+    Q_UNUSED(context);
+
+    gMutexLogFile.lock();
+    bool bAbort2Exit=false;
+    QString logString;
+    switch(type)
+    {
+    case QtDebugMsg://dump to console.
+        std::cout<<"<Debug>:"<<msg.toStdString()<<endl;
+        break;
+    case QtWarningMsg://dump to file.
+        logString="<"+QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")+">,"+msg;
+        break;
+    case QtCriticalMsg:
+        logString=QString("<Critical>:%1").arg(msg);
+        break;
+    case QtFatalMsg:
+        logString=QString("<Fatal>:%1").arg(msg);
+        bAbort2Exit=true;
+        break;
+    case QtInfoMsg:
+        logString=QString("<Info>:%1").arg(msg);
+        break;
+    default:
+        break;
+    }
+    if(!logString.isEmpty())
+    {
+        QString logFileName;
+        logFileName+=QDir::currentPath()+"/log/PMS-";
+        logFileName+=QDateTime::currentDateTime().toString("yyyy-MM-dd");
+        logFileName+=".log";
+        QFile logFile(logFileName);
+        if(logFile.open(QIODevice::WriteOnly|QIODevice::Append))
+        {
+            QTextStream ts(&logFile);
+            ts<<logString<<endl;
+        }
+        logFile.close();
+    }
+    //abort when fatal error occured.
+    if(bAbort2Exit)
+    {
+        abort();
+    }
+    gMutexLogFile.unlock();
+}
 //type:0,encrypt,1:decrypt.
 QString AesEncryptBase64(int type,char *inData,int inDataSize)
 {
@@ -56,13 +109,10 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    qDebug()<<"PMS Server "<<PMSSERVER_VERSION<<" build on "<<QString(__DATE__)<<QString(__TIME__);
-    //QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-
     //check its ftp base dir is exist or not.
-    qDebug()<<"Working Dir:"<<QDir::currentPath();
     QString dataDir=QDir::currentPath()+"/data";
     QString updateDir=QDir::currentPath()+"/update";
+    QString logDir=QDir::currentPath()+"/log";
     QDir dir;
     if(!QDir(dataDir).exists())
     {
@@ -72,15 +122,29 @@ int main(int argc, char *argv[])
     {
         dir.mkpath(updateDir);
     }
+    if(!QDir(logDir).exists())
+    {
+        dir.mkpath(logDir);
+    }
+
+    //dump critical msg to file.
+    //qInstallMessageHandler(gDumpLog2File);
+
+    qDebug()<<"PMS Server "<<PMSSERVER_VERSION<<" build on "<<QString(__DATE__)<<QString(__TIME__);
+    //QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+
+    //load config file.
+    qDebug()<<"loading config file...";
+    PGblPara::ZGetInstance()->ZLoadCfgFile();
 
     //mysql info.
-    qDebug()<<"MySQL Server ["<<MYSQL_IP<<":"<<MYSQL_PORT<<"],DB:"<<MYSQL_DB<<",USER:"<<MYSQL_USER;
+    qDebug()<<"MySQL Server ["<<PGblPara::ZGetInstance()->m_mysqlIP<<":"<<PGblPara::ZGetInstance()->m_mysqlPort<<"],USER:"<<PGblPara::ZGetInstance()->m_mysqlUser;
     //try to connect mysql.
     QSqlDatabase testDB=QSqlDatabase::addDatabase("QMYSQL");
-    testDB.setHostName(MYSQL_IP);
-    testDB.setPort(MYSQL_PORT);
-    testDB.setUserName(MYSQL_USER);
-    testDB.setPassword(MYSQL_PASS);
+    testDB.setHostName(PGblPara::ZGetInstance()->m_mysqlIP);
+    testDB.setPort(PGblPara::ZGetInstance()->m_mysqlPort.toInt());
+    testDB.setUserName(PGblPara::ZGetInstance()->m_mysqlUser);
+    testDB.setPassword(PGblPara::ZGetInstance()->m_mysqlPass);
     testDB.setDatabaseName("mysql");
     if(testDB.open())
     {
@@ -343,15 +407,11 @@ int main(int argc, char *argv[])
     }
     qDebug()<<"check BackupInfo table is okay.";
 
-    //load config file.
-    qDebug()<<"loading config file...";
-    PGblPara::ZGetInstance()->ZLoadCfgFile();
-
     //start TCP Server.
     PTcpServer tcpServer;
-    if(tcpServer.listen(QHostAddress::Any,TCP_PORT))
+    if(tcpServer.listen(QHostAddress::Any,PGblPara::ZGetInstance()->m_tcpPort.toInt()))
     {
-        qDebug()<<"listening on "<<TCP_PORT<<"...";
+        qDebug()<<"listening on "<<PGblPara::ZGetInstance()->m_tcpPort<<"...";
     }else{
         qDebug()<<"start failed:"<<tcpServer.errorString();
         return -1;

@@ -5,6 +5,7 @@
 #include <QSqlError>
 #include <QTimer>
 #include <NetPro/pnetfrmfile.h>
+#include "pgblpara.h"
 int QBytes2Int(QByteArray bytes) {
     int addr = bytes[0] & 0x000000FF;
     addr |= ((bytes[1] << 8) & 0x0000FF00);
@@ -48,10 +49,10 @@ void PTcpThread::run()
     }else{
         this->m_mysqlDb=QSqlDatabase::addDatabase("QMYSQL");
     }
-    this->m_mysqlDb.setHostName("127.0.0.1");
-    this->m_mysqlDb.setPort(3306);
-    this->m_mysqlDb.setUserName("root");
-    this->m_mysqlDb.setPassword("123456");
+    this->m_mysqlDb.setHostName(PGblPara::ZGetInstance()->m_mysqlIP);
+    this->m_mysqlDb.setPort(PGblPara::ZGetInstance()->m_mysqlPort.toInt());
+    this->m_mysqlDb.setUserName(PGblPara::ZGetInstance()->m_mysqlUser);
+    this->m_mysqlDb.setPassword(PGblPara::ZGetInstance()->m_mysqlPass);
     this->m_mysqlDb.setDatabaseName("pms");
     if(this->m_mysqlDb.open())
     {

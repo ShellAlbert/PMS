@@ -890,6 +890,26 @@ void PNetFrame_Task::ZArchieveTask(QString taskName,QString refTemplateName)
     tXmlWriter.writeEndElement();//NetPro.
     tXmlWriter.writeEndDocument();
 }
+void PNetFrame_Task::ZFindTask(QString machineNo,QString classNo,QString orderNo,QString productNo,QString startTime,QString endTime)
+{
+    QXmlStreamWriter  tXmlWriter(&this->m_frmXmlData);
+    tXmlWriter.setAutoFormatting(true);
+    tXmlWriter.writeStartDocument();
+    tXmlWriter.writeStartElement(QString("NetPro"));
+    tXmlWriter.writeAttribute(QString("dest"),QString("Task"));
+    tXmlWriter.writeStartElement(QString("Task"));
+    tXmlWriter.writeAttribute(QString("cmd"),QString("find"));
+    tXmlWriter.writeAttribute(QString("machineNo"),machineNo);
+    tXmlWriter.writeAttribute(QString("classNo"),classNo);
+    tXmlWriter.writeAttribute(QString("orderNo"),orderNo);
+    tXmlWriter.writeAttribute(QString("productNo"),productNo);
+    tXmlWriter.writeAttribute(QString("startTime"),startTime);
+    tXmlWriter.writeAttribute(QString("endTime"),endTime);
+    tXmlWriter.writeCharacters("TaskFind");
+    tXmlWriter.writeEndElement();//Task.
+    tXmlWriter.writeEndElement();//NetPro.
+    tXmlWriter.writeEndDocument();
+}
 void PNetFrame_Form::ZListForm()
 {
     QXmlStreamWriter  tXmlWriter(&this->m_frmXmlData);

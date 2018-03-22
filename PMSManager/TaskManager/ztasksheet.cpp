@@ -1022,40 +1022,40 @@ bool ZTaskWidget::ZCheckCellDataValidation()
                 }
             }else if(ZCell::CellWidget_QCheckBox==cell->ZGetCellWidgetType())
             {
-                if(cell->ZGetCellData().isEmpty())
-                {
-                    QString errLog(tr("CheckBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
-                    emit this->ZSignalLogMsg(errLog);
-                    checkLog.append(errLog);
-                    bCheckOkay=false;
-                }
+//                if(cell->ZGetCellData().isEmpty())
+//                {
+//                    QString errLog(tr("CheckBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+//                    emit this->ZSignalLogMsg(errLog);
+//                    checkLog.append(errLog);
+//                    bCheckOkay=false;
+//                }
             }else if(ZCell::CellWidget_QComboBox==cell->ZGetCellWidgetType())
             {
-                if(cell->ZGetCellData().isEmpty())
-                {
-                    QString errLog(tr("ComboBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
-                    emit this->ZSignalLogMsg(errLog);
-                    checkLog.append(errLog);
-                    bCheckOkay=false;
-                }
+//                if(cell->ZGetCellData().isEmpty())
+//                {
+//                    QString errLog(tr("ComboBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+//                    emit this->ZSignalLogMsg(errLog);
+//                    checkLog.append(errLog);
+//                    bCheckOkay=false;
+//                }
             }else if(ZCell::CellWidget_QDateTimeEdit==cell->ZGetCellWidgetType())
             {
-                if(cell->ZGetCellData().isEmpty())
-                {
-                    QString errLog(tr("DateTime单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
-                    emit this->ZSignalLogMsg(errLog);
-                    checkLog.append(errLog);
-                    bCheckOkay=false;
-                }
+//                if(cell->ZGetCellData().isEmpty())
+//                {
+//                    QString errLog(tr("DateTime单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+//                    emit this->ZSignalLogMsg(errLog);
+//                    checkLog.append(errLog);
+//                    bCheckOkay=false;
+//                }
             }else if(ZCell::CellWidget_QSpinBox==cell->ZGetCellWidgetType())
             {
-                if(cell->ZGetCellData().isEmpty())
-                {
-                    QString errLog(tr("SpinBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
-                    emit this->ZSignalLogMsg(errLog);
-                    checkLog.append(errLog);
-                    bCheckOkay=false;
-                }
+//                if(cell->ZGetCellData().isEmpty())
+//                {
+//                    QString errLog(tr("SpinBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+//                    emit this->ZSignalLogMsg(errLog);
+//                    checkLog.append(errLog);
+//                    bCheckOkay=false;
+//                }
             }
         }
     }

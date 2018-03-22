@@ -71,6 +71,7 @@ public:
         ProType_Task_CheckOkay,
         ProType_Task_CheckFailed,
         ProType_Task_Archieve,
+        ProType_Task_Find,
 
         ProType_Form_Add,
         ProType_Form_Del,

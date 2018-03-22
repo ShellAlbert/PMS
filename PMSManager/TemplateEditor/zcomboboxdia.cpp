@@ -7,15 +7,26 @@ ZComboBoxDia::ZComboBoxDia(QWidget *parent):QDialog(parent)
     this->m_llAddValue=new QLabel(tr("新列表值"));
     this->m_leAddValue=new QLineEdit;
     this->m_tbAdd=new QToolButton;
-    this->m_tbAdd->setText(tr("ADD"));
+    this->m_tbAdd->setText(tr("增加"));
+    this->m_tbAdd->setIcon(QIcon(":/common/images/common/add.png"));
+    this->m_tbAdd->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
     this->m_tbDel=new QToolButton;
-    this->m_tbDel->setText(tr("DEL"));
+    this->m_tbDel->setText(tr("移除"));
+    this->m_tbDel->setIcon(QIcon(":/common/images/common/del.png"));
+    this->m_tbDel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     this->m_listWidget=new QListWidget;
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("Okay"));
+    this->m_tbOkay->setText(tr("确认"));
+    this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
+    this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("Cancel"));
+    this->m_tbCancel->setText(tr("取消"));
+    this->m_tbCancel->setIcon(QIcon(":/common/images/common/cancel.png"));
+    this->m_tbCancel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
     this->m_gridLayout=new QGridLayout;
     this->m_gridLayout->addWidget(this->m_llAddValue,0,0,1,1);
     this->m_gridLayout->addWidget(this->m_leAddValue,0,1,1,1);
@@ -85,6 +96,8 @@ void ZComboBoxDia::ZSlotAdd()
         QListWidgetItem *item=new QListWidgetItem;
         item->setText(name);
         this->m_listWidget->addItem(item);
+
+        this->m_leAddValue->clear();
     }
 }
 void ZComboBoxDia::ZSlotDel()

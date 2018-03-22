@@ -2238,12 +2238,14 @@ void PTemplateEditor::ZSlotTemplateTreePopupMenu(const QPoint &pt)
     QAction actNew(QIcon(":/TemplateEditor/images/TemplateEditor/NewTemplate.png"),tr("新建模板"));
     QAction actOpen(QIcon(":/TemplateEditor/images/TemplateEditor/OpenTemplate.png"),tr("打开模板"));
     QAction actDel(QIcon(":/TemplateEditor/images/TemplateEditor/DelTemplate.png"),tr("删除模板"));
+    QAction actExport(QIcon(":/UserManager/images/UserManager/Export.png"),tr("导出Excel"));
     connect(&actNew,SIGNAL(triggered(bool)),this,SLOT(ZSlotNewTemplate()));
     connect(&actOpen,SIGNAL(triggered(bool)),this,SLOT(ZSlotOpenTemplate()));
     connect(&actDel,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelTemplate()));
     popMenu.addAction(&actNew);
     popMenu.addAction(&actOpen);
     popMenu.addAction(&actDel);
+    popMenu.addAction(&actExport);
     popMenu.exec(QCursor::pos());
 }
 void PTemplateEditor::ZSlotVarSourceTreePopupMenu(const QPoint &pt)
@@ -2258,12 +2260,14 @@ void PTemplateEditor::ZSlotVarSourceTreePopupMenu(const QPoint &pt)
     QAction actNew(QIcon(":/TemplateEditor/images/TemplateEditor/NewTemplate.png"),tr("新建变量源"));
     QAction actOpen(QIcon(":/TemplateEditor/images/TemplateEditor/OpenTemplate.png"),tr("打开变量源"));
     QAction actDel(QIcon(":/TemplateEditor/images/TemplateEditor/DelTemplate.png"),tr("删除变量源"));
+    QAction actExport(QIcon(":/UserManager/images/UserManager/Export.png"),tr("导出Excel"));
     connect(&actNew,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddVarSource()));
     connect(&actOpen,SIGNAL(triggered(bool)),this,SLOT(ZSlotOpenVarSource()));
     connect(&actDel,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelVarSource()));
     popMenu.addAction(&actNew);
     popMenu.addAction(&actOpen);
     popMenu.addAction(&actDel);
+    popMenu.addAction(&actExport);
     popMenu.exec(QCursor::pos());
 }
 void PTemplateEditor::ZAddLogMsg(QString logMsg)

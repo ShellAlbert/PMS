@@ -663,6 +663,21 @@ QString PNetPro::ZParseNetFrmXmlData(QString xmlData,QSqlDatabase db)
                     ackNetFrmXmlData=netFrm.ZGetAckNetFrmXmlData();
                     emit this->ZSignalOpLog(netFrm.ZGetOpLogMsg());
                     PGblPara::ZGetInstance()->m_muxDB.unlock();//unlock DB.
+                }else if(cmd=="find"){
+                    //void ZFindTask(QString machineNo,QString classNo,QString orderNo,QString productNo,QString startTime,QString endTime);
+                    this->m_proType=ProType_Task_Find;
+                    QString machineNo=attr.value(QString("machineNo")).toString();
+                    QString classNo=attr.value(QString("classNo")).toString();
+                    QString orderNo=attr.value(QString("orderNo")).toString();
+                    QString productNo=attr.value(QString("productNo")).toString();
+                    QString startTime=attr.value(QString("startTime")).toString();
+                    QString endTime=attr.value(QString("endTime")).toString();
+                    PGblPara::ZGetInstance()->m_muxDB.lock();//lock DB.
+                    PNetFrmTask netFrm(db);
+                    netFrm.ZFindTask(machineNo,classNo,orderNo,productNo,startTime,endTime);
+                    ackNetFrmXmlData=netFrm.ZGetAckNetFrmXmlData();
+                    emit this->ZSignalOpLog(netFrm.ZGetOpLogMsg());
+                    PGblPara::ZGetInstance()->m_muxDB.unlock();//unlock DB.
                 }else{
                     this->m_proType=ProType_Unknown;
                 }

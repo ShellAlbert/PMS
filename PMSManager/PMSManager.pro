@@ -140,7 +140,8 @@ HEADERS += \
     UserManager/zuserinfodia.h \
     pgblpara.h \
     pmainwin.h \
-    pwaitingdia.h
+    pwaitingdia.h \
+    TaskManager/zadvancedfinddialog.h
 
 SOURCES += \
     BackupManager/zbackupinfodia.cpp \
@@ -244,7 +245,8 @@ SOURCES += \
     main.cpp \
     pgblpara.cpp \
     pmainwin.cpp \
-    pwaitingdia.cpp
+    pwaitingdia.cpp \
+    TaskManager/zadvancedfinddialog.cpp
 
 
 RESOURCES += \

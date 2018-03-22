@@ -719,9 +719,11 @@ void PProcessEditor::ZSlotPopupMenu(const QPoint &pt)
     QAction actNew(QIcon(":/ProcessEditor/images/ProcessEditor/AddProcess.png"),tr("新建工序"));
     QAction actOpen(QIcon(":/ProcessEditor/images/ProcessEditor/OpenProcess.png"),tr("打开工序"));
     QAction actDel(QIcon(":/ProcessEditor/images/ProcessEditor/DelProcess.png"),tr("删除工序"));
+    QAction actExport(QIcon(":/UserManager/images/UserManager/Export.png"),tr("导出Excel"));
     popMenu.addAction(&actNew);
     popMenu.addAction(&actOpen);
     popMenu.addAction(&actDel);
+    popMenu.addAction(&actExport);
 
     connect(&actNew,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddProcess()));
     connect(&actOpen,SIGNAL(triggered(bool)),this,SLOT(ZSlotOpenProcess()));

@@ -292,6 +292,7 @@ ZUpdateNotifyDialog::ZUpdateNotifyDialog(QWidget *parent):ZBaseInfoDia(ZBaseInfo
 
     this->m_cbNeverNotify=new QCheckBox;
     this->m_cbNeverNotify->setText(tr("不再提醒"));
+    this->m_cbNeverNotify->setChecked(true);
 
     this->m_llIcon=new QLabel;
     this->m_llIcon->setPixmap(QPixmap(":/TaskBar/images/Update.png"));
@@ -1099,11 +1100,11 @@ void PMainWin::ZSlotExitSys()
 }
 void PMainWin::ZSlotDoExitClean()
 {
-    QToolTip::showText(QPoint(100,100),tr("PMS系统正在退出..."),0,QRect(0,0,300,300),500);
     if(MyUserInfo::ZGetInstance()->m_bPNetProtocolExitFlag && MyUserInfo::ZGetInstance()->m_bPNetTimeoutExitFlag)
     {
         qApp->exit(0);
     }
+    QTimer::singleShot(1000,this,SLOT(ZSlotDoExitClean()));
 }
 void PMainWin::ZSlotCloseSubWidget(QString widget)
 {

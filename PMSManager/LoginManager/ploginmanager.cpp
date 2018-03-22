@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QDir>
+#include <QToolTip>
 #include <QStringList>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
@@ -274,6 +275,21 @@ PLoginManager::~PLoginManager()
     delete this->m_stackedWidget;
     delete this->m_llInfo;
     delete this->m_vLayout;
+}
+void PLoginManager::ZSlotDoExitClean()
+{
+    if(MyUserInfo::ZGetInstance()->m_bPNetProtocolExitFlag && MyUserInfo::ZGetInstance()->m_bPNetTimeoutExitFlag)
+    {
+        this->reject();
+    }
+    //schedule another check.
+    QTimer::singleShot(1000,this,SLOT(ZSlotDoExitClean()));
+}
+void PLoginManager::closeEvent(QCloseEvent *e)
+{
+    MyUserInfo::ZGetInstance()->m_bExitFlag=true;
+    QTimer::singleShot(1000,this,SLOT(ZSlotDoExitClean()));
+    e->ignore();
 }
 void PLoginManager::ZSlotDoLogin()
 {

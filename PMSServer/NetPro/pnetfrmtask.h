@@ -25,6 +25,7 @@ public:
     void ZCheckOkayTask(QString taskName,QString refTemplate);
     void ZCheckFailedTask(QString taskName,QString refTemplate);
     void ZArchieveTask(QString taskName,QString refTemplate);
+    void ZFindTask(QString machineNo,QString classNo,QString orderNo,QString productNo,QString startTime,QString endTime);
 };
 
 #endif // PNETFRMTASK_H

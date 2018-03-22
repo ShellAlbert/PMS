@@ -181,7 +181,7 @@ void PNetFrmVarSource::ZSaveVarSource(QString name,QString xmlData,QString creat
         }//StarElement.
     }//while().
     sql.append("PRIMARY KEY (`TaskName`)  COMMENT '')");
-    qDebug()<<sql;
+    //qDebug()<<sql;
     QSqlQuery query2(this->m_db);
     if(query2.exec(sql))
     {

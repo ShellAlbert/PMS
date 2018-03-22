@@ -546,7 +546,7 @@ void PNetFrmTask::ZSaveTask(QString taskName,QString refTemplate,QString taskVal
     //remove the last ',' character.
     insertSql=insertSql.mid(0,insertSql.size()-1);
     insertSql.append(" )");
-    qDebug()<<"sql:"<<insertSql;
+    //qDebug()<<"sql:"<<insertSql;
 
     QSqlQuery query3(this->m_db);
     if(query3.exec(insertSql))
@@ -827,4 +827,87 @@ void PNetFrmTask::ZArchieveTask(QString taskName,QString refTemplate)
     tXmlWriter.writeEndElement();//Task.
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
+}
+void PNetFrmTask::ZFindTask(QString machineNo,QString classNo,QString orderNo,QString productNo,QString startTime,QString endTime)
+{
+    qint32 retCode=0;
+    QString errMsg;
+    QSqlQuery query(this->m_db);
+    //SELECT TaskName,MachineNo,ClassNo,OrderNo,ProductNo,Creator,CreateTime FROM taskinfo WHERE MachineNo='Sewing-3031' AND ClassNo='C' AND OrderNo='P2018-00345' AND ProductNo='P23938';
+    QString strSql("SELECT `TaskName`,`MachineNo`,`ClassNo`,`OrderNo`,`ProductNo`,`Creator`,`CreateTime` FROM `pms`.`taskinfo` WHERE ");
+    if(!machineNo.isEmpty())
+    {
+        strSql+=QString(" `MachineNo`='%1' ").arg(machineNo);
+    }
+    if(!classNo.isEmpty())
+    {
+        if(!machineNo.isEmpty())
+        {
+             strSql+=" AND ";
+        }
+        strSql+=QString(" `ClassNo`='%1' ").arg(classNo);
+    }
+    if(!orderNo.isEmpty())
+    {
+        if(!machineNo.isEmpty() || !classNo.isEmpty())
+        {
+             strSql+=" AND ";
+        }
+        strSql+=QString(" `OrderNo`='%1' ").arg(orderNo);
+    }
+    if(!productNo.isEmpty())
+    {
+        if(!machineNo.isEmpty() || !classNo.isEmpty() || !orderNo.isEmpty())
+        {
+             strSql+=" AND ";
+        }
+        strSql+=QString(" `ProductNo`='%1' ").arg(productNo);
+    }
+    qDebug()<<strSql;
+    if(!query.exec(strSql))
+    {
+        retCode=-1;
+        errMsg=query.lastError().text();
+        this->m_opLogMsg=QString("find task failed:%1.").arg(errMsg);
+    }
+
+    QXmlStreamWriter  tXmlWriter(&this->m_ackNetFrmXmlData);
+    tXmlWriter.setAutoFormatting(true);
+    tXmlWriter.writeStartDocument();
+    tXmlWriter.writeStartElement(QString("NetPro"));
+    tXmlWriter.writeAttribute(QString("dest"),QString("Task"));
+    if(retCode<0)
+    {
+        tXmlWriter.writeStartElement(QString("Task"));
+        tXmlWriter.writeAttribute(QString("retCode"),QString("%1").arg(retCode));
+        tXmlWriter.writeAttribute(QString("errMsg"),errMsg);
+        tXmlWriter.writeCharacters("TaskFind");
+        tXmlWriter.writeEndElement();//Task.
+    }else{
+        while(query.next())
+        {
+            QString retTaskName=query.value(0).toString();
+            QString retMachineNo=query.value(1).toString();
+            QString retClassNo=query.value(2).toString();
+            QString retOrderNo=query.value(3).toString();
+            QString retProductNo=query.value(4).toString();
+            QString retCreator=query.value(5).toString();
+            QString retCreateTime=query.value(6).toString();
+
+            tXmlWriter.writeStartElement(QString("Task"));
+            tXmlWriter.writeAttribute(QString("cmd"),QString("find"));
+            tXmlWriter.writeAttribute(QString("machineNo"),retMachineNo);
+            tXmlWriter.writeAttribute(QString("classNo"),retClassNo);
+            tXmlWriter.writeAttribute(QString("orderNo"),retOrderNo);
+            tXmlWriter.writeAttribute(QString("productNo"),retProductNo);
+            tXmlWriter.writeAttribute(QString("creator"),retCreator);
+            tXmlWriter.writeAttribute(QString("createTime"),retCreateTime);
+            tXmlWriter.writeAttribute(QString("retCode"),QString("%1").arg(retCode));
+            tXmlWriter.writeCharacters(retTaskName);
+            tXmlWriter.writeEndElement();//Task.
+        }
+    }
+    tXmlWriter.writeEndElement();//NetPro
+    tXmlWriter.writeEndDocument();
+    //qDebug()<<this->m_ackNetFrmXmlData;
 }
