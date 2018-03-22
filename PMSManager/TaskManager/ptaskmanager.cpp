@@ -486,6 +486,7 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
                         if(widget)
                         {
                             widget->ZSetTaskState(Task_Type_Save);
+                            widget->m_sheet->ZMakeProxyWidgetUnEditable(true);
                         }
                         break;
                     }
@@ -531,6 +532,7 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
                     if(widget->m_sheet->ZGetTaskName()==taskName)
                     {
                         widget->ZSetTaskState(Task_Type_Submit);
+                        widget->m_sheet->ZMakeProxyWidgetUnEditable(false);
                     }
                 }
                 this->ZAddLogMsg(tr("submit task [%1] success,state:[%2].").arg(taskName).arg(ZGetTaskStateString(taskState)));
@@ -561,6 +563,7 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
                     if(widget->m_sheet->ZGetTaskName()==taskName)
                     {
                         widget->ZSetTaskState(Task_Type_Save);
+                        widget->m_sheet->ZMakeProxyWidgetUnEditable(true);
                     }
                 }
                 this->ZAddLogMsg(tr("withdraw task [%1] success,state:[%2].").arg(taskName).arg(ZGetTaskStateString(taskState)));
@@ -591,6 +594,7 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
                     if(widget->m_sheet->ZGetTaskName()==taskName)
                     {
                         widget->ZSetTaskState(Task_Type_Check_Okay);
+                        widget->m_sheet->ZMakeProxyWidgetUnEditable(false);
                     }
                 }
                 this->ZAddLogMsg(tr("check okay task [%1] success,state:[%2].").arg(taskName).arg(ZGetTaskStateString(taskState)));
@@ -621,6 +625,7 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
                     if(widget->m_sheet->ZGetTaskName()==taskName)
                     {
                         widget->ZSetTaskState(Task_Type_Check_Failed);
+                        widget->m_sheet->ZMakeProxyWidgetUnEditable(true);
                     }
                 }
                 this->ZAddLogMsg(tr("check failed task [%1] success,state:[%2].").arg(taskName).arg(ZGetTaskStateString(taskState)));
@@ -652,6 +657,7 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
                     if(widget->m_sheet->ZGetTaskName()==taskName)
                     {
                         widget->ZSetTaskState(Task_Type_Archieve);
+                        widget->m_sheet->ZMakeProxyWidgetUnEditable(false);
                     }
                 }
                 this->ZAddLogMsg(tr("Archiev task [%1] success.").arg(taskName));
@@ -1143,16 +1149,18 @@ void PTaskManager::ZSlotPopupMenu(const QPoint &pt)
     QAction actOpen(QIcon(":/TaskManager/images/TaskManager/MdyTask.png"),tr("打开任务"));
     QAction actDel(QIcon(":/TaskManager/images/TaskManager/DelTask.png"),tr("删除任务"));
     QAction actArchive(QIcon(":/TaskManager/images/TaskManager/DelTask.png"),tr("归档"));
+    QAction actExport(QIcon(":/UserManager/images/UserManager/Export.png"),tr("导出Excel..."));
     popMenu.addAction(&actNew);
     popMenu.addAction(&actOpen);
     popMenu.addAction(&actDel);
+    popMenu.addAction(&actArchive);
+    popMenu.addAction(&actExport);
     popMenu.addSeparator();
     popMenu.addAction(&actArchive);
     connect(&actNew,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddTask()));
     connect(&actOpen,SIGNAL(triggered(bool)),this,SLOT(ZSlotMdyTask()));
     connect(&actDel,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelTask()));
     connect(&actArchive,SIGNAL(triggered(bool)),this,SLOT(ZSlotArchieve()));
-
 
     QMenu subMenu(tr("审核"));
     QAction actSubmit(QIcon(":/TaskManager/images/TaskManager/SubmitTask.png"),tr("提交审核"));

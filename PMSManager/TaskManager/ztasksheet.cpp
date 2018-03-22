@@ -30,8 +30,8 @@ ZTaskSheet::ZTaskSheet(QTreeWidget *varTree,QWidget *parent):QTableWidget(parent
     this->m_cellDelegate=new ZCellDelegate;
     this->setItemDelegate(this->m_cellDelegate);
 
-    this->setRowCount(80);
-    this->setColumnCount(40);
+    this->setRowCount(ROW_COUNT);
+    this->setColumnCount(COL_COUNT);
     //all cell were locked except the cells that bind Vars.
     for(qint32 i=0;i<this->rowCount();i++)
     {
@@ -432,6 +432,52 @@ void ZTaskSheet::ZSetTaskState(qint32 state)
 qint32 ZTaskSheet::ZGetTaskState()
 {
     return this->m_taskState;
+}
+void ZTaskSheet::ZMakeProxyWidgetUnEditable(bool bEditable)
+{
+    for(qint32 i=0;i<this->rowCount();i++)
+    {
+        for(qint32 j=0;j<this->columnCount();j++)
+        {
+            ZCell *cell=static_cast<ZCell*>(this->item(i,j));
+            if(cell)
+            {
+                switch(cell->ZGetCellWidgetType())
+                {
+                case ZCell::CellWidget_QLabel:
+                    break;
+                case ZCell::CellWidget_QLineEdit:
+                    break;
+                case ZCell::CellWidget_QCheckBox:
+                {
+                    QCheckBox *cb=qobject_cast<QCheckBox*>(cell);
+                    cb->setEnabled(bEditable);
+                }
+                    break;
+                case ZCell::CellWidget_QComboBox:
+                {
+                    QComboBox *cb=qobject_cast<QComboBox*>(cell);
+                    cb->setEnabled(bEditable);
+                }
+                    break;
+                case ZCell::CellWidget_QDateTimeEdit:
+                {
+                    QDateTimeEdit *dt=qobject_cast<QDateTimeEdit*>(cell);
+                    dt->setEnabled(bEditable);
+                }
+                    break;
+                case ZCell::CellWidget_QSpinBox:
+                {
+                    QSpinBox *sb=qobject_cast<QSpinBox*>(cell);
+                    sb->setEnabled(bEditable);
+                }
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    }
 }
 void ZTaskSheet::ZSlotCellChanged(int row,int col)
 {

@@ -15,6 +15,8 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChartView>
 #include <QtCharts/QValueAxis>
+#define ROW_COUNT   80
+#define COL_COUNT   40
 class ZTaskSheet : public QTableWidget
 {
     Q_OBJECT
@@ -42,6 +44,8 @@ public:
 
     void ZSetTaskState(qint32 state);
     qint32 ZGetTaskState();
+
+    void ZMakeProxyWidgetUnEditable(bool bEditable);
 signals:
     void ZSignalLogMsg(QString logMsg);
     void ZSignalDataChanged(QString taskName);
