@@ -229,6 +229,15 @@ void PNetProTimeout::ZSlotStart()
 }
 void PNetProTimeout::ZSlotScanWaitAckQueue()
 {
+    if(MyUserInfo::ZGetInstance()->m_bExitFlag)
+    {
+        this->m_timer->stop();
+        MyUserInfo::ZGetInstance()->m_bPNetTimeoutExitFlag=true;
+        emit this->ZSignalExit();
+        return;
+    }
+
+
     QList<qint32> removeIndexList;
     MyNetQueue::ZGetInstance()->m_mutexWaitAckQueue.lock();
     for(qint32 i=0;i<MyNetQueue::ZGetInstance()->m_waitAckQueue.count();i++)
@@ -257,28 +266,20 @@ void PNetProTimeout::ZSlotScanWaitAckQueue()
 
     }
     MyNetQueue::ZGetInstance()->m_mutexWaitAckQueue.unlock();
-
-    if(MyUserInfo::ZGetInstance()->m_bExitFlag)
-    {
-        this->m_timer->stop();
-        MyUserInfo::ZGetInstance()->m_bPNetTimeoutExitFlag=true;
-        emit this->ZSignalExit();
-        return;
-    }
 }
 
 PNetProcessor::PNetProcessor()
 {
     this->m_thread=new QThread;
     this->m_netProtocol=new PNetProtocol;
-    connect(this->m_thread,SIGNAL(started()),this->m_netProtocol,SLOT(ZSlotStart()));
+    connect(this->m_thread,SIGNAL(started()),this->m_netProtocol,SLOT(ZSlotStart()),Qt::QueuedConnection);
     connect(this->m_netProtocol,SIGNAL(ZSignalTxNetFrm(qint32)),this,SLOT(ZSlotTxNetFrm(qint32)));
     this->m_netProtocol->moveToThread(this->m_thread);
 
 
     this->m_timeoutThread=new QThread;
     this->m_netTimeout=new PNetProTimeout;
-    connect(this->m_timeoutThread,SIGNAL(started()),this->m_netTimeout,SLOT(ZSlotStart()));
+    connect(this->m_timeoutThread,SIGNAL(started()),this->m_netTimeout,SLOT(ZSlotStart()),Qt::QueuedConnection);
     connect(this->m_netTimeout,SIGNAL(ZSignalTxNetFrmTimeout(qint32)),this,SLOT(ZSlotTxNetFrmTimeout(qint32)));
     this->m_netTimeout->moveToThread(this->m_timeoutThread);
 

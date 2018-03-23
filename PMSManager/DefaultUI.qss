@@ -52,7 +52,7 @@ QCheckBox::indicator::checked {
 /*combobox设置*/
 QComboBox{border:1px solid gray;min-width:28px;}
 QComboBox QAbstractItemView::item{height:25px;}
-QComboBox::down-arrow{image:url(:/common/images/common/combobox-arrowdown.png);}
+/*QComboBox::down-arrow{image:url(:/common/images/common/combobox-arrowdown.png);}*/
 QComboBox::drop-down{border:0px;}
 
 /*menu样式设置*/
@@ -94,12 +94,12 @@ QTabWidget[showHeader='true'] QTabBar::tab:selected{background:#55B023;margin-to
 
 /**GroupBox设置*/
 QGroupBox{
-border: 1px solid white;
-border-radius:8px;
-margin-top:6px;
+    border: 1px solid black;
+    border-radius:8px;
+    margin-top:6px;
 }
 QGroupBox:title{
-color:white;
-subcontrol-origin: margin;
-left: 10px;
+    color:black;
+    subcontrol-origin: margin;
+    left: 10px;
 }

@@ -287,9 +287,9 @@ void PLoginManager::ZSlotDoExitClean()
 }
 void PLoginManager::closeEvent(QCloseEvent *e)
 {
+    Q_UNUSED(e);
     MyUserInfo::ZGetInstance()->m_bExitFlag=true;
     QTimer::singleShot(1000,this,SLOT(ZSlotDoExitClean()));
-    e->ignore();
 }
 void PLoginManager::ZSlotDoLogin()
 {

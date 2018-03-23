@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
     qDebug()<<"check database PMS is okay.";
     //check roleinfo table.
     QString strCheckRoleInfoTable(
-                "CREATE TABLE IF NOT EXISTS `pms`.`roleinfo` ("
+                "CREATE TABLE IF NOT EXISTS `pms`.`RoleInfo` ("
                 "`RoleName` varchar(64) NOT NULL,"
                 "`PermBits` varchar(64) NOT NULL,"
                 "`RoleMemo` varchar(512) DEFAULT NULL,"
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
     qDebug()<<"check RoleInfo table is okay.";
 
     //if admin role is not exist then create it.
-    QString strCheckAdminRole("SELECT * FROM `pms`.`roleinfo` WHERE `RoleName`='admin'");
+    QString strCheckAdminRole("SELECT * FROM `pms`.`RoleInfo` WHERE `RoleName`='admin'");
     if(!query.exec(strCheckAdminRole))
     {
         qDebug()<<query.lastError().text();
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
             qDebug()<<"check Admin role is okay.";
         }else{
             //admin role is not exist.create it now.
-            query.prepare("INSERT  INTO `pms`.`roleinfo`(`RoleName`,`PermBits`,`RoleMemo`,`Creator`,`CreateTime`) VALUES ('admin','255,255,255,255,255,255','PMS Initial Created','admin',:CreateTime)");
+            query.prepare("INSERT  INTO `pms`.`RoleInfo`(`RoleName`,`PermBits`,`RoleMemo`,`Creator`,`CreateTime`) VALUES ('admin','255,255,255,255,255,255','PMS Initial Created','admin',:CreateTime)");
             query.bindValue(":CreateTime",QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
             if(!query.exec())
             {
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
 
     //check userinfo table.
     QString strCheckUserInfoTable(
-                "CREATE TABLE IF NOT EXISTS `pms`.`userinfo` ("
+                "CREATE TABLE IF NOT EXISTS `pms`.`UserInfo` ("
                 " `UserName` VARCHAR(64) NOT NULL,"
                 " `RealName` VARCHAR(256) DEFAULT NULL,"
                 " `RoleName` VARCHAR(64) NOT NULL,"
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
     qDebug()<<"check UserInfo table is okay.";
 
     //if admin user is not exist then create it.
-    QString strCheckAdminUser("SELECT *FROM `pms`.`userinfo` WHERE `UserName`='admin'");
+    QString strCheckAdminUser("SELECT *FROM `pms`.`UserInfo` WHERE `UserName`='admin'");
     if(!query.exec(strCheckAdminUser))
     {
         qDebug()<<query.lastError().text();
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
             qDebug()<<"check Admin user is okay.";
         }else{
             //admin user is not exist.create it now.
-            query.prepare("INSERT  INTO `pms`.`userinfo`(`UserName`,`RealName`,`RoleName`,`Sex`,`LockBit`,`Password`,`Mobile`,`Creator`,`CreateTime`,`LastLoginTime`) VALUES ('admin','超级管理员','admin','male',0,'MTIzNDU2','13522296239','PMS',:CreateTime,:LastLoginTime)");
+            query.prepare("INSERT  INTO `pms`.`UserInfo`(`UserName`,`RealName`,`RoleName`,`Sex`,`LockBit`,`Password`,`Mobile`,`Creator`,`CreateTime`,`LastLoginTime`) VALUES ('admin','超级管理员','admin','male',0,'MTIzNDU2','13522296239','PMS',:CreateTime,:LastLoginTime)");
             query.bindValue(":CreateTime",QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
             query.bindValue(":LastLoginTime",QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
             if(!query.exec())
@@ -252,7 +252,7 @@ int main(int argc, char *argv[])
     }
     //check templateinfo table.
     QString strCheckTemplateInfoTable(
-                "CREATE TABLE IF NOT EXISTS `pms`.`templateinfo` ("
+                "CREATE TABLE IF NOT EXISTS `pms`.`TemplateInfo` ("
                 "  `TemplateName` varchar(64) NOT NULL,"
                 "  `VarSourceName` varchar(64) NOT NULL,"
                 "   `FileSize` int(11) DEFAULT NULL,"
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
 
     //check varsourceinfo table.
     QString strCheckVarSourceInfoTable(
-                "  CREATE TABLE IF NOT EXISTS `pms`.`varsourceinfo` ("
+                "  CREATE TABLE IF NOT EXISTS `pms`.`VarSourceInfo` ("
                 "   `VarSourceName` varchar(64) NOT NULL,"
                 "   `RefCount` int(11) DEFAULT NULL,"
                 "  `Creator` varchar(64) DEFAULT NULL,"
@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
 
     //check folderinfo table.
     QString strCheckFolderInfoTable(
-                " CREATE TABLE IF NOT EXISTS `pms`.`folderinfo` ("
+                " CREATE TABLE IF NOT EXISTS `pms`.`FolderInfo` ("
                 "  `FolderName` varchar(64) NOT NULL,"
                 "  `Creator` varchar(64) DEFAULT NULL,"
                 "  `CreateTime` datetime DEFAULT NULL,"
@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
 
     //check fileinfo table.
     QString strCheckFileInfoTable(
-                " CREATE TABLE IF NOT EXISTS `pms`.`fileinfo` ("
+                " CREATE TABLE IF NOT EXISTS `pms`.`FileInfo` ("
                 " `FileName` varchar(64) NOT NULL,"
                 " `FolderName` varchar(64) DEFAULT NULL,"
                 "  `FileType` varchar(8) DEFAULT NULL,"
@@ -318,7 +318,7 @@ int main(int argc, char *argv[])
 
     //check processinfo table.
     QString strCheckProcessInfoTable(
-                " CREATE TABLE IF NOT EXISTS `pms`.`processinfo` ("
+                " CREATE TABLE IF NOT EXISTS `pms`.`ProcessInfo` ("
                 "  `ProcessName` varchar(64) NOT NULL,"
                 "  `StepNum` int(11) DEFAULT NULL,"
                 "  `Creator` varchar(64) DEFAULT NULL,"
@@ -334,7 +334,7 @@ int main(int argc, char *argv[])
 
     //check stepinfo table.
     QString strCheckStepInfoTable(
-                "CREATE TABLE IF NOT EXISTS `pms`.`stepinfo` ("
+                "CREATE TABLE IF NOT EXISTS `pms`.`StepInfo` ("
                 " `No` int(11) NOT NULL AUTO_INCREMENT,"
                 "  `StepName` varchar(64) DEFAULT NULL,"
                 "  `ProcessName` varchar(64) DEFAULT NULL,"
@@ -352,7 +352,7 @@ int main(int argc, char *argv[])
 
     //check taskinfo table.
     QString strCheckTaskInfoTable(
-                " CREATE TABLE IF NOT EXISTS `pms`.`taskinfo` ("
+                " CREATE TABLE IF NOT EXISTS `pms`.`TaskInfo` ("
                 "  `TaskName` varchar(64) NOT NULL,"
                 "  `RefProcess` varchar(64) DEFAULT NULL,"
                 "  `RefStep` varchar(64) DEFAULT NULL,"
@@ -377,7 +377,7 @@ int main(int argc, char *argv[])
 
     //check forminfo table.
     QString strCheckFormInfoTable(
-                "   CREATE TABLE IF NOT EXISTS `pms`.`forminfo` ("
+                "   CREATE TABLE IF NOT EXISTS `pms`.`FormInfo` ("
                 "   `FormName` varchar(64) NOT NULL,"
                 "   `FileSize` int(11) DEFAULT NULL,"
                 "   `Creator` varchar(64) DEFAULT NULL,"
@@ -393,7 +393,7 @@ int main(int argc, char *argv[])
 
     //check backupinfo table.
     QString strCheckBackupInfoTable(
-                "CREATE TABLE IF NOT EXISTS `pms`.`backupinfo` ("
+                "CREATE TABLE IF NOT EXISTS `pms`.`BackupInfo` ("
                 "`BackupName` varchar(64) NOT NULL,"
                 "`FileSize` int(11) DEFAULT NULL,"
                 " `Creator` varchar(64) DEFAULT NULL,"

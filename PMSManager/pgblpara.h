@@ -121,12 +121,27 @@ public:
     }
     void ZLoadIniFile()
     {
+        QString iniFileName(QDir::currentPath()+"/PMS.ini");
+        if(!QFile::exists(iniFileName))
+        {
+            //write the default value.
+            QSettings iniFile(iniFileName,QSettings::IniFormat);
+            iniFile.beginGroup("Server");
+            iniFile.setValue("IP","127.0.0.1");
+            iniFile.setValue("PORT","6800");
+            iniFile.endGroup();
+
+            iniFile.beginGroup("PDF");
+            iniFile.setValue("ViewType","inner");
+            iniFile.setValue("OutViewer","C:\\Foxit\\pdfview.exe");
+            iniFile.endGroup();
+        }
         //read ini file.
-        QSettings iniFile(QDir::currentPath()+"/PMS.ini",QSettings::IniFormat);
+        QSettings iniFile(iniFileName,QSettings::IniFormat);
         iniFile.beginGroup("Server");
         this->m_appVersion=QString("3.0.0");
         this->m_PMSIp=iniFile.value("IP","127.0.0.1").toString();
-        this->m_PMSPort=iniFile.value("Port",6800).toInt();
+        this->m_PMSPort=iniFile.value("PORT",6800).toInt();
         iniFile.endGroup();
 
         iniFile.beginGroup("PDF");
