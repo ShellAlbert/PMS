@@ -45,6 +45,7 @@ public slots:
 private:
     QTimer *m_timer;
 };
+
 class PNetProcessor:public QObject
 {
     Q_OBJECT

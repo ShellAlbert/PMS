@@ -210,7 +210,7 @@ void PNetProtocol::ZParseRecvData()
         memmove(this->m_recvBuffer->data(),this->m_recvBuffer->data()+index,this->m_recvDataSize);
     }
 }
-PNetProTimeout::PNetProTimeout(QObject *parent)
+PNetProTimeout::PNetProTimeout(QObject *parent):QObject(parent)
 {
     this->m_timer=NULL;
 }
@@ -223,7 +223,7 @@ PNetProTimeout::~PNetProTimeout()
 }
 void PNetProTimeout::ZSlotStart()
 {
-    this->m_timer=new QTimer(this);
+    this->m_timer=new QTimer;
     connect(this->m_timer,SIGNAL(timeout()),this,SLOT(ZSlotScanWaitAckQueue()));
     this->m_timer->start(1000);
 }
@@ -236,7 +236,6 @@ void PNetProTimeout::ZSlotScanWaitAckQueue()
         emit this->ZSignalExit();
         return;
     }
-
 
     QList<qint32> removeIndexList;
     MyNetQueue::ZGetInstance()->m_mutexWaitAckQueue.lock();
@@ -272,16 +271,20 @@ PNetProcessor::PNetProcessor()
 {
     this->m_thread=new QThread;
     this->m_netProtocol=new PNetProtocol;
-    connect(this->m_thread,SIGNAL(started()),this->m_netProtocol,SLOT(ZSlotStart()),Qt::QueuedConnection);
-    connect(this->m_netProtocol,SIGNAL(ZSignalTxNetFrm(qint32)),this,SLOT(ZSlotTxNetFrm(qint32)));
     this->m_netProtocol->moveToThread(this->m_thread);
+
+    connect(this->m_thread,SIGNAL(started()),this->m_netProtocol,SLOT(ZSlotStart()),Qt::DirectConnection);
+    connect(this->m_netProtocol,SIGNAL(ZSignalTxNetFrm(qint32)),this,SLOT(ZSlotTxNetFrm(qint32)));
+
 
 
     this->m_timeoutThread=new QThread;
     this->m_netTimeout=new PNetProTimeout;
-    connect(this->m_timeoutThread,SIGNAL(started()),this->m_netTimeout,SLOT(ZSlotStart()),Qt::QueuedConnection);
-    connect(this->m_netTimeout,SIGNAL(ZSignalTxNetFrmTimeout(qint32)),this,SLOT(ZSlotTxNetFrmTimeout(qint32)));
     this->m_netTimeout->moveToThread(this->m_timeoutThread);
+
+    connect(this->m_timeoutThread,SIGNAL(started()),this->m_netTimeout,SLOT(ZSlotStart()),Qt::DirectConnection);
+    connect(this->m_netTimeout,SIGNAL(ZSignalTxNetFrmTimeout(qint32)),this,SLOT(ZSlotTxNetFrmTimeout(qint32)));
+
 
     this->m_thread->start();
     this->m_timeoutThread->start();
@@ -289,9 +292,10 @@ PNetProcessor::PNetProcessor()
 PNetProcessor::~PNetProcessor()
 {
     this->m_timeoutThread->quit();
-    this->m_timeoutThread->wait(1000);
     this->m_thread->quit();
-    this->m_thread->wait(1000);
+
+    this->m_timeoutThread->wait();
+    this->m_thread->wait();
 
     delete this->m_netProtocol;
     delete this->m_netTimeout;
