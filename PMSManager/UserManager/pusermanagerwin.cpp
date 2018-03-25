@@ -981,7 +981,8 @@ void PUserManagerWin::ZSlotExportXML()
 }
 void PUserManagerWin::ZSlotExportExcel()
 {
-    QString fileName=QFileDialog::getSaveFileName(this,tr("Export User List to Excel"),".",tr("Microsoft Excel(*.xlsx)"));
+    QString excelFileName="PMSUserList"+QDateTime::currentDateTime().toString("yyyyMMdd")+".xlsx";
+    QString fileName=QFileDialog::getSaveFileName(this,tr("导出用户列表到Excel文件"),excelFileName,tr("Microsoft Excel(*.xlsx)"));
     if(fileName.isEmpty())
     {
         return;

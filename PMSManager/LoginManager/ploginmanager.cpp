@@ -9,6 +9,9 @@
 #include <QStringList>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
+#include <QMenu>
+#include <QAction>
+#include <QDesktopServices>
 ZLoginPart::ZLoginPart(QWidget *parent):QFrame(parent)
 {
     this->setStyleSheet("QFrame{background-color:white;}");
@@ -28,6 +31,8 @@ bool ZLoginPart::ZDoInit()
         return false;
     }
     this->m_llLogo->setPixmap(QPixmap(":/LoginManager/images/LoginManager/Logo.png"));
+    this->m_llLogo->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this->m_llLogo,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotShowMenu(QPoint)));
 
     try{
         this->m_llUserIcon=new QLabel;
@@ -173,6 +178,28 @@ void ZLoginPart::ZSlotCancel()
 {
     emit this->ZSignalDoExit();
 }
+void ZLoginPart::ZSlotShowMenu(const QPoint &pt)
+{
+    Q_UNUSED(pt);
+    QMenu popMenu;
+    QAction acteEditCfg(QIcon(":/GuideWin/images/GuideWin/Top.png"),tr("修改配置文件"));
+    QAction actReLoadCfg(QIcon(":/GuideWin/images/GuideWin/Top.png"),tr("重新加载配置文件"));
+    popMenu.addAction(&acteEditCfg);
+    popMenu.addAction(&actReLoadCfg);
+    connect(&acteEditCfg,SIGNAL(triggered(bool)),this,SLOT(ZSlotEditServerCfgFile()));
+    connect(&actReLoadCfg,SIGNAL(triggered(bool)),this,SLOT(ZSlotReloadServerCfgFile()));
+    popMenu.exec(QCursor::pos());
+}
+void ZLoginPart::ZSlotEditServerCfgFile()
+{
+    QString iniFileName(QDir::currentPath()+"/PMS.ini");
+    QDesktopServices::openUrl("file:///"+iniFileName);
+}
+void ZLoginPart::ZSlotReloadServerCfgFile()
+{
+    MyUserInfo::ZGetInstance()->ZLoadIniFile();
+}
+
 ZWaitingPart::ZWaitingPart(QWidget *parent):QFrame(parent)
 {
     this->m_llWaitingGif=new QLabel;
@@ -234,6 +261,7 @@ PLoginManager::PLoginManager(QWidget *parent):ZBaseInfoDia(ZBaseInfoDia::Dialog_
 
     this->m_llBanner=new QLabel;
     this->m_llBanner->setPixmap(QPixmap(":/LoginManager/images/LoginManager/Banner.png"));
+    this->m_llBanner->setScaledContents(true);
 
     this->m_loginPart=new ZLoginPart;
     this->m_waitingPart=new ZWaitingPart;
@@ -449,3 +477,4 @@ void PLoginManager::ZLockUserName(QString userName)
     this->m_loginPart->m_cbUserName->setCurrentText(userName);
     this->m_loginPart->m_cbUserName->setEnabled(false);
 }
+

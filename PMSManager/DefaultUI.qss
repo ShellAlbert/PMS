@@ -40,7 +40,7 @@ QTreeView::item:selected:!active {
 
 /*checkbox样式设置*/
 QCheckBox::indicator {
-    width: 40px;
+    width: 30px;
     height: 20px;
 }
 QCheckBox::indicator::unchecked {
@@ -49,11 +49,6 @@ QCheckBox::indicator::unchecked {
 QCheckBox::indicator::checked {
     image: url(:/common/images/common/checkbox-checked.png);
 }
-/*combobox设置*/
-QComboBox{border:1px solid gray;min-width:28px;}
-QComboBox QAbstractItemView::item{height:25px;}
-/*QComboBox::down-arrow{image:url(:/common/images/common/combobox-arrowdown.png);}*/
-QComboBox::drop-down{border:0px;}
 
 /*menu样式设置*/
 QMenu{

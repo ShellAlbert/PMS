@@ -26,6 +26,10 @@ signals:
 private slots:
     void ZSlotOkay();
     void ZSlotCancel();
+
+    void ZSlotShowMenu(const QPoint &pt);
+    void ZSlotEditServerCfgFile();
+    void ZSlotReloadServerCfgFile();
 public:
     QLabel *m_llLogo;
 
