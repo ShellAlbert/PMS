@@ -29,6 +29,8 @@ signals:
     void ZSignalAatch(QString moduleName);
     void ZSignalDetch(QString moduleName);
 private slots:
+    void ZSlotLoadDataFromServer();
+
     void ZSlotAddGrp();
     void ZSlotMdyGrp();
     void ZSlotDelGrp();

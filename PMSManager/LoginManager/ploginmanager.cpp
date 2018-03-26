@@ -182,10 +182,12 @@ void ZLoginPart::ZSlotShowMenu(const QPoint &pt)
 {
     Q_UNUSED(pt);
     QMenu popMenu;
-    QAction acteEditCfg(QIcon(":/GuideWin/images/GuideWin/Top.png"),tr("修改配置文件"));
-    QAction actReLoadCfg(QIcon(":/GuideWin/images/GuideWin/Top.png"),tr("重新加载配置文件"));
+    QAction acteEditCfg(QIcon(":/LoginManager/images/LoginManager/edit.png"),tr("修改配置"));
+    QAction actReLoadCfg(QIcon(":/LoginManager/images/LoginManager/reload.png"),tr("重新加载"));
+    QAction actHelp(QIcon(":/LoginManager/images/LoginManager/help.png"),tr("帮助"));
     popMenu.addAction(&acteEditCfg);
     popMenu.addAction(&actReLoadCfg);
+    popMenu.addAction(&actHelp);
     connect(&acteEditCfg,SIGNAL(triggered(bool)),this,SLOT(ZSlotEditServerCfgFile()));
     connect(&actReLoadCfg,SIGNAL(triggered(bool)),this,SLOT(ZSlotReloadServerCfgFile()));
     popMenu.exec(QCursor::pos());
@@ -198,6 +200,7 @@ void ZLoginPart::ZSlotEditServerCfgFile()
 void ZLoginPart::ZSlotReloadServerCfgFile()
 {
     MyUserInfo::ZGetInstance()->ZLoadIniFile();
+    QMessageBox::information(this,tr("操作提示"),tr("重新加载配置文件成功!"));
 }
 
 ZWaitingPart::ZWaitingPart(QWidget *parent):QFrame(parent)
@@ -268,7 +271,7 @@ PLoginManager::PLoginManager(QWidget *parent):ZBaseInfoDia(ZBaseInfoDia::Dialog_
     this->m_loginFailPart=new ZLoginFailPart;
     this->m_llInfo=new QLabel;
     this->m_llInfo->setMargin(8);
-    this->m_llInfo->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+    this->m_llInfo->setAlignment(Qt::AlignRight|Qt::AlignBottom);
     this->m_llInfo->setText(tr("捷温汽车系统(中国)有限公司\t\t柘园生物技术支持"));
 
     this->m_stackedWidget=new QStackedWidget;

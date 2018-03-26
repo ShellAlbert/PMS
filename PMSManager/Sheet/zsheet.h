@@ -11,6 +11,8 @@
 #include <QMouseEvent>
 #include <QMenu>
 #include <QAction>
+#define TABLE_ROW_COUNT 100
+#define TABLE_COL_COUNT 50
 class ZSheet : public QTableWidget
 {
     Q_OBJECT
@@ -59,6 +61,8 @@ private slots:
     void ZSlotVAlignBottom();
     void ZSlotMerge();
     void ZSlotSplit();
+    void ZSlotFastRemoveWidget();
+    void ZSlotRemoveWidget();
 signals:
     void ZSignalSheetChanged(QString templateName);
     void ZSignalBindVar();
@@ -94,6 +98,9 @@ private:
 
     QAction *m_actionMerge;
     QAction *m_actionSplit;
+
+    QAction *m_actFastRemoveWidget;
+    QAction *m_actRemoveWidget;
 };
 
 

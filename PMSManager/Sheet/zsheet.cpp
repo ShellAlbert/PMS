@@ -2,12 +2,14 @@
 #include <qlabel.h>
 #include <QBuffer>
 #include <QPixmap>
+#include <QInputDialog>
+#include <QMessageBox>
 ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
 {
     this->m_cellDelegate=new ZCellDelegate;
     this->setItemDelegate(this->m_cellDelegate);
-    this->setRowCount(100);
-    this->setColumnCount(50);
+    this->setRowCount(TABLE_ROW_COUNT);
+    this->setColumnCount(TABLE_COL_COUNT);
 
     //at default,initial all unit to ZCell object.
     for(qint32 i=0;i<this->rowCount();i++)
@@ -54,6 +56,12 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
     this->m_actionSplit=new QAction(QIcon(":/TemplateEditor/images/TemplateEditor/Split.png"),tr("拆分"),this);
     connect(this->m_actionSplit,SIGNAL(triggered()),this,SLOT(ZSlotSplit()));
 
+    this->m_actFastRemoveWidget=new QAction(QIcon(":/common/images/common/del.png"),tr("快速移除组件"),this);
+    connect(this->m_actFastRemoveWidget,SIGNAL(triggered(bool)),this,SLOT(ZSlotFastRemoveWidget()));
+    this->m_actRemoveWidget=new QAction(QIcon(":/common/images/common/del.png"),tr("移除组件..."),this);
+    connect(this->m_actRemoveWidget,SIGNAL(triggered(bool)),this,SLOT(ZSlotRemoveWidget()));
+
+
     this->m_subMenuAlign->addSection(tr("HAlign"));
     this->m_subMenuAlign->addAction(this->m_actionHAlignLeft);
     this->m_subMenuAlign->addAction(this->m_actionHAlignCenter);
@@ -71,6 +79,8 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
     this->m_popupMenu->addSection(tr("Cell Command"));
     this->m_popupMenu->addAction(this->m_actionMerge);
     this->m_popupMenu->addAction(this->m_actionSplit);
+    this->m_popupMenu->addAction(this->m_actFastRemoveWidget);
+    this->m_popupMenu->addAction(this->m_actRemoveWidget);
 }
 
 ZSheet::~ZSheet()
@@ -87,6 +97,8 @@ ZSheet::~ZSheet()
     delete this->m_subMenuAlign;
     delete this->m_actionMerge;
     delete this->m_actionSplit;
+    delete this->m_actFastRemoveWidget;
+    delete this->m_actRemoveWidget;
     delete this->m_popupMenu;
 }
 void ZSheet::mousePressEvent(QMouseEvent *event)
@@ -275,6 +287,55 @@ void ZSheet::ZSlotSplit()
 {
 
 }
+void ZSheet::ZSlotFastRemoveWidget()
+{
+    ZCell* tCell=static_cast<ZCell*>(this->currentItem());
+    if(!tCell)
+    {
+        return;
+    }
+    QWidget *oldWidget=this->cellWidget(this->currentIndex().row(),this->currentIndex().column());
+    if(oldWidget)
+    {
+        delete oldWidget;
+        oldWidget=NULL;
+
+        ZCell *newCell=new ZCell;
+        newCell->ZSetCellWidgetType(ZCell::CellWidget_No);
+        this->setItem(this->currentIndex().row(),this->currentIndex().column(),newCell);
+    }
+}
+void ZSheet::ZSlotRemoveWidget()
+{
+    QString xyText=QInputDialog::getText(this,tr("目标坐标"),tr("请输入要移除组件的单元格坐标(例如: 1,1)"));
+    if(xyText.isEmpty())
+    {
+        return;
+    }
+    QStringList xyList=xyText.split(",");
+    if(2!=xyList.size())
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("错误的坐标!"));
+        return;
+    }
+    qint32 x=xyList.at(0).toInt();
+    qint32 y=xyList.at(1).toInt();
+    if(!(x>=0 && x<=TABLE_ROW_COUNT-1) || !(y>=0 && y<=TABLE_COL_COUNT-1))
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("错误的坐标!"));
+        return;
+    }
+    QWidget *oldWidget=this->cellWidget(x-1,y-1);
+    if(oldWidget)
+    {
+        delete oldWidget;
+        oldWidget=NULL;
+
+        ZCell *newCell=new ZCell;
+        newCell->ZSetCellWidgetType(ZCell::CellWidget_No);
+        this->setItem(x-1,y-1,newCell);
+    }
+}
 //for print html.
 QString ZSheet::ZGetPrintHtml()
 {
@@ -351,18 +412,18 @@ QString ZSheet::ZGetPrintHtml()
                 if(tCell->ZGetDataType()=="Boolean")
                 {
                     tHtml.append("<input type=\"checkbox\" checked=\"checked\">");
-                }                
+                }
                 if(tCell->ZGetCellWidgetType()==ZCell::CellWidget_QLabel)
                 {
-                   QString str = "<image src=\"data:image/png;base64,";
-                   QLabel *label = qobject_cast<QLabel*>(this->cellWidget(i,j));
-                   if(label)
-                   {
+                    QString str = "<image src=\"data:image/png;base64,";
+                    QLabel *label = qobject_cast<QLabel*>(this->cellWidget(i,j));
+                    if(label)
+                    {
 
-                       str+=PixMapToString(*label->pixmap());
-                       str+="\"width=100% height=100%>";
-                       tHtml.append(str);
-                   }
+                        str+=PixMapToString(*label->pixmap());
+                        str+="\"width=100% height=100%>";
+                        tHtml.append(str);
+                    }
                 }
                 else
                     tHtml.append(tCell->text());

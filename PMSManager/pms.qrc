@@ -227,6 +227,10 @@
         <file>images/LoginManager/Error.png</file>
         <file>images/LoginManager/Return.png</file>
         <file>images/LoginManager/Logo.png</file>
+        <file>images/LoginManager/Splash.png</file>
+        <file>images/LoginManager/edit.png</file>
+        <file>images/LoginManager/help.png</file>
+        <file>images/LoginManager/reload.png</file>
     </qresource>
     <qresource prefix="/SystemSetup">
         <file>images/SystemSetup/Security.png</file>

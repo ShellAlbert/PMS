@@ -234,10 +234,7 @@ PUserManagerWin::PUserManagerWin()
     this->setLayout(this->m_hLayoutMain);
 
     //list all roles and users.
-    ZListRoleUserInfoDia *dia=new ZListRoleUserInfoDia(this);
-    dia->ZSetAckNetFrmProcessWidget(this);
-    dia->ZExecuteListOp();
-    dia->ZShowWaitingDialog();
+    QTimer::singleShot(1000,this,SLOT(ZSlotLoadDataFromServer()));
 }
 PUserManagerWin::~PUserManagerWin()
 {
@@ -302,6 +299,7 @@ PUserManagerWin::~PUserManagerWin()
     delete this->m_tbTurnPage[3];
     delete this->m_cbPage;
     delete this->m_hLayoutRightTop;
+    this->m_treeWidget->clear();
     delete this->m_treeWidget;
     delete this->m_vLayoutRight;
     delete this->m_hLayoutMain;
@@ -605,6 +603,14 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
             this->ZUpdateGrpUserInfo();
         }
     }
+    QCoreApplication::processEvents();
+}
+void PUserManagerWin::ZSlotLoadDataFromServer()
+{
+    ZListRoleUserInfoDia *dia=new ZListRoleUserInfoDia(this);
+    dia->ZSetAckNetFrmProcessWidget(this);
+    dia->ZExecuteListOp();
+    dia->ZShowWaitingDialog();
 }
 void PUserManagerWin::ZSlotAddGrp()
 {
