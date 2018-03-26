@@ -664,6 +664,7 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
             }
         }
     }
+    QCoreApplication::processEvents();
 }
 void PTaskManager::closeEvent(QCloseEvent *event)
 {
@@ -728,6 +729,8 @@ void PTaskManager::ZSlotSaveTask()
         dia->ZSetAckNetFrmProcessWidget(this);
         dia->ZSetTaskName(task->m_sheet->ZGetTaskName());
         dia->ZSetRefTemplateName(task->m_sheet->ZGetRefTemplateName());
+        dia->ZSetProcessName(task->m_sheet->ZGetProcessName());
+        dia->ZSetStepName(task->m_sheet->ZGetStepName());
         dia->ZSetTaskValueXmlData(task->ZGetTaskVarValueXmlData());
         //辅助数据，生产线/机器号，班组，订单号，产品号
         dia->ZSetTaskAuxData(task->ZGetTaskAuxData());

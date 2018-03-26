@@ -518,6 +518,7 @@ void PFileManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
             }
         }
     }
+    QCoreApplication::processEvents();
 }
 void PFileManager::ZSlotNewFolder()
 {

@@ -120,6 +120,7 @@ private slots:
     void ZSlotPopupMenu(const QPoint &pt);
     void ZSlotShowLineChart();
     void ZSlotShowBarChart();
+    void ZSlotHideVarTree();
 public:
     ///////////////////////////
     QHBoxLayout *m_hLayoutTop;
@@ -131,6 +132,9 @@ public:
     QComboBox *m_cbOrderNo;
     QLabel *m_llProductNo;
     QComboBox *m_cbProductNo;
+
+    QToolButton *m_tbHideVarList;
+
     ///////////////////////////
     ZTaskSheet* m_sheet;
     QTreeWidget *m_treeVar;
@@ -154,6 +158,8 @@ public:
     QString m_createTime;
     QString m_checker;
     QString m_checkTime;
+private:
+    bool m_bHideVarTree;
 };
 #include <QComboBox>
 #include <QDateTimeEdit>

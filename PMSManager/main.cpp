@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     splash->show();
 
     //check cache dir is exist or not.
-    splash->showMessage(QObject::tr("PMS正在检查资源文件..."),Qt::AlignLeft|Qt::AlignVCenter,Qt::black);
+    splash->showMessage(QObject::tr("PMS正在检查资源文件..."),Qt::AlignLeft|Qt::AlignBottom,Qt::black);
     QDir dir;
     QString cacheDir(QDir::currentPath()+"/cache");
     if(!dir.exists(cacheDir))
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     QThread::usleep(5000);
 
     //load skin file.
-    splash->showMessage(QObject::tr("PMS正在载入UI文件..."),Qt::AlignLeft|Qt::AlignVCenter,Qt::black);
+    splash->showMessage(QObject::tr("PMS正在载入UI文件..."),Qt::AlignLeft|Qt::AlignBottom,Qt::black);
     QFile file(":/Skin/DefaultUI.qss");
     if(file.open(QIODevice::ReadOnly))
     {
@@ -84,8 +84,8 @@ int main(int argc, char *argv[])
         mainWin.showMaximized();
         guideWin.show();
         QDesktopWidget *desktop=app.desktop();
-        qint32 nX=desktop->screenGeometry().width()-guideWin.width()*2;
-        qint32 nY=desktop->screenGeometry().height()-guideWin.height()*2;
+        qint32 nX=desktop->screenGeometry().width()-guideWin.width()*4;
+        qint32 nY=(desktop->screenGeometry().height()-guideWin.height())/2;
         guideWin.move(nX,nY);
 
         return app.exec();

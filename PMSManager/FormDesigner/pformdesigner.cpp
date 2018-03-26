@@ -1016,6 +1016,7 @@ void PFormDesigner::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraL
             }
         }
     }
+    QCoreApplication::processEvents();
 }
 void PFormDesigner::closeEvent(QCloseEvent *event)
 {

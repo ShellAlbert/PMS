@@ -297,6 +297,8 @@ void ZSheet::ZSlotFastRemoveWidget()
     QWidget *oldWidget=this->cellWidget(this->currentIndex().row(),this->currentIndex().column());
     if(oldWidget)
     {
+        this->removeCellWidget(this->currentIndex().row(),this->currentIndex().column());
+
         delete oldWidget;
         oldWidget=NULL;
 
@@ -328,6 +330,8 @@ void ZSheet::ZSlotRemoveWidget()
     QWidget *oldWidget=this->cellWidget(x-1,y-1);
     if(oldWidget)
     {
+        this->removeCellWidget(x-1,y-1);
+
         delete oldWidget;
         oldWidget=NULL;
 

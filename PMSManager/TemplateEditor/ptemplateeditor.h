@@ -88,6 +88,11 @@ private slots:
     void ZSlotMergeSplitCell();
     void ZSlotCellActivated(qint32 x,qint32 y);
     void ZSlotCellAutoAdjust(void);
+
+    void ZSlotPopMenu(const QPoint &pt);
+    void ZSlotBindCurrentCell();
+    void ZSlotBindCell();
+    void ZSlotRemoveBind();
 public:
 
     ZSheet *m_sheet;

@@ -297,7 +297,7 @@ void ZTaskSheet::ZSetTemplateXmlDataAndVarSourceXmlData(QString templateXmlData,
                 if(cell)
                 {
                     cell->ZSetCellWidgetType(ZCell::CellWidget_QDateTimeEdit);
-                    qDebug()<<"datetimeedit:"<<x<<y;
+                    //qDebug()<<"datetimeedit:"<<x<<y;
                 }
             }else if(nodeName==QString("bindvar"))
             {
@@ -450,26 +450,38 @@ void ZTaskSheet::ZMakeProxyWidgetUnEditable(bool bEditable)
                     break;
                 case ZCell::CellWidget_QCheckBox:
                 {
-                    QCheckBox *cb=qobject_cast<QCheckBox*>(cell);
-                    cb->setEnabled(bEditable);
+                    QCheckBox *cb=static_cast<QCheckBox*>(this->cellWidget(i,j));
+                    if(cb)
+                    {
+                        cb->setEnabled(bEditable);
+                    }
                 }
                     break;
                 case ZCell::CellWidget_QComboBox:
                 {
-                    QComboBox *cb=qobject_cast<QComboBox*>(cell);
-                    cb->setEnabled(bEditable);
+                    QComboBox *cb=static_cast<QComboBox*>(this->cellWidget(i,j));
+                    if(cb)
+                    {
+                        cb->setEnabled(bEditable);
+                    }
                 }
                     break;
                 case ZCell::CellWidget_QDateTimeEdit:
                 {
-                    QDateTimeEdit *dt=qobject_cast<QDateTimeEdit*>(cell);
-                    dt->setEnabled(bEditable);
+                    QDateTimeEdit *dte=static_cast<QDateTimeEdit*>(this->cellWidget(i,j));
+                    if(dte)
+                    {
+                        dte->setEnabled(bEditable);
+                    }
                 }
                     break;
                 case ZCell::CellWidget_QSpinBox:
                 {
-                    QSpinBox *sb=qobject_cast<QSpinBox*>(cell);
-                    sb->setEnabled(bEditable);
+                    QSpinBox *sb=static_cast<QSpinBox*>(this->cellWidget(i,j));
+                    if(sb)
+                    {
+                        sb->setEnabled(bEditable);
+                    }
                 }
                     break;
                 default:
@@ -649,6 +661,12 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
         this->m_cbProductNo->addItem(QIcon(":/TaskManager/images/TaskManager/ProductNo.png"),lstProductNo.at(i));
     }
 
+    this->m_tbHideVarList=new QToolButton;
+    this->m_tbHideVarList->setIcon(QIcon(":/TaskManager/images/TaskManager/arrow_right.png"));
+    this->m_tbHideVarList->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    connect(this->m_tbHideVarList,SIGNAL(clicked(bool)),this,SLOT(ZSlotHideVarTree()));
+    this->m_bHideVarTree=true;
+
     this->m_hLayoutTop=new QHBoxLayout;
     this->m_hLayoutTop->addWidget(this->m_llProductLine);
     this->m_hLayoutTop->addWidget(this->m_cbProuctLine);
@@ -659,6 +677,7 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
     this->m_hLayoutTop->addWidget(this->m_llProductNo);
     this->m_hLayoutTop->addWidget(this->m_cbProductNo);
     this->m_hLayoutTop->addStretch(1);
+    this->m_hLayoutTop->addWidget(this->m_tbHideVarList);
 
     /////////////////////////////////////////////////
     this->m_treeVar=new QTreeWidget;
@@ -720,6 +739,7 @@ ZTaskWidget::~ZTaskWidget()
     delete this->m_cbProductNo;
     delete this->m_llOrderNo;
     delete this->m_cbOrderNo;
+    delete this->m_tbHideVarList;
     delete this->m_hLayoutTop;
     ///////////////////////////////////
     delete this->m_sheet;
@@ -733,6 +753,20 @@ ZTaskWidget::~ZTaskWidget()
     delete this->m_rightSpliter;
     delete this->m_leftSpliter;
     delete this->m_vLayoutMain;
+}
+void ZTaskWidget::ZSlotHideVarTree()
+{
+    if(this->m_bHideVarTree) //hide it.
+    {
+        this->m_leftSpliter->setStretchFactor(0,1);
+        this->m_leftSpliter->setStretchFactor(1,0);
+        this->m_tbHideVarList->setIcon(QIcon(":/TaskManager/images/TaskManager/arrow_left.png"));
+    }else{ //show it.
+        this->m_leftSpliter->setStretchFactor(0,8);
+        this->m_leftSpliter->setStretchFactor(1,2);
+        this->m_tbHideVarList->setIcon(QIcon(":/TaskManager/images/TaskManager/arrow_right.png"));
+    }
+    this->m_bHideVarTree=!this->m_bHideVarTree;
 }
 void ZTaskWidget::ZSlotPopupMenu(const QPoint &pt)
 {
@@ -851,10 +885,17 @@ QString ZTaskWidget::ZGetTaskVarValueXmlData()
                 {
                     QString valValue=dte->dateTime().toString("yyyy-MM-dd hh:mm:ss");
                     tXmlWriter.writeAttribute(QString("val"),valValue);
-                    qDebug()<<"save:"<<valValue;
                 }
             }
             default:
+            case ZCell::CellWidget_QSpinBox:
+            {
+                QSpinBox *sb=static_cast<QSpinBox*>(this->m_sheet->cellWidget(x,y));
+                if(sb)
+                {
+                    tXmlWriter.writeAttribute(QString("val"),QString::number(sb->value(),10));
+                }
+            }
                 break;
             }
             tXmlWriter.writeCharacters(varName);
@@ -880,8 +921,8 @@ QString ZTaskWidget::ZGetTaskVarValueXmlData()
     }
     tXmlWriter.writeEndElement();//NetPro.
     tXmlWriter.writeEndDocument();
-//    qDebug()<<"saveTask:";
-//    qDebug()<<valXmlData;
+    //    qDebug()<<"saveTask:";
+    //    qDebug()<<valXmlData;
     return valXmlData;
 }
 QStringList ZTaskWidget::ZGetTaskAuxData()
@@ -1068,40 +1109,40 @@ bool ZTaskWidget::ZCheckCellDataValidation()
                 }
             }else if(ZCell::CellWidget_QCheckBox==cell->ZGetCellWidgetType())
             {
-//                if(cell->ZGetCellData().isEmpty())
-//                {
-//                    QString errLog(tr("CheckBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
-//                    emit this->ZSignalLogMsg(errLog);
-//                    checkLog.append(errLog);
-//                    bCheckOkay=false;
-//                }
+                //                if(cell->ZGetCellData().isEmpty())
+                //                {
+                //                    QString errLog(tr("CheckBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                //                    emit this->ZSignalLogMsg(errLog);
+                //                    checkLog.append(errLog);
+                //                    bCheckOkay=false;
+                //                }
             }else if(ZCell::CellWidget_QComboBox==cell->ZGetCellWidgetType())
             {
-//                if(cell->ZGetCellData().isEmpty())
-//                {
-//                    QString errLog(tr("ComboBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
-//                    emit this->ZSignalLogMsg(errLog);
-//                    checkLog.append(errLog);
-//                    bCheckOkay=false;
-//                }
+                //                if(cell->ZGetCellData().isEmpty())
+                //                {
+                //                    QString errLog(tr("ComboBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                //                    emit this->ZSignalLogMsg(errLog);
+                //                    checkLog.append(errLog);
+                //                    bCheckOkay=false;
+                //                }
             }else if(ZCell::CellWidget_QDateTimeEdit==cell->ZGetCellWidgetType())
             {
-//                if(cell->ZGetCellData().isEmpty())
-//                {
-//                    QString errLog(tr("DateTime单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
-//                    emit this->ZSignalLogMsg(errLog);
-//                    checkLog.append(errLog);
-//                    bCheckOkay=false;
-//                }
+                //                if(cell->ZGetCellData().isEmpty())
+                //                {
+                //                    QString errLog(tr("DateTime单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                //                    emit this->ZSignalLogMsg(errLog);
+                //                    checkLog.append(errLog);
+                //                    bCheckOkay=false;
+                //                }
             }else if(ZCell::CellWidget_QSpinBox==cell->ZGetCellWidgetType())
             {
-//                if(cell->ZGetCellData().isEmpty())
-//                {
-//                    QString errLog(tr("SpinBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
-//                    emit this->ZSignalLogMsg(errLog);
-//                    checkLog.append(errLog);
-//                    bCheckOkay=false;
-//                }
+                //                if(cell->ZGetCellData().isEmpty())
+                //                {
+                //                    QString errLog(tr("SpinBox单元格(%1,%2)没有填写数据!\n").arg(x+1).arg(y+1));
+                //                    emit this->ZSignalLogMsg(errLog);
+                //                    checkLog.append(errLog);
+                //                    bCheckOkay=false;
+                //                }
             }
         }
     }
@@ -1220,7 +1261,7 @@ ZLineChartDialog::ZLineChartDialog(QWidget *parent):QDialog(parent)
 
     this->m_chart=new QChart;
     this->m_chart->setTitle(tr("变量趋势图"));
-//    this->m_chart->setTheme(QChart::ChartThemeBlueCerulean);
+    //    this->m_chart->setTheme(QChart::ChartThemeBlueCerulean);
     this->m_chart->legend()->setAlignment(Qt::AlignRight);
 
     //create Y axis.
@@ -1330,7 +1371,7 @@ ZBarChartDialog::ZBarChartDialog(QWidget *parent):QDialog(parent)
 
     this->m_chart=new QChart;
     this->m_chart->setTitle(tr("变量趋势图"));
-//    this->m_chart->setTheme(QChart::ChartThemeBlueCerulean);
+    //    this->m_chart->setTheme(QChart::ChartThemeBlueCerulean);
     this->m_chart->legend()->setAlignment(Qt::AlignRight);
 
     //create Y axis.

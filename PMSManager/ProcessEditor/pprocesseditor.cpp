@@ -511,6 +511,7 @@ void PProcessEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList para
             }
         }
     }
+    QCoreApplication::processEvents();
 }
 void PProcessEditor::closeEvent(QCloseEvent *event)
 {

@@ -865,6 +865,7 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
             }
         }
     }
+    QCoreApplication::processEvents();
 }
 void PTemplateEditor::ZSlotNewTemplate()
 {
@@ -1906,7 +1907,8 @@ void PTemplateEditor::ZSlotExportVarSourceTemplate()
     {
         return;
     }
-    QString fileName=QFileDialog::getSaveFileName(this,tr("导出Excel变量源模板"),sheet->m_sheet->ZGetSheetName(),tr("Microsoft Excel(*.xlsx)"));
+    QString excelTemplateName=this->m_tabWidget->tabText(this->m_tabWidget->currentIndex())+QObject::tr("变量源.xlsx");
+    QString fileName=QFileDialog::getSaveFileName(this,tr("导出Excel变量源模板"),excelTemplateName,tr("Microsoft Excel(*.xlsx)"));
     if(fileName.isEmpty())
     {
         return;
@@ -1924,20 +1926,94 @@ void PTemplateEditor::ZSlotExportVarSourceTemplate()
     {
         for(qint32 y=0;y<colCount;y++)
         {
-            QString text=sheet->m_sheet->item(x,y)->text();
-            if(text.startsWith("@"))
+            ZCell *cell=static_cast<ZCell*>(sheet->m_sheet->item(x,y));
+            if(cell)
             {
-                ZVarSourceInfo varInfo;
-                varInfo.m_varName=text;
-                varInfo.m_varType="";
-                varInfo.m_rule="";
-                varInfo.m_refValue="";
-                varInfo.m_cell=QString("%1,%2").arg(x).arg(y);
-                varList.append(varInfo);
+                switch(cell->ZGetCellWidgetType())
+                {
+                case ZCell::CellWidget_No:
+                {
+                    QString text=sheet->m_sheet->item(x,y)->text();
+                    if(text.startsWith("@"))
+                    {
+                        ZVarSourceInfo varInfo;
+                        varInfo.m_varName=text;
+                        varInfo.m_varType="Digital";
+                        varInfo.m_rule="X";
+                        varInfo.m_refValue="X";
+                        varInfo.m_cell=QString("%1,%2").arg(x).arg(y);
+                        varList.append(varInfo);
+                    }
+                }
+                    break;
+                case ZCell::CellWidget_QLabel:
+                    break;
+                case ZCell::CellWidget_QCheckBox:
+                {
+                    QCheckBox *cb = static_cast<QCheckBox*>(sheet->m_sheet->cellWidget(x,y));
+                    if(cb)
+                    {
+                        ZVarSourceInfo varInfo;
+                        varInfo.m_varName="@check";
+                        varInfo.m_varType="Boolean";
+                        varInfo.m_rule="X";
+                        varInfo.m_refValue="false";
+                        varInfo.m_cell=QString("%1,%2").arg(x).arg(y);
+                        varList.append(varInfo);
+                    }
+                }
+                    break;
+                case ZCell::CellWidget_QComboBox:
+                {
+                    QComboBox *cb = static_cast<QComboBox*>(sheet->m_sheet->cellWidget(x,y));
+                    if(cb)
+                    {
+                        ZVarSourceInfo varInfo;
+                        varInfo.m_varName="@select";
+                        varInfo.m_varType="String";
+                        varInfo.m_rule="X";
+                        varInfo.m_refValue=cb->currentText();
+                        varInfo.m_cell=QString("%1,%2").arg(x).arg(y);
+                        varList.append(varInfo);
+                    }
+                }
+                    break;
+                case ZCell::CellWidget_QSpinBox:
+                {
+                    QSpinBox *cb = static_cast<QSpinBox*>(sheet->m_sheet->cellWidget(x,y));
+                    if(cb)
+                    {
+                        ZVarSourceInfo varInfo;
+                        varInfo.m_varName="@spin";
+                        varInfo.m_varType="Digital";
+                        varInfo.m_rule=QString::number(cb->minimum(),10)+"-X-"+QString::number(cb->maximum(),10);
+                        varInfo.m_refValue=QString::number(cb->value(),10);
+                        varInfo.m_cell=QString("%1,%2").arg(x).arg(y);
+                        varList.append(varInfo);
+                    }
+                }
+                    break;
+                case ZCell::CellWidget_QLineEdit:
+                    break;
+                case ZCell::CellWidget_QDateTimeEdit:
+                {
+                    QDateTimeEdit *dte = static_cast<QDateTimeEdit*>(sheet->m_sheet->cellWidget(x,y));
+                    if(dte)
+                    {
+                        ZVarSourceInfo varInfo;
+                        varInfo.m_varName="@datetime";
+                        varInfo.m_varType="Datetime";
+                        varInfo.m_rule=dte->dateTime().toString("yyyyMMddhhmmss")+"-X-"+dte->dateTime().toString("yyyyMMddhhmmss");
+                        varInfo.m_refValue=dte->dateTime().toString("yyyyMMddhhmmss");
+                        varInfo.m_cell=QString("%1,%2").arg(x).arg(y);
+                        varList.append(varInfo);
+                    }
+                }
+                    break;
+                }
             }
         }
     }
-
     /////////////////////////////////////////////////////
     //Examples                  5
     //VarName   Type   Rule  RefValue    Cell
@@ -1983,7 +2059,7 @@ void PTemplateEditor::ZSlotExportVarSourceTemplate()
     xlsx.write(nExcelRows,1,"@marrage",fmt);
     xlsx.write(nExcelRows,2,"Boolean",fmt);
     xlsx.write(nExcelRows,3,"X",fmt);
-    xlsx.write(nExcelRows,4,"true",fmt);
+    xlsx.write(nExcelRows,4,"true/false",fmt);
     xlsx.write(nExcelRows,5,"1,4",fmt);
     nExcelRows++;
 
@@ -2386,6 +2462,8 @@ ZSheetWidget::ZSheetWidget()
     this->m_autoVarItem->setText(4,tr("预定义值"));
     this->m_treeWidget->addTopLevelItem(this->m_generalVarItem);
     this->m_treeWidget->addTopLevelItem(this->m_autoVarItem);
+    this->m_treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this->m_treeWidget,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotPopMenu(QPoint)));
 
 #define ICON_W  24
 #define ICON_H  24
@@ -3191,4 +3269,84 @@ void ZSheetWidget::ZSlotCellAutoAdjust(void)
 {
     this->m_sheet->resizeRowsToContents();
     this->m_sheet->resizeColumnsToContents();
+}
+void ZSheetWidget::ZSlotPopMenu(const QPoint &pt)
+{
+    if(NULL==this->m_treeWidget->currentItem())
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("未选择变量,无法完成绑定!"));
+        return;
+    }
+    QModelIndex modelIndex=this->m_sheet->currentIndex();
+    ZCell *cell=static_cast<ZCell*>(this->m_sheet->item(modelIndex.row(),modelIndex.column()));
+    if(NULL==cell)
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("未选择单元格,无法完成绑定!"));
+        return;
+    }
+
+    QMenu popMenu;
+    QAction actBindCurrentCell(QIcon(":/TemplateEditor/images/TemplateEditor/BindVar.png"),tr("绑定当前单元格"));
+    QAction actBindCell(QIcon(":/TemplateEditor/images/TemplateEditor/BindVar.png"),tr("绑定单元格..."));
+    QAction actRemoveBind(QIcon(":/TemplateEditor/images/TemplateEditor/UnbindVar.png"),tr("移除绑定"));
+    popMenu.addAction(&actBindCurrentCell);
+    popMenu.addAction(&actBindCell);
+    popMenu.addAction(&actRemoveBind);
+    connect(&actBindCurrentCell,SIGNAL(triggered(bool)),this,SLOT(ZSlotBindCurrentCell()));
+    connect(&actBindCell,SIGNAL(triggered(bool)),this,SLOT(ZSlotBindCell()));
+    connect(&actRemoveBind,SIGNAL(triggered(bool)),this,SLOT(ZSlotRemoveBind()));
+    popMenu.exec(QCursor::pos());
+}
+void ZSheetWidget::ZSlotBindCurrentCell()
+{
+    QModelIndex modelIndex=this->m_sheet->currentIndex();
+    ZCell *cell=static_cast<ZCell*>(this->m_sheet->item(modelIndex.row(),modelIndex.column()));
+    if(NULL==cell)
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("未选择单元格,无法完成绑定!"));
+        return;
+    }
+
+    QTreeWidgetItem *itemVar=this->m_treeWidget->currentItem();
+    if(NULL==itemVar)
+    {
+        return;
+    }
+    itemVar->setText(1,QString("%1,%2").arg(modelIndex.row()+1).arg(modelIndex.column()+1));
+}
+void ZSheetWidget::ZSlotBindCell()
+{
+    QTreeWidgetItem *itemVar=this->m_treeWidget->currentItem();
+    if(NULL==itemVar)
+    {
+        return;
+    }
+    QString xyText=QInputDialog::getText(this,tr("输入单元格坐标"),tr("请输入要绑定的单元格坐标,例如: 1,1"));
+    if(xyText.isEmpty())
+    {
+        return;
+    }
+    QStringList xyList=xyText.split(",");
+    if(2!=xyList.size())
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("错误的坐标输入,无法完成绑定!"));
+        return;
+    }
+    qint32 x=xyList.at(0).toInt();
+    qint32 y=xyList.at(1).toInt();
+    if(!(x>=0 && x<=TABLE_ROW_COUNT) || !(y>=0 && y<=TABLE_COL_COUNT))
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("坐标越界,无法完成绑定!"));
+        return;
+    }
+    itemVar->setText(1,QString("%1,%2").arg(x).arg(y));
+}
+void ZSheetWidget::ZSlotRemoveBind()
+{
+    QTreeWidgetItem *itemVar=this->m_treeWidget->currentItem();
+    if(NULL==itemVar)
+    {
+        return;
+    }
+    itemVar->setText(1,"");
 }

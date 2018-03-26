@@ -182,6 +182,10 @@ void ZFileInfoDia::ZParseAckNetFrmXmlData()
         }//StarElement.
     }//while().
 }
+QSize ZFileInfoDia::sizeHint() const
+{
+    return QSize(200,100);
+}
 void ZFileInfoDia::ZSlotOkay()
 {
     switch(this->m_diaType)

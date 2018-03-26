@@ -27,6 +27,8 @@ public:
     void ZParseAckNetFrmXmlData();
 
     void ZDwnData(QString fileName,QString folderName,qint32 totalBlock,qint32 blockSize,qint32 remainBytes);
+protected:
+    QSize sizeHint() const;
 private slots:
     void ZSlotOkay();
     void ZSlotCancel();
