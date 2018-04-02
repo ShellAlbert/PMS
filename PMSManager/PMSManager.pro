@@ -262,6 +262,8 @@ INCLUDEPATH += $$PWD/FileManager/poppler
 DEPENDPATH += $$PWD/FileManager/poppler
 LIBS += -L$$PWD/FileManager/poppler -llibpoppler-qt5
 
+INCLUDEPATH += $$PWD/CuteReport
+LIBS += -L$$PWD/CuteReport -lCuteDesignerd -lCuteReportCored -lCuteReportWidgetsd -lCuteReportWidgetsThirdpartyd -lPropertyEditord
 FORMS += \
     KDReports/previewdialogbase.ui \
     KDReports/tablebreakingdialogbase.ui \

@@ -10,11 +10,18 @@
 #include <FormDesigner/pformdesigner.h>
 #include <QSettings>
 #include <QDesktopWidget>
+
 //the administrator username is admin,not root!!!
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+//    CuteDesigner::Core  * core = new CuteDesigner::Core();
+//    int result = app.exec();
+//    delete core;
+//    return result;
+
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
     QSplashScreen *splash=new QSplashScreen;

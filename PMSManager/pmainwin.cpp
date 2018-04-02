@@ -582,6 +582,7 @@ PMainWin::PMainWin(QWidget *parent)
     this->m_processEdit=NULL;
     this->m_taskManager=NULL;
     this->m_formDesigner=NULL;
+    this->m_cuteReport=NULL;
 
     //status bar.
     this->m_lblTime=new QLabel;
@@ -669,6 +670,11 @@ PMainWin::~PMainWin()
     if(this->m_formDesigner)
     {
         delete this->m_formDesigner;
+    }
+    if(this->m_cuteReport)
+    {
+        delete this->m_cuteReport;
+        delete this->m_cuteReportContainer;
     }
     delete this->m_midArea;
     delete this->m_logManager;
@@ -1029,6 +1035,7 @@ void PMainWin::ZSlotShowTaskManager()
     }
     this->m_taskManager->showNormal();
 }
+class MainWindow;
 void PMainWin::ZSlotShowFormDesigner()
 {
     if(!MyUserInfo::ZGetInstance()->m_RoleInfo.m_formDesignerPerm)
@@ -1036,6 +1043,7 @@ void PMainWin::ZSlotShowFormDesigner()
         QMessageBox::critical(this,tr("错误提示"),tr("您无权限访问<报表生成器>功能模块!\n请联系您的创建者:[%1].").arg(MyUserInfo::ZGetInstance()->m_UserInfo.m_Creator));
         return;
     }
+    //open the self-designed form designer.
     if(this->m_formDesigner==NULL)
     {
         this->m_formDesigner=new PFormDesigner;
@@ -1046,6 +1054,18 @@ void PMainWin::ZSlotShowFormDesigner()
         this->m_midArea->setActiveSubWindow(this->m_mdiFormDesigner);
     }
     this->m_formDesigner->showNormal();
+
+    //open the cute-report designer.
+    if(this->m_cuteReport==NULL)
+    {
+        this->m_cuteReportContainer=new QWidget;
+        this->m_cuteReport=new CuteDesigner::Core(this->m_cuteReportContainer);
+        connect(this->m_cuteReport,SIGNAL(ZSignalCloseEvent(QString)),this,SLOT(ZSlotCloseSubWidget(QString)));
+        this->m_mdiCuteReport=this->m_midArea->addSubWindow(this->m_cuteReportContainer);
+    }else{
+        this->m_midArea->setActiveSubWindow(this->m_mdiCuteReport);
+    }
+    this->m_cuteReportContainer->showNormal();
 }
 void PMainWin::ZSlotShowSystemLog()
 {
@@ -1138,6 +1158,11 @@ void PMainWin::ZSlotCloseSubWidget(QString widget)
         delete this->m_formDesigner;
         this->m_formDesigner=NULL;
         this->m_mdiFormDesigner=NULL;
+    }else if(widget==QString("CuteReport"))
+    {
+        delete this->m_cuteReport;
+        delete this->m_cuteReportContainer;
+        this->m_mdiCuteReport=NULL;
     }
 }
 void PMainWin::ZSlotHearBeat()

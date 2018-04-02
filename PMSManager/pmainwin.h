@@ -22,6 +22,8 @@
 #include <QMap>
 #include <BasePart/zbaseinfodia.h>
 #include <Logger/zlogmanager.h>
+#include "CuteReport/designercore.h"
+
 class ZHeartBeatInfoDia:public ZBaseInfoDia
 {
 public:
@@ -222,6 +224,11 @@ private:
 
     PFormDesigner *m_formDesigner;
     QMdiSubWindow *m_mdiFormDesigner;
+
+
+    QWidget *m_cuteReportContainer;
+    CuteDesigner::Core *m_cuteReport;
+    QMdiSubWindow *m_mdiCuteReport;
 private:
     QTimer *m_timerHeartBeat;
 
