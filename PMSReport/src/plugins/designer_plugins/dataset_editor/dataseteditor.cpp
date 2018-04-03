@@ -293,7 +293,7 @@ void DatasetEditor::slotRequestForRename(QString currentName)
     if (!dataset)
         return;
     RenameDialog d(dataset, core()->currentReport(), core()->mainWindow());
-    d.setWindowTitle("Dataset renaming");
+    d.setWindowTitle("重命名数据源");
     if (d.exec() == QDialog::Accepted) {
         dataset->setObjectName(d.newName());
     }

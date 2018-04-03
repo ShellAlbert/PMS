@@ -515,7 +515,7 @@ void StdStorageDialog::currentItemChanged ( QTreeWidgetItem * current, QTreeWidg
         QString ext = current->text(1);
         ui->fileName->setText(name + "." + ext);
         m_currentFileNameIsManuallyEntered = false;
-        if (ext == "qtrp")
+        if (ext == "pft")
             ui->preview->setReport(currentObjectUrl());
         else if (ext == "jpg" || ext == "jpeg" || ext == "png")
             ui->preview->setImage(QImage::fromData(m_storage->loadObject(currentObjectUrl())));

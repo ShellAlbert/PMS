@@ -475,7 +475,7 @@ void Core::setDocumentTitles(int id, const QString & name)
     QMap<int, QString>::iterator i;
     for (i = m_documentTitles.begin(); i != m_documentTitles.end(); ++i)
         list.append(i.value());
-    list.append("Cute Report");
+    list.append("PMS报表设计器");
 
     m_mainWindow->setWindowTitle(list.join(" - "));
 }
@@ -819,7 +819,7 @@ QString Core::loadReportDialog()
         m_reportCore->log(CuteReport::LogDebug, "Designer::Core", "loadReportDialog", "loadMethod != 0");
         QFileInfo fInfo(lastURL.section(":",1,1));
         fileURL = QFileDialog::getOpenFileName(reportCore()->rootWidget(), title, fInfo.absoluteDir().absolutePath(),
-                                               tr("PMS报表模板 (*.qtrp)"), 0, QFileDialog::Options(m_loadMethod == 3 ? QFileDialog::DontUseNativeDialog : 0));
+                                               tr("PMS报表模板 (*.pft)"), 0, QFileDialog::Options(m_loadMethod == 3 ? QFileDialog::DontUseNativeDialog : 0));
         if (!fileURL.isEmpty())
             fileURL = "file:" + fileURL;
         m_reportCore->log(CuteReport::LogDebug, "Designer::Core", "loadReportDialog", QString("selected file: \'%1\'')").arg(fileURL));

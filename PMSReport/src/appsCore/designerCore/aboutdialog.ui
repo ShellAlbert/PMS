@@ -11,11 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>About CuteReport</string>
-  </property>
-  <property name="windowIcon">
-   <iconset resource="designerCore.qrc">
-    <normaloff>:/images/logo.svg</normaloff>:/images/logo.svg</iconset>
+   <string>关于PMSReport</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="1">

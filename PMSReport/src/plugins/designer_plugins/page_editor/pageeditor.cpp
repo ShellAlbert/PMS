@@ -236,13 +236,13 @@ QList<DesignerMenu *> PageEditor::mainMenu()
 
     QList<CuteDesigner::DesignerMenu*> menus;
 
-    CuteDesigner::DesignerMenu * reportMenu = new CuteDesigner::DesignerMenu(parent, "Page", 400, 400); // very high priority;  very high priority;
+    CuteDesigner::DesignerMenu * reportMenu = new CuteDesigner::DesignerMenu(parent, "页面", 400, 400); // very high priority;  very high priority;
     menus.append(reportMenu);
 
-    reportMenu->menu->addAction(createAction("peActionNewPage", "New Page", ":/images/document-new.png", "Alt+P, Alt+N", SLOT(slotNewPage())));
-    reportMenu->menu->addAction(m_deleteAction = createAction("peActionDeletePage", "Delete Page", ":/images/document-close.png", "Alt+P, Alt+D", SLOT(slotDeletePage())));
-    reportMenu->menu->addAction(m_objectsLoadAction = createAction("peActionLoadPageItems", "Load Objects", ":/images/document-open.png", "Alt+P, Alt+L", SLOT(slotObjectsLoad())));
-    reportMenu->menu->addAction(m_objectsSaveAction = createAction("peActionSavePageItems", "Save Objects as...", ":/images/document-save-as.png", "Alt+P, Alt+S", SLOT(slotObjectsSave())));
+    reportMenu->menu->addAction(createAction("peActionNewPage", "新建页面", ":/images/document-new.png", "Alt+P, Alt+N", SLOT(slotNewPage())));
+    reportMenu->menu->addAction(m_deleteAction = createAction("peActionDeletePage", "删除页面", ":/images/document-close.png", "Alt+P, Alt+D", SLOT(slotDeletePage())));
+    reportMenu->menu->addAction(m_objectsLoadAction = createAction("peActionLoadPageItems", "载入对象", ":/images/document-open.png", "Alt+P, Alt+L", SLOT(slotObjectsLoad())));
+    reportMenu->menu->addAction(m_objectsSaveAction = createAction("peActionSavePageItems", "对象另存为...", ":/images/document-save-as.png", "Alt+P, Alt+S", SLOT(slotObjectsSave())));
 
     return menus;
 }

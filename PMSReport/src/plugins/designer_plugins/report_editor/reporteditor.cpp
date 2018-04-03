@@ -254,9 +254,9 @@ void ReportEditor::slotRequestForDeleteRenderer(const QString &name)
     if (!core()->currentReport())
         return;
 
-    int ret = QMessageBox::warning(core()->mainWindow(), tr("CuteReport"),
-                                   tr("Current selected renderer will be removed.\n"
-                                      "Do you want to proceed?"),
+    int ret = QMessageBox::warning(core()->mainWindow(), tr("PMSReport"),
+                                   tr("当前选择的渲染器将被移除.\n"
+                                      "您确认要继续吗?"),
                                    QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
     if (ret == QMessageBox::Cancel)
         return;
@@ -300,7 +300,7 @@ void ReportEditor::slotRequestForDeletePrinter(const QString &name)
     if (!core()->currentReport())
         return;
 
-    int ret = QMessageBox::warning(core()->mainWindow(), tr("CuteReport"),
+    int ret = QMessageBox::warning(core()->mainWindow(), tr("PMSReport"),
                                    tr("Current selected printer will be removed.\n"
                                       "Do you want to proceed?"),
                                    QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
@@ -366,9 +366,9 @@ void ReportEditor::slotRequestForDeleteStorage(const QString & storageName)
     if (!core()->currentReport())
         return;
 
-    int ret = QMessageBox::warning(core()->mainWindow(), tr("CuteReport"),
-                                   tr("Current selected storage will be removed.\n"
-                                      "Do you want to proceed?"),
+    int ret = QMessageBox::warning(core()->mainWindow(), tr("PMSReport"),
+                                   tr("当前选择的存储将被移除.\n"
+                                      "您确认要继续吗?"),
                                    QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
     if (ret == QMessageBox::Cancel)
         return;
@@ -539,13 +539,13 @@ bool ReportEditor::saveReport(CuteReport::ReportInterface * report, bool askFile
 
     QFileInfo file(objectUrl);
     if(file.suffix().isEmpty())
-        objectUrl += ".qtrp";
+        objectUrl += ".pft";
     QString error;
     bool result = core()->reportCore()->saveReport(objectUrl, report, &error);
 
     if (!result && !error.isEmpty()) {
         core()->reportCore()->log(CuteReport::LogError, "ReportEditor", error);
-        QMessageBox::critical(core()->mainWindow(), tr("Cute Report"),
+        QMessageBox::critical(core()->mainWindow(), tr("PMS Report"),
                               tr("File cannot be saved there."),
                               QMessageBox::Ok, QMessageBox::Ok);
     }
@@ -563,9 +563,9 @@ void ReportEditor::slotRequestForCloseReport()
         return;
 
     if (report->isDirty() && report->isValid()) {
-        int ret = QMessageBox::warning(core()->mainWindow(), tr("Cute Report"),
-                                       tr("The document has been modified.\n"
-                                          "Do you want to save your changes?"),
+        int ret = QMessageBox::warning(core()->mainWindow(), tr("PMS Report"),
+                                       tr("文档已经被修改.\n"
+                                          "您要保存修改吗?"),
                                        QMessageBox::Save | QMessageBox::Discard
                                        | QMessageBox::Cancel,
                                        QMessageBox::Save);
@@ -854,9 +854,9 @@ void ReportEditor::slotAppIsAboutToClose(bool* cancel)
     foreach (ReportStruct st, m_reports) {
         CuteReport::ReportInterface * report = st.report;
         if ((report->isDirty() || report->fileUrl().isEmpty()) && report->isValid()) {
-            int ret = QMessageBox::warning(core()->mainWindow(), tr("Cute Report"),
-                                           tr("The document <b>\"%1\"</b> has been modified.<br>"
-                                              "Do you want to save your changes?").arg(report->name().isEmpty() ? tr("NoName") : report->name()),
+            int ret = QMessageBox::warning(core()->mainWindow(), tr("PMS Report"),
+                                           tr("文档 <b>\"%1\"</b> 已经被修改.<br>"
+                                              "您要保存修改吗?").arg(report->name().isEmpty() ? tr("未命名") : report->name()),
                                            QMessageBox::Yes | QMessageBox::No| QMessageBox::Cancel,
                                            QMessageBox::Yes);
             if (ret == QMessageBox::Cancel) {
