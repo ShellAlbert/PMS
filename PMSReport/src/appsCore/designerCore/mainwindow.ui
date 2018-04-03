@@ -188,12 +188,12 @@
      <x>0</x>
      <y>0</y>
      <width>925</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuReport">
     <property name="title">
-     <string>File</string>
+     <string>文件</string>
     </property>
     <addaction name="separator"/>
     <addaction name="separator"/>
@@ -205,7 +205,7 @@
      <bool>true</bool>
     </property>
     <property name="title">
-     <string>Edit</string>
+     <string>编辑</string>
     </property>
     <addaction name="separator"/>
     <addaction name="actionCut"/>
@@ -216,7 +216,7 @@
    </widget>
    <widget class="QMenu" name="menuPage">
     <property name="title">
-     <string>Page</string>
+     <string>页面</string>
     </property>
     <addaction name="separator"/>
    </widget>
@@ -225,7 +225,7 @@
      <bool>true</bool>
     </property>
     <property name="title">
-     <string>Ser&amp;vice</string>
+     <string>服务</string>
     </property>
     <addaction name="actionRender"/>
     <addaction name="actionRenderStop"/>
@@ -235,14 +235,14 @@
      <bool>true</bool>
     </property>
     <property name="title">
-     <string>Tools</string>
+     <string>工具</string>
     </property>
     <addaction name="separator"/>
     <addaction name="actionOptions"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>He&amp;lp</string>
+     <string>帮助</string>
     </property>
     <addaction name="actionAbout"/>
    </widget>
@@ -262,7 +262,7 @@
      <normaloff>:/images/application_exit.png</normaloff>:/images/application_exit.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Quit</string>
+    <string>退出(&amp;Q)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -273,7 +273,10 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Undo</string>
+    <string>撤销(&amp;U)</string>
+   </property>
+   <property name="toolTip">
+    <string>撤销刚才的操作</string>
    </property>
   </action>
   <action name="actionRedo">
@@ -281,7 +284,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Redo</string>
+    <string>重做(&amp;R)</string>
    </property>
   </action>
   <action name="actionCopy">
@@ -293,7 +296,7 @@
      <normaloff>:/images/copy.png</normaloff>:/images/copy.png</iconset>
    </property>
    <property name="text">
-    <string>C&amp;opy</string>
+    <string>复制(&amp;C)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -305,7 +308,7 @@
      <normaloff>:/images/cut.png</normaloff>:/images/cut.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Cut</string>
+    <string>剪切(&amp;V)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+X</string>
@@ -317,7 +320,7 @@
      <normaloff>:/images/paste.png</normaloff>:/images/paste.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Paste</string>
+    <string>粘贴(&amp;P)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
@@ -325,12 +328,12 @@
   </action>
   <action name="actionDelete">
    <property name="text">
-    <string>&amp;Delete</string>
+    <string>删除(&amp;D)</string>
    </property>
   </action>
   <action name="actionNew_Page">
    <property name="text">
-    <string>New Page</string>
+    <string>新增页(&amp;N)</string>
    </property>
   </action>
   <action name="actionMagnets">
@@ -344,7 +347,7 @@
      <normaloff>:/images/media-playback-start.png</normaloff>:/images/media-playback-start.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Render</string>
+    <string>渲染(&amp;R)</string>
    </property>
    <property name="toolTip">
     <string>Run Renderer</string>
@@ -362,7 +365,7 @@
      <normaloff>:/images/application_exit.png</normaloff>:/images/application_exit.png</iconset>
    </property>
    <property name="text">
-    <string>r&amp;enderStop</string>
+    <string>停止渲染(&amp;E)</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -371,7 +374,7 @@
      <normaloff>:/images/dialog-information.png</normaloff>:/images/dialog-information.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;About CuteReport</string>
+    <string>关于(&amp;A)</string>
    </property>
   </action>
   <action name="actionOptions">
@@ -380,17 +383,17 @@
      <normaloff>:/images/run-build.png</normaloff>:/images/run-build.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Options...</string>
+    <string>选项(&amp;O)</string>
    </property>
   </action>
   <action name="actionExport">
    <property name="text">
-    <string>Export...</string>
+    <string>导出...</string>
    </property>
   </action>
   <action name="actionTest">
    <property name="text">
-    <string>test</string>
+    <string>测试</string>
    </property>
   </action>
  </widget>

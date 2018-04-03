@@ -686,9 +686,8 @@ void Core::_rendererDone(ReportInterface * report, bool successful)
     Q_UNUSED(report)
 
     if (!successful) {
-        QMessageBox::critical(m_mainWindow, tr("CuteReport Designer"),
-                              tr("Errors found while generating report.\n"
-                                 "Press log button on the bottom left corner for detailed information."));
+        QMessageBox::critical(m_mainWindow, tr("PMS报表设计器"),
+                              tr("产生报表时发生错误.\n请单击左下角日志按钮查看错误信息."));
     }
 }
 
@@ -747,7 +746,7 @@ QString Core::loadObjectDialog(const QStringList &fileExtensions, const QString 
             fileExtensionsFormatted << QString("*.%1").arg(fileExt);
         }
     }
-    QString fileFilter = QString("CuteReport object (%1)").arg(fileExtensionsFormatted.join(" "));
+    QString fileFilter = QString("PMS报表设计器-object (%1)").arg(fileExtensionsFormatted.join(" "));
 
     QFileInfo fi(lastURL.section(":",1,1));
     QString fileURL = QFileDialog::getOpenFileName(reportCore()->rootWidget(), title,  fi.absolutePath(), fileFilter, 0,
@@ -789,7 +788,7 @@ QString Core::saveObjectDialog(const QStringList &fileExtensions, const QString 
             fileExtensionsFormatted << QString("*.%1").arg(fileExt);
         }
     }
-    QString fileFilter = QString("CuteReport object (*.%1)").arg(fileExtensionsFormatted.join(" "));
+    QString fileFilter = QString("PMS报表设计器-object (*.%1)").arg(fileExtensionsFormatted.join(" "));
 
     fileURL = QFileDialog::getSaveFileName(reportCore()->rootWidget(), title, fi.absolutePath(), QString("CuteReport object (%1)").arg(fileFilter), 0,
                                            QFileDialog::Options(m_loadMethod == 3 ? QFileDialog::DontUseNativeDialog : 0));
@@ -805,7 +804,7 @@ QString Core::loadReportDialog()
 {
     m_reportCore->log(CuteReport::LogDebug, "Designer::Core", "loadReportDialog");
 
-    QString title = "Load Report";
+    QString title = "PMS报表设计器-载入报表";
     QString lastURL = getSettingValue("CuteReport_ReportEditor/lastURL").toString();
     QString fileURL = m_currentReport ? m_currentReport->fileUrl() : "";
 
@@ -820,7 +819,7 @@ QString Core::loadReportDialog()
         m_reportCore->log(CuteReport::LogDebug, "Designer::Core", "loadReportDialog", "loadMethod != 0");
         QFileInfo fInfo(lastURL.section(":",1,1));
         fileURL = QFileDialog::getOpenFileName(reportCore()->rootWidget(), title, fInfo.absoluteDir().absolutePath(),
-                                               tr("CuteReport templates (*.qtrp)"), 0, QFileDialog::Options(m_loadMethod == 3 ? QFileDialog::DontUseNativeDialog : 0));
+                                               tr("PMS报表模板 (*.qtrp)"), 0, QFileDialog::Options(m_loadMethod == 3 ? QFileDialog::DontUseNativeDialog : 0));
         if (!fileURL.isEmpty())
             fileURL = "file:" + fileURL;
         m_reportCore->log(CuteReport::LogDebug, "Designer::Core", "loadReportDialog", QString("selected file: \'%1\'')").arg(fileURL));
@@ -837,7 +836,7 @@ QString Core::saveCurrentReportDialog()
     if (!m_currentReport)
         return QString();
 
-    QString title = tr("Save Report");
+    QString title = tr("保存报表");
     QString lastURL = getSettingValue("CuteReport_ReportEditor/lastURL").toString();
     QString fileURL = m_currentReport->fileUrl();
 

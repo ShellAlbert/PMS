@@ -137,13 +137,13 @@ void MainWindow::slotLoadReport_after(CuteReport::ReportInterface *report)
 void MainWindow::slotNewReport_after(CuteReport::ReportInterface * report)
 {
     Q_UNUSED(report)
-    setWindowTitle(tr("CuteReport v%1 (unsaved report)").arg( REPORT_VERSION ));
+    setWindowTitle(tr("PMS报表设计器 v%1 (未保存)").arg( REPORT_VERSION ));
 }
 
 
 void MainWindow::slotNewPage_after(CuteReport::PageInterface*)
 {
-    setWindowTitle(tr("CuteReport v%1 (unsaved report)").arg( REPORT_VERSION ));
+    setWindowTitle(tr("PMS报表设计器 v%1 (未保存)").arg( REPORT_VERSION ));
 }
 
 

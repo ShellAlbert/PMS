@@ -24,7 +24,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
-          <string>URL:</string>
+          <string>文件路径:</string>
          </property>
         </widget>
        </item>
@@ -50,14 +50,14 @@
           </sizepolicy>
          </property>
          <property name="placeholderText">
-          <string>Enter report name</string>
+          <string>请输入报表名称</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Author:</string>
+          <string>创建者:</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -73,14 +73,14 @@
           </sizepolicy>
          </property>
          <property name="placeholderText">
-          <string>Enter author</string>
+          <string>请输入创建者</string>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Description:</string>
+          <string>报表描述:</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -100,7 +100,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Name:</string>
+          <string>报表名称:</string>
          </property>
         </widget>
        </item>
@@ -117,7 +117,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Variables:</string>
+          <string> 变量列表:</string>
          </property>
         </widget>
        </item>
@@ -147,7 +147,7 @@
    <item>
     <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>Options:</string>
+      <string>报表选项:</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -163,11 +163,11 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tabStorage">
       <attribute name="title">
-       <string>Storage</string>
+       <string>存储</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
@@ -216,7 +216,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Default storage name:</string>
+             <string>默认存储名称:</string>
             </property>
            </widget>
           </item>
@@ -229,7 +229,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Selected storage Type:</string>
+             <string>选定存储类型:</string>
             </property>
            </widget>
           </item>
@@ -297,7 +297,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Assigned storages:</string>
+               <string>指定存储:</string>
               </property>
              </widget>
             </item>
@@ -374,7 +374,7 @@
                <string>...</string>
               </property>
               <property name="icon">
-               <iconset resource="../../../../addons_pro/plugins/core_plugins/items/chart/chart.qrc">
+               <iconset resource="../dataset_editor/dataset_editor.qrc">
                 <normaloff>:/images/trash-empty.png</normaloff>:/images/trash-empty.png</iconset>
               </property>
               <property name="iconSize">
@@ -521,7 +521,7 @@
      </widget>
      <widget class="QWidget" name="tabRenderer">
       <attribute name="title">
-       <string>Renderer</string>
+       <string>渲染器</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
@@ -557,7 +557,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Default renderer name:</string>
+             <string>默认渲染器名称:</string>
             </property>
            </widget>
           </item>
@@ -570,7 +570,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Selected renderer Type:</string>
+             <string>选定的渲染器类型:</string>
             </property>
            </widget>
           </item>
@@ -604,7 +604,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Assigned renderers:</string>
+               <string>指定渲染器:</string>
               </property>
              </widget>
             </item>
@@ -728,7 +728,7 @@
                <string>...</string>
               </property>
               <property name="icon">
-               <iconset resource="../../../../addons_pro/plugins/core_plugins/items/chart/chart.qrc">
+               <iconset resource="../dataset_editor/dataset_editor.qrc">
                 <normaloff>:/images/trash-empty.png</normaloff>:/images/trash-empty.png</iconset>
               </property>
               <property name="iconSize">
@@ -875,7 +875,7 @@
      </widget>
      <widget class="QWidget" name="tabPrinter">
       <attribute name="title">
-       <string>Printer</string>
+       <string>打印机</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0">
@@ -911,7 +911,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Default printer name:</string>
+             <string>默认打印机名称:</string>
             </property>
            </widget>
           </item>
@@ -924,7 +924,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Selected printer Type:</string>
+             <string>选定的打印机类型:</string>
             </property>
            </widget>
           </item>
@@ -958,7 +958,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Assigned printers:</string>
+               <string>指定的打印机:</string>
               </property>
              </widget>
             </item>
@@ -1082,7 +1082,7 @@
                <string>...</string>
               </property>
               <property name="icon">
-               <iconset resource="../../../../addons_pro/plugins/core_plugins/items/chart/chart.qrc">
+               <iconset resource="../dataset_editor/dataset_editor.qrc">
                 <normaloff>:/images/trash-empty.png</normaloff>:/images/trash-empty.png</iconset>
               </property>
               <property name="iconSize">
@@ -1229,7 +1229,7 @@
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Inheritance</string>
+       <string>继承</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_11">
        <item row="0" column="0" colspan="2">
@@ -1252,7 +1252,7 @@
            <item row="1" column="0">
             <widget class="QLabel" name="label_14">
              <property name="text">
-              <string>Base report file name:</string>
+              <string> 基报表文件:</string>
              </property>
             </widget>
            </item>
@@ -1262,7 +1262,7 @@
            <item row="2" column="0">
             <widget class="QLabel" name="label_13">
              <property name="text">
-              <string>Base report path:</string>
+              <string>基报表路径:</string>
              </property>
             </widget>
            </item>
@@ -1303,7 +1303,7 @@
              <item>
               <widget class="QPushButton" name="bDetachBaseReport">
                <property name="text">
-                <string>Detach</string>
+                <string>剥离</string>
                </property>
               </widget>
              </item>
@@ -1397,7 +1397,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../addons_pro/plugins/core_plugins/items/chart/chart.qrc"/>
+  <include location="../dataset_editor/dataset_editor.qrc"/>
   <include location="../page_editor/page_editor.qrc"/>
   <include location="reporteditor.qrc"/>
   <include location="../script_editor/script_editor.qrc"/>

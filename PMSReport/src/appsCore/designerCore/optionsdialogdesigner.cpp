@@ -66,7 +66,7 @@ QListWidgetItem *OptionsDialogDesigner::createButton(QListWidget *listWidget)
 {
     QListWidgetItem *configButton = new QListWidgetItem(listWidget);
     configButton->setIcon(QIcon(":/images/options_report.png"));
-    configButton->setText(tr("Designer"));
+    configButton->setText(tr("设计器"));
     configButton->setTextAlignment(Qt::AlignHCenter);
     configButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 

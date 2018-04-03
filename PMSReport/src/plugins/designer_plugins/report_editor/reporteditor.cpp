@@ -169,7 +169,7 @@ QIcon ReportEditor::icon()
 
 QString ReportEditor::name()
 {
-    return QString("Reports");
+    return QString("报表设计");
 }
 
 
@@ -698,15 +698,15 @@ QList<CuteDesigner::DesignerMenu*> ReportEditor::mainMenu()
 
     QList<CuteDesigner::DesignerMenu*> menus;
 
-    CuteDesigner::DesignerMenu * reportMenu = new CuteDesigner::DesignerMenu(parent, "File", 1000, 1000); // very high priority;  very high priority;
+    CuteDesigner::DesignerMenu * reportMenu = new CuteDesigner::DesignerMenu(parent, "文件", 1000, 1000); // very high priority;  very high priority;
     menus.append(reportMenu);
 
-    m_newReportAction = createAction("actionNewReport", "New Report", ":/images/document-new.png", "Ctrl+N", SLOT(slotRequestForNewReport()));
+    m_newReportAction = createAction("actionNewReport", "新建报表", ":/images/document-new.png", "Ctrl+N", SLOT(slotRequestForNewReport()));
     reportMenu->menu->addAction(m_newReportAction);
-    m_openReportAction = createAction("actionOpenReport", "Open Report", ":/images/document-open.png", "Ctrl+O", SLOT(slotRequestForOpenReport()));
+    m_openReportAction = createAction("actionOpenReport", "打开报表", ":/images/document-open.png", "Ctrl+O", SLOT(slotRequestForOpenReport()));
     reportMenu->menu->addAction(m_openReportAction);
 
-    m_previousReportsAction = createAction("actionOpenPrevReport", "Recent Reports", ":/images/document-save.png", "", "");
+    m_previousReportsAction = createAction("actionOpenPrevReport", "最近的报表", ":/images/document-save.png", "", "");
     QMenu * prevOpenMenu = new QMenu("Previous Reports");
     for (int i = 0; i<m_prevReports.size(); ++i) {
         QString url = m_prevReports.at(i);
@@ -715,11 +715,11 @@ QList<CuteDesigner::DesignerMenu*> ReportEditor::mainMenu()
     m_previousReportsAction->setMenu(prevOpenMenu);
     reportMenu->menu->addAction(m_previousReportsAction);
 
-    m_saveReportAction = createAction("actionSaveReport", "Save Report", ":/images/document-save.png", "Ctrl+S", SLOT(slotRequestForSaveReport()));
+    m_saveReportAction = createAction("actionSaveReport", "保存报表", ":/images/document-save.png", "Ctrl+S", SLOT(slotRequestForSaveReport()));
     reportMenu->menu->addAction(m_saveReportAction);
-    m_saveReportAsAction = createAction("actionSaveAsReport", "Save Report As...", ":/images/document-save-as.png", "", SLOT(slotRequestForSaveReportAs()));
+    m_saveReportAsAction = createAction("actionSaveAsReport", "报表另存为...", ":/images/document-save-as.png", "", SLOT(slotRequestForSaveReportAs()));
     reportMenu->menu->addAction(m_saveReportAsAction);
-    m_closeReportAction = createAction("actionCloseReport", "Close Report", ":/images/document-close.png", "Ctrl+W", SLOT(slotRequestForCloseReport()));
+    m_closeReportAction = createAction("actionCloseReport", "关闭报表", ":/images/document-close.png", "Ctrl+W", SLOT(slotRequestForCloseReport()));
     reportMenu->menu->addAction(m_closeReportAction);
 
     m_saveReportAction->setEnabled(false);

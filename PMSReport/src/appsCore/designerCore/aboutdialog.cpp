@@ -42,7 +42,7 @@ AboutDialog::AboutDialog(QWidget* parent, Qt::WindowFlags fl): QDialog(parent, f
 #ifdef STATICBUILD
     labelBuildType->setText(QString("Static (%1, %2)").arg(COMPILER_VER).arg(PROCESSOR_TYPE));
 #else
-    labelBuildType->setText(QString("Dynamic (%1, %2)").arg(COMPILER_VER).arg(PROCESSOR_TYPE));
+    labelBuildType->setText(QString("动态编译(%1, %2)").arg(COMPILER_VER).arg(PROCESSOR_TYPE));
 #endif
 
 #ifdef PRO

@@ -1,0 +1,90 @@
+QFrame{background-color:#cce5f9;}
+QDialog{background-color:#cce5f9;}
+
+QToolButton{
+background-color: qconicalgradient(cx:0.5, cy:0.522909, angle:179.9, stop:0.494318 rgba(214, 214, 214, 255), stop:0.5 rgba(236, 236, 236, 255));
+border: 1px solid rgb(124, 124, 124);
+border-radius:5px;
+padding: 6px 12px 6px 12p;
+}
+QToolButton:hover{
+  background-color: qconicalgradient(cx:0.5, cy:0.522909, angle:179.9, stop:0.494318 rgba(181, 225, 250, 255), stop:0.5 rgba(222, 242, 251, 255));
+  border-radius:5px;
+  border: 1px solid #3C80B1;
+}
+QToolButton:pressed{
+  background-color: qconicalgradient(cx:0.5, cy:0.522909, angle:179.9, stop:0.494318 rgba(134, 198, 233, 255), stop:0.5 rgba(206, 234, 248, 255));
+  border-radius:5px;
+  border: 1px solid #5F92B2;
+}
+
+QTreeWidget{
+    background-color: #CCE5F1;
+    color: black;
+}
+QTreeWidget::item{
+    margin:4px;
+    color: black;
+    background: #CCE5F1;
+    background-clip: margin;
+}
+QTreeView::item:hover {
+    background: rgb(69, 187, 217);;
+}
+QTreeView::item:selected:active{
+    background: rgb(69, 187, 200);
+}
+QTreeView::item:selected:!active {
+    background: rgb(63, 147, 168);
+}
+
+
+
+/*menu样式设置*/
+QMenu{
+    padding:5px;
+    background:white;
+    border:1px solid gray;
+ }
+QMenu::item{
+    padding:0px 40px 0px 30px;
+    height:25px;
+}
+QMenu::item:selected:enabled{
+    background:lightgray;
+    color:white;
+}
+QMenu::item:selected:!enabled{
+    background:transparent;
+}
+QMenu::separator{
+    height:1px;
+    background:lightgray;
+    margin:5px 0px 5px 0px;
+}
+
+/**日期控件QDateEdit**/
+QCalendarWidget QMenu{width:80px;left:10px;}
+QCalendarWidget QToolButton {height: 18px; }
+QCalendarWidget QToolButton:hover {border-radius:0px;color:red;}
+QCalendarWidget QWidget{background-color: #fefbea;border:0px;}
+QCalendarWidget QAbstractItemView {selection-background-color: rgb(255, 174, 0);}
+
+/**QTabWidget**/
+QTabWidget{border:none;margin:0px;outline:none;}
+QTabWidget[showHeader='true']::pane{border:1px solid #55B023;border-radius:0px;position: absolute;top: -1px;}
+QTabWidget[showHeader='false']::pane{border:none;position: absolute;margin:0px;}
+QTabWidget[showHeader='true'] QTabBar::tab{alignment:left;color:white;padding:2px 16px;margin-top:3px;margin-left:5px;height:21px;border-top-left-radius: 5px;border-top-right-radius: 5px;background:#C9B084}
+QTabWidget[showHeader='true'] QTabBar::tab:selected{background:#55B023;margin-top:1px;height:23px;}
+
+/**GroupBox设置*/
+QGroupBox{
+    border: 1px solid black;
+    border-radius:8px;
+    margin-top:6px;
+}
+QGroupBox:title{
+    color:black;
+    subcontrol-origin: margin;
+    left: 10px;
+}

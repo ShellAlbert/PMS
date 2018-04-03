@@ -112,7 +112,7 @@
                <string>Delete dataset</string>
               </property>
               <property name="icon">
-               <iconset resource="../../../../addons_pro/plugins/core_plugins/items/chart/chart.qrc">
+               <iconset resource="dataset_editor.qrc">
                 <normaloff>:/images/trash-empty.png</normaloff>:/images/trash-empty.png</iconset>
               </property>
               <property name="iconSize">
@@ -136,7 +136,7 @@
             <item>
              <widget class="QToolButton" name="bTest">
               <property name="text">
-               <string>Test</string>
+               <string>测试数据源</string>
               </property>
               <property name="icon">
                <iconset resource="../script_editor/script_editor.qrc">
@@ -339,9 +339,9 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../addons_pro/plugins/core_plugins/items/chart/chart.qrc"/>
-  <include location="../script_editor/script_editor.qrc"/>
   <include location="../../../appsCore/designerCore/designerCore.qrc"/>
+  <include location="dataset_editor.qrc"/>
+  <include location="../script_editor/script_editor.qrc"/>
  </resources>
  <connections/>
 </ui>

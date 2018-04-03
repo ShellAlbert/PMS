@@ -37,7 +37,7 @@ OptionsDialog::OptionsDialog(CuteDesigner::Core *core) :
 {
     ui->setupUi(this);
 
-    setWindowTitle(tr("Options Dialog"));
+    setWindowTitle(tr("PMS报表选项对话框"));
 
     connect(ui->contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(changePage(QListWidgetItem*,QListWidgetItem*)));
 

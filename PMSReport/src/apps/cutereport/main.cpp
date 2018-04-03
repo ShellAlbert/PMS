@@ -25,7 +25,16 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a (argc, argv);
+    QApplication app(argc, argv);
+
+    //load skin file.
+    QFile skinFile(":/skin/DefaultUI.qss");
+    if(skinFile.open(QIODevice::ReadOnly))
+    {
+        QString qss=skinFile.readAll();
+        app.setStyleSheet(qss);
+        skinFile.close();
+    }
 
     bool designer = true;
 //    for (int i=0; i< argc; ++i) {
@@ -35,13 +44,13 @@ int main(int argc, char *argv[])
 
     if (designer) {
         CuteDesigner::Core  * core = new CuteDesigner::Core();
-        int result = a.exec();
+        int result = app.exec();
         delete core;
         return result;
     } else {
         Console console;
         console.run(argc, argv);
-        return a.exec();
+        return app.exec();
     }
 
     return -1;

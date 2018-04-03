@@ -77,7 +77,7 @@ QListWidgetItem * OptionsDialogRendererPage::createButton(QListWidget * listWidg
 {
     QListWidgetItem *configButton = new QListWidgetItem(listWidget);
     configButton->setIcon(QIcon(":/images/renderer_96x96.png"));
-    configButton->setText(tr("Renderer"));
+    configButton->setText(tr("渲染器"));
     configButton->setTextAlignment(Qt::AlignHCenter);
     configButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 

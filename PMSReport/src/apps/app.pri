@@ -74,3 +74,6 @@ contains(DEFINES, STATICPLUGINS_CORE) {
 
 win32: CONFIG(debug, debug|release): LIBS += -lCuteDesignerd -lCuteReportWidgetsd -lCuteReportCored
 else: LIBS += -lCuteDesigner -lCuteReportWidgets -lCuteReportCore
+
+RESOURCES += \
+    $$PWD/globalappres.qrc

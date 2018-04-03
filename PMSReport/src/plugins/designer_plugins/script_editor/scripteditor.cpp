@@ -152,7 +152,7 @@ QIcon ScriptEditor::icon()
 
 QString ScriptEditor::name()
 {
-    return QString("Script");
+    return QString("脚本设计");
 }
 
 

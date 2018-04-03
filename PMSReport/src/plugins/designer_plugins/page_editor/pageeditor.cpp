@@ -226,7 +226,7 @@ QIcon PageEditor::icon()
 
 QString PageEditor::name()
 {
-    return QString("Pages");
+    return QString("页面设计");
 }
 
 

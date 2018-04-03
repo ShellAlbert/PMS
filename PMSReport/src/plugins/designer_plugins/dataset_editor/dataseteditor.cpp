@@ -131,7 +131,7 @@ QIcon DatasetEditor::icon()
 
 QString DatasetEditor::name()
 {
-    return QString("Datasets");
+    return QString("数据源");
 }
 
 

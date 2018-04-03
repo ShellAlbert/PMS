@@ -91,7 +91,7 @@ void DatasetContainer::addDatasetPlugins(QList<CuteReport::ReportPluginInterface
         CuteReport::DatasetInterface * ds = static_cast<CuteReport::DatasetInterface *>(plugin);
         QToolButton * b = new QToolButton(this);
         b->setIcon(ds->icon());
-        b->setToolTip(QString("Add dataset: %1").arg(ds->moduleFullName()));
+        b->setToolTip(QString("增加数据源: %1").arg(ds->moduleFullName()));
         b->setIconSize(QSize(24,24));
         b->setAutoRaise(true);
         connect(b, SIGNAL(clicked()), this, SLOT(slotNewDatasetPressed()));

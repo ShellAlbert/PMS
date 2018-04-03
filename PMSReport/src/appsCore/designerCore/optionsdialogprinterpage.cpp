@@ -77,7 +77,7 @@ QListWidgetItem * OptionsDialogPrinterPage::createButton(QListWidget * listWidge
 {
     QListWidgetItem *configButton = new QListWidgetItem(listWidget);
     configButton->setIcon(QIcon(":/images/printer_96x96.png"));
-    configButton->setText(tr("Printer"));
+    configButton->setText(tr("打印机"));
     configButton->setTextAlignment(Qt::AlignHCenter);
     configButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 

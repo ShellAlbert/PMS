@@ -32,7 +32,7 @@ StorageSettingsDialog::StorageSettingsDialog(CuteDesigner::Core * core) :
     m_core(core)
 {
     ui->setupUi(this);
-    setWindowTitle("Storage settings");
+    setWindowTitle("存储设置");
 
     m_page = new OptionsDialogStoragePage(core);
     m_page->activate();

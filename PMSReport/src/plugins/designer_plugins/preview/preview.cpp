@@ -103,7 +103,7 @@ QIcon Preview::icon()
 
 QString Preview::name()
 {
-    return QString("Preview");
+    return QString("报表预览");
 }
 
 

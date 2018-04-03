@@ -77,7 +77,7 @@ QListWidgetItem * OptionsDialogStoragePage::createButton(QListWidget * listWidge
 {
     QListWidgetItem *configButton = new QListWidgetItem(listWidget);
     configButton->setIcon(QIcon(":/images/storage_96x96.jpeg"));
-    configButton->setText(tr("Storage"));
+    configButton->setText(tr("存储"));
     configButton->setTextAlignment(Qt::AlignHCenter);
     configButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
