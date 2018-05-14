@@ -61,6 +61,26 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
     this->m_actRemoveWidget=new QAction(QIcon(":/common/images/common/del.png"),tr("移除组件..."),this);
     connect(this->m_actRemoveWidget,SIGNAL(triggered(bool)),this,SLOT(ZSlotRemoveWidget()));
 
+    this->m_actMutexManagr=new QAction(QIcon(":/common/images/common/del.png"),tr("复选框互斥"),this);
+    connect(this->m_actMutexManagr,SIGNAL(triggered(bool)),this,SLOT(ZSlotMutexManager()));
+
+    this->m_actDeleteRows=new QAction(QIcon(":/common/images/common/del.png"),tr("删除行"),this);
+    connect(this->m_actDeleteRows,SIGNAL(triggered(bool)),this,SLOT(ZSlotDeleteRows()));
+
+    this->m_actDeleteCols=new QAction(QIcon(":/common/images/common/del.png"),tr("删除列"),this);
+    connect(this->m_actDeleteCols,SIGNAL(triggered(bool)),this,SLOT(ZSlotDeleteCols()));
+
+    this->m_actInsertRows=new QAction(QIcon(":/common/images/common/add.png"),tr("插入行"),this);
+    connect(this->m_actInsertRows,SIGNAL(triggered(bool)),this,SLOT(ZSlotInsertRows()));
+
+    this->m_actInsertCols=new QAction(QIcon(":/common/images/common/add.png"),tr("插入列"),this);
+    connect(this->m_actInsertCols,SIGNAL(triggered(bool)),this,SLOT(ZSlotInsertCols()));
+
+    this->m_subMenuRowCol=new QMenu(tr("行与列"));
+    this->m_subMenuRowCol->addAction(this->m_actDeleteRows);
+    this->m_subMenuRowCol->addAction(this->m_actDeleteCols);
+    this->m_subMenuRowCol->addAction(this->m_actInsertRows);
+    this->m_subMenuRowCol->addAction(this->m_actInsertCols);
 
     this->m_subMenuAlign->addSection(tr("HAlign"));
     this->m_subMenuAlign->addAction(this->m_actionHAlignLeft);
@@ -81,6 +101,11 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
     this->m_popupMenu->addAction(this->m_actionSplit);
     this->m_popupMenu->addAction(this->m_actFastRemoveWidget);
     this->m_popupMenu->addAction(this->m_actRemoveWidget);
+
+    this->m_popupMenu->addSection(tr("exclusive"));
+
+    this->m_popupMenu->addMenu(this->m_subMenuRowCol);
+    this->m_popupMenu->addAction(this->m_actMutexManagr);
 }
 
 ZSheet::~ZSheet()
@@ -99,6 +124,12 @@ ZSheet::~ZSheet()
     delete this->m_actionSplit;
     delete this->m_actFastRemoveWidget;
     delete this->m_actRemoveWidget;
+    delete this->m_actMutexManagr;
+    delete this->m_actDeleteRows;
+    delete this->m_actDeleteCols;
+    delete this->m_actInsertRows;
+    delete this->m_actInsertCols;
+    delete this->m_subMenuRowCol;
     delete this->m_popupMenu;
 }
 void ZSheet::mousePressEvent(QMouseEvent *event)
@@ -338,6 +369,54 @@ void ZSheet::ZSlotRemoveWidget()
         ZCell *newCell=new ZCell;
         newCell->ZSetCellWidgetType(ZCell::CellWidget_No);
         this->setItem(x-1,y-1,newCell);
+    }
+}
+void ZSheet::ZSlotMutexManager()
+{
+
+}
+void ZSheet::ZSlotDeleteRows()
+{
+    qint32 rowNo=this->currentRow();
+    if(rowNo!=-1)
+    {
+        if(QMessageBox::Ok==QMessageBox::question(this,tr("操作确认"),tr("您确认要删除该行吗?\n行号%1.").arg(rowNo+1),QMessageBox::Ok,QMessageBox::Cancel))
+        {
+            this->removeRow(rowNo);
+        }
+    }
+}
+void ZSheet::ZSlotDeleteCols()
+{
+    qint32 colNo=this->currentColumn();
+    if(colNo!=-1)
+    {
+        if(QMessageBox::Ok==QMessageBox::question(this,tr("操作确认"),tr("您确认要删除该列吗?\n列号%1.").arg(colNo+1),QMessageBox::Ok,QMessageBox::Cancel))
+        {
+            this->removeColumn(colNo);
+        }
+    }
+}
+void ZSheet::ZSlotInsertRows()
+{
+    qint32 rowNo=this->currentRow();
+    this->insertRow(rowNo);
+    for(qint32 i=0;i<this->columnCount();i++)
+    {
+        ZCell *tCell=new ZCell;
+        tCell->ZSetCellWidgetType(ZCell::CellWidget_No);
+        this->setItem(rowNo,i,tCell);
+    }
+}
+void ZSheet::ZSlotInsertCols()
+{
+    qint32 colNo=this->currentColumn();
+    this->insertColumn(colNo);
+    for(qint32 i=0;i<this->rowCount();i++)
+    {
+        ZCell *tCell=new ZCell;
+        tCell->ZSetCellWidgetType(ZCell::CellWidget_No);
+        this->setItem(i,colNo,tCell);
     }
 }
 //for print html.

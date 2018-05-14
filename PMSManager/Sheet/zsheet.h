@@ -63,6 +63,11 @@ private slots:
     void ZSlotSplit();
     void ZSlotFastRemoveWidget();
     void ZSlotRemoveWidget();
+    void ZSlotMutexManager();
+    void ZSlotDeleteRows();
+    void ZSlotDeleteCols();
+    void ZSlotInsertRows();
+    void ZSlotInsertCols();
 signals:
     void ZSignalSheetChanged(QString templateName);
     void ZSignalBindVar();
@@ -101,6 +106,15 @@ private:
 
     QAction *m_actFastRemoveWidget;
     QAction *m_actRemoveWidget;
+
+    QAction *m_actMutexManagr;
+
+    QMenu *m_subMenuRowCol;
+    QAction *m_actDeleteRows;
+    QAction *m_actDeleteCols;
+    QAction *m_actInsertRows;
+    QAction *m_actInsertCols;
+
 };
 
 

@@ -122,7 +122,7 @@ class ZProductLinePresetDialog:public QDialog
 {
     Q_OBJECT
 public:
-    ZProductLinePresetDialog(QWidget *parent=0);
+    ZProductLinePresetDialog(QString refTemplateName,QWidget *parent=0);
     ~ZProductLinePresetDialog();
 
     QStringList ZReadList();
@@ -136,6 +136,7 @@ private slots:
     void ZSlotReset();
     void ZSlotImport();
     void ZSlotExport();
+    void ZSlotClickFill();
 private:
     QListWidget *m_list;
     QToolButton *m_tbAdd;
@@ -143,8 +144,32 @@ private:
     QToolButton *m_tbReset;
     QToolButton *m_tbImport;
     QToolButton *m_tbExport;
+    QToolButton *m_tbClickFill;
     QVBoxLayout *m_vLayoutBtn;
     QHBoxLayout *m_hLayout;
+private:
+    QString m_refTemplateName;
+};
+class ZProductLinePresetDialogXYList:public QDialog
+{
+    Q_OBJECT
+public:
+    ZProductLinePresetDialogXYList(QString refTemplateName,QWidget *parent=0);
+    ~ZProductLinePresetDialogXYList();
+
+    void ZPutList(QStringList xyList);
+    QStringList ZGetList();
+private slots:
+    void ZSlotAdd();
+    void ZSlotDel();
+private:
+    QLabel *m_llNotes;
+    QListWidget *m_lstXY;
+    QToolButton *m_tbAdd;
+    QToolButton *m_tbDel;
+    QVBoxLayout *m_vLayoutBtn;
+    QHBoxLayout *m_hLayout;
+    QVBoxLayout *m_vLayoutMain;
 };
 ////////////////////////////////
 /// \brief The ZProductLinePresetDialog class

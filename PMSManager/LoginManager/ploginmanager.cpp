@@ -144,6 +144,8 @@ bool ZLoginPart::ZDoInit()
 
     connect(this->m_tbOkay,SIGNAL(clicked(bool)),this,SLOT(ZSlotOkay()));
     connect(this->m_tbCancel,SIGNAL(clicked(bool)),this,SLOT(ZSlotCancel()));
+
+    connect(this->m_lePassword,SIGNAL(returnPressed()),this,SLOT(ZSlotOkay()));
     return true;
 }
 ZLoginPart::~ZLoginPart()
@@ -244,6 +246,10 @@ ZLoginFailPart::ZLoginFailPart(QWidget *parent):QFrame(parent)
     this->setLayout(this->m_hLayout);
 
     connect(this->m_tbReturn,SIGNAL(clicked(bool)),this,SIGNAL(ZSignalReturn()));
+    this->m_tbReturn->setFocus();
+    this->m_tbReturn->setShortcut(QKeySequence::InsertParagraphSeparator);
+    this->m_tbReturn->setShortcut(Qt::Key_Enter);
+    this->m_tbReturn->setShortcut(Qt::Key_Return);
 }
 ZLoginFailPart::~ZLoginFailPart()
 {

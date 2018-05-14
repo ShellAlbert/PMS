@@ -40,15 +40,17 @@ QTreeView::item:selected:!active {
 
 /*checkbox样式设置*/
 QCheckBox::indicator {
-    width: 30px;
+    width: 20px;
     height: 20px;
 }
+/*
 QCheckBox::indicator::unchecked {
     image: url(:/common/images/common/checkbox-unchecked.png);
 }
 QCheckBox::indicator::checked {
     image: url(:/common/images/common/checkbox-checked.png);
 }
+*/
 
 /*menu样式设置*/
 QMenu{

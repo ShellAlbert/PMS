@@ -615,7 +615,7 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
     this->m_cbProuctLine->setEditable(true);
     this->m_cbProuctLine->setMinimumWidth(160);
     //载入生产线预置值供用户选择，减少操作键盘次数。
-    ZProductLinePresetDialog PLDia;
+    ZProductLinePresetDialog PLDia(this->m_refTemplate);
     QStringList lstPL=PLDia.ZReadList();
     for(qint32 i=0;i<lstPL.size();i++)
     {
@@ -938,12 +938,20 @@ void ZTaskWidget::ZSetTaskAuxData(QStringList auxData)
 {
     if(auxData.size()==4)
     {
-        this->m_cbProuctLine->setCurrentText(auxData.at(0));
+        QString lineNoMachineNo=auxData.at(0);
+        if(lineNoMachineNo.isEmpty())
+        {
+            //auto fill preset data @ load event.
+            lineNoMachineNo=MyUserInfo::ZGetInstance()->m_lineNoMachineNo;
+        }
+        this->m_cbProuctLine->setCurrentText(lineNoMachineNo);
         this->m_cbClass->setCurrentText(auxData.at(1));
         this->m_cbOrderNo->setCurrentText(auxData.at(2));
         this->m_cbProductNo->setCurrentText(auxData.at(3));
     }
 }
+
+
 void ZTaskWidget::ZSetGeVarBindCellEditable(bool bEditable)
 {
     for(qint32 i=0;i<this->m_geVarItem->childCount();i++)

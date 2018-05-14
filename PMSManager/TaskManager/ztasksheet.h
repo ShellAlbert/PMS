@@ -103,6 +103,8 @@ public:
     QStringList ZGetTaskAuxData();
     void ZSetTaskAuxData(QStringList auxData);
 
+    void ZSetAutoFill_At_Load_Event();
+
     void ZSetGeVarBindCellEditable(bool bEditable);
 
     QString ZGetTaskVarValueXmlData();

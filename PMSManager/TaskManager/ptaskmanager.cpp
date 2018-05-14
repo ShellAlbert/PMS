@@ -416,6 +416,7 @@ void PTaskManager::ZProcessAckNetFrm(QString item,QString cmd,QStringList paraLi
             auxList.append(orderNo);
             auxList.append(productNo);
             task->ZSetTaskAuxData(auxList);
+
             QString templateXmlData=QString(QByteArray::fromBase64(templatedata.toUtf8()));
             QString varSrcData=QString(QByteArray::fromBase64(varsrcdata.toUtf8()));
             task->m_sheet->ZSetTemplateXmlDataAndVarSourceXmlData(templateXmlData,varSrcData);
@@ -1199,10 +1200,20 @@ void PTaskManager::ZSlotAatchDetch()
 }
 void PTaskManager::ZSlotInputPreset()
 {
+    QString templateName;
+    if(this->m_tabWidget->currentIndex()!=0)
+    {
+        ZTaskWidget *task=qobject_cast<ZTaskWidget*>(this->m_tabWidget->currentWidget());
+        if(task!=NULL)
+        {
+            templateName=task->m_sheet->ZGetRefTemplateName();
+        }
+    }
+
     QAction *src=qobject_cast<QAction*>(this->sender());
     if(src==this->m_actProductLine)
     {
-        ZProductLinePresetDialog dia;
+        ZProductLinePresetDialog dia(templateName);
         dia.exec();
     }else if(src==this->m_actClass)
     {
@@ -1223,7 +1234,8 @@ void PTaskManager::ZSlotAdvancedFind()
     ZAdvancedFindDialog dia;
     dia.exec();
 }
-ZProductLinePresetDialog::ZProductLinePresetDialog(QWidget *parent):QDialog(parent)
+ZProductLinePresetDialog::ZProductLinePresetDialog(QString refTemplateName,QWidget *parent)
+    :m_refTemplateName(refTemplateName),QDialog(parent)
 {
     this->setWindowTitle(tr("生产线/机器号-输入预置列表"));
 
@@ -1252,12 +1264,18 @@ ZProductLinePresetDialog::ZProductLinePresetDialog(QWidget *parent):QDialog(pare
     this->m_tbExport->setIcon(QIcon(":/UserManager/images/UserManager/Export.png"));
     this->m_tbExport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
+    this->m_tbClickFill=new QToolButton;
+    this->m_tbClickFill->setText(tr("自动"));
+    this->m_tbClickFill->setIcon(QIcon(":/UserManager/images/UserManager/Export.png"));
+    this->m_tbClickFill->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
     this->m_vLayoutBtn=new QVBoxLayout;
     this->m_vLayoutBtn->addWidget(this->m_tbAdd);
     this->m_vLayoutBtn->addWidget(this->m_tbDel);
     this->m_vLayoutBtn->addWidget(this->m_tbReset);
     this->m_vLayoutBtn->addWidget(this->m_tbImport);
     this->m_vLayoutBtn->addWidget(this->m_tbExport);
+    this->m_vLayoutBtn->addWidget(this->m_tbClickFill);
     this->m_vLayoutBtn->addStretch(1);
     ///////////////////////////////////////
     this->m_list=new QListWidget;
@@ -1271,6 +1289,7 @@ ZProductLinePresetDialog::ZProductLinePresetDialog(QWidget *parent):QDialog(pare
     connect(this->m_tbReset,SIGNAL(clicked(bool)),this,SLOT(ZSlotReset()));
     connect(this->m_tbImport,SIGNAL(clicked(bool)),this,SLOT(ZSlotImport()));
     connect(this->m_tbExport,SIGNAL(clicked(bool)),this,SLOT(ZSlotExport()));
+    connect(this->m_tbClickFill,SIGNAL(clicked(bool)),this,SLOT(ZSlotClickFill()));
 
     //read exist file data.
     QStringList itemList=this->ZReadList();
@@ -1376,6 +1395,92 @@ void ZProductLinePresetDialog::ZSlotExport()
 {
 
 }
+void ZProductLinePresetDialog::ZSlotClickFill()
+{
+    if(this->m_refTemplateName.isEmpty())
+    {
+        return;
+    }
+    ZProductLinePresetDialogXYList xyListDia(this->m_refTemplateName);
+    xyListDia.exec();
+}
+ZProductLinePresetDialogXYList::ZProductLinePresetDialogXYList(QString refTemplateName,QWidget *parent):QDialog(parent)
+{
+    this->setWindowTitle(tr("自动填写单元格坐标列表"));
+    明天晚上从这里继续修改。
+    this->m_llNotes=new QLabel;
+    this->m_llNotes->setText(tr("当创建基于模板 <%1> 的任务时，单击以下单元格时，将在单元格中自动填写 <生产机/机器号>。").arg(refTemplateName));
+    this->m_lstXY=new QListWidget;
+    this->m_tbAdd=new QToolButton;
+    this->m_tbAdd->setText(tr("增加"));
+    this->m_tbAdd->setIcon(QIcon(":/common/images/common/add.png"));
+    this->m_tbAdd->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+    this->m_tbDel=new QToolButton;
+    this->m_tbDel->setText(tr("移除"));
+    this->m_tbDel->setIcon(QIcon(":/common/images/common/del.png"));
+    this->m_tbDel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    this->m_vLayoutBtn=new QVBoxLayout;
+    this->m_vLayoutBtn->addWidget(this->m_tbAdd);
+    this->m_vLayoutBtn->addWidget(this->m_tbDel);
+    this->m_vLayoutBtn->addStretch(1);
+
+    this->m_hLayout=new QHBoxLayout;
+    this->m_hLayout->addWidget(this->m_lstXY);
+    this->m_hLayout->addLayout(this->m_vLayoutBtn);
+
+    this->m_vLayoutMain=new QVBoxLayout;
+    this->m_vLayoutMain->addWidget(this->m_llNotes);
+    this->m_vLayoutMain->addLayout(this->m_hLayout);
+    this->setLayout(this->m_vLayoutMain);
+
+    connect(this->m_tbAdd,SIGNAL(clicked(bool)),this,SLOT(ZSlotAdd()));
+    connect(this->m_tbDel,SIGNAL(clicked(bool)),this,SLOT(ZSlotDel()));
+}
+ZProductLinePresetDialogXYList::~ZProductLinePresetDialogXYList()
+{
+    delete this->m_llNotes;
+    delete this->m_tbAdd;
+    delete this->m_tbDel;
+    delete this->m_vLayoutBtn;
+    delete this->m_lstXY;
+    delete this->m_hLayout;
+    delete this->m_vLayoutMain;
+}
+
+void ZProductLinePresetDialogXYList::ZPutList(QStringList xyList)
+{
+
+}
+QStringList ZProductLinePresetDialogXYList::ZGetList()
+{
+    QStringList xyList;
+    return xyList;
+}
+
+void ZProductLinePresetDialogXYList::ZSlotAdd()
+{
+    QString newXY=QInputDialog::getText(this,tr("新增项"),tr("请输入新项目：x,y"));
+    QStringList xyList=newXY.split(",");
+    if(xyList.size()!=2)
+    {
+        QMessageBox::critical(this,tr("错误"),tr("您输入格式不正确!"));
+        return;
+    }
+    this->m_lstXY->addItem(newXY);
+}
+void ZProductLinePresetDialogXYList::ZSlotDel()
+{
+    QListWidgetItem *item=this->m_lstXY->currentItem();
+    if(item)
+    {
+        this->m_lstXY->removeItemWidget(item);
+        delete item;
+    }
+}
+
+
+
 ////////////////////////////////////////////
 ZClassPresetDialog::ZClassPresetDialog(QWidget *parent):QDialog(parent)
 {

@@ -135,6 +135,11 @@ public:
             iniFile.setValue("ViewType","inner");
             iniFile.setValue("OutViewer","C:\\Foxit\\pdfview.exe");
             iniFile.endGroup();
+
+            //auto fill task sheet LineNo/MachineNo field @load event.
+            iniFile.beginGroup("AutoFill@Load");
+            iniFile.setValue("LineNoMachineNo","PMS2018");
+            iniFile.endGroup();
         }
         //read ini file.
         QSettings iniFile(iniFileName,QSettings::IniFormat);
@@ -147,6 +152,11 @@ public:
         iniFile.beginGroup("PDF");
         this->m_pdfViewType=iniFile.value("ViewType","inner").toString();
         this->m_outPdfViewer=iniFile.value("OutViewer","C:\\Foxit\\pdfview.exe").toString();
+        iniFile.endGroup();
+
+        //auto fill task sheet LineNo/MachineNo field @load event.
+        iniFile.beginGroup("AutoFill@Load");
+        this->m_lineNoMachineNo=iniFile.value("LineNoMachineNo","PMS2018").toString();
         iniFile.endGroup();
     }
     QString m_appVersion;
@@ -161,6 +171,9 @@ public:
 
     QString m_pdfViewType;
     QString m_outPdfViewer;
+
+    //auto fill task sheet LineNo/MachineNo field @load event.
+    QString m_lineNoMachineNo;
 
 public:
     bool m_bCheckNewVersion;

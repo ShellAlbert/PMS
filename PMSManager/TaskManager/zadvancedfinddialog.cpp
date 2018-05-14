@@ -115,7 +115,7 @@ ZAdvancedFindDialog::~ZAdvancedFindDialog()
 void ZAdvancedFindDialog::ZSlotLoadPresetValues()
 {
     //载入预置输入项，减少用户操作键盘。
-    ZProductLinePresetDialog PLDia;
+    ZProductLinePresetDialog PLDia("");
     QStringList lstPL=PLDia.ZReadList();
     for(qint32 i=0;i<lstPL.size();i++)
     {
