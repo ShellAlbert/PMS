@@ -9,6 +9,7 @@
 #include <QButtonGroup>
 #include <QToolButton>
 #include <QGridLayout>
+#include <QTreeWidget>
 #include "NetProtocol/pnetframe.h"
 #include "BasePart/zbaseinfodia.h"
 class ZUserInfoDia : public ZBaseInfoDia
@@ -19,6 +20,7 @@ public:
         Type_NewUser=0,
         Type_MdyUser=1,
         Type_DelUser=2,
+        Type_DelUserList=3,
     }UserInfoDiaType;
 
     ZUserInfoDia(UserInfoDiaType type,QWidget *parent=0);
@@ -41,6 +43,9 @@ public:
 
     QString ZGetMobile();
     void ZSetMobile(QString mobile);
+
+    void ZSetDelUserList(QString userName,QString roleName);
+    qint32 ZGetDelUserListCount();
 
     void ZParseAckNetFrmXmlData();
 private slots:
@@ -66,6 +71,8 @@ private:
 
     QLabel *m_lblMobile;
     QLineEdit *m_letMobile;
+
+    QTreeWidget *m_treeUserList;
 
     QToolButton *m_btnOkay;
     QToolButton *m_btnCancel;

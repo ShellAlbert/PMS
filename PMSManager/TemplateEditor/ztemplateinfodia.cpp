@@ -10,15 +10,23 @@ ZTemplateInfoDia::ZTemplateInfoDia(TemplateInfoDiaType type,QWidget *parent):ZBa
     this->m_llTemplateName=new QLabel(tr("模板名称"));
     this->m_leTempalteName=new QLineEdit;
     this->m_leTempalteName->setMaxLength(16);
+    connect(this->m_leTempalteName,SIGNAL(returnPressed()),this,SLOT(ZSlotOkay()));
+
+    this->m_llSaveAsTemplateName=new QLabel(tr("另存为名称"));
+    this->m_leSaveAsTempalteName=new QLineEdit;
+    this->m_leSaveAsTempalteName->setMaxLength(16);
+    connect(this->m_leSaveAsTempalteName,SIGNAL(returnPressed()),this,SLOT(ZSlotOkay()));
+
 
     this->m_llVarSourcName=new QLabel(tr("变量源名称"));
     this->m_leVarSourceName=new QLineEdit;
     this->m_leVarSourceName->setMaxLength(16);
+    connect(this->m_leVarSourceName,SIGNAL(returnPressed()),this,SLOT(ZSlotOkay()));
 
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("OKAY"));
+    this->m_tbOkay->setText(tr("确定"));
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("CANCEL"));
+    this->m_tbCancel->setText(tr("取消"));
     this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
     this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_tbCancel->setIcon(QIcon(":/common/images/common/cancel.png"));
@@ -79,6 +87,14 @@ ZTemplateInfoDia::ZTemplateInfoDia(TemplateInfoDiaType type,QWidget *parent):ZBa
         this->m_gridLayout->addWidget(this->m_llVarSourcName,1,0,1,1);
         this->m_gridLayout->addWidget(this->m_leVarSourceName,1,1,1,1);
         break;
+    case Type_SaveAsTemplate:
+        this->setWindowTitle(tr("模板另存为"));
+        this->m_llOpTips->setText(tr("该模板将会被全新复制一份。"));
+        this->m_gridLayout->addWidget(this->m_llTemplateName,0,0,1,1);
+        this->m_gridLayout->addWidget(this->m_leTempalteName,0,1,1,1);
+        this->m_gridLayout->addWidget(this->m_llSaveAsTemplateName,1,0,1,1);
+        this->m_gridLayout->addWidget(this->m_leSaveAsTempalteName,1,1,1,1);
+        break;
     default:
         break;
     }
@@ -98,6 +114,8 @@ ZTemplateInfoDia::~ZTemplateInfoDia()
 
     delete this->m_llTemplateName;
     delete this->m_leTempalteName;
+    delete this->m_llSaveAsTemplateName;
+    delete this->m_leSaveAsTempalteName;
     delete this->m_llVarSourcName;
     delete this->m_leVarSourceName;
     delete this->m_gridLayout;
@@ -116,6 +134,10 @@ QString ZTemplateInfoDia::ZGetTemplateName()
 {
     return this->m_leTempalteName->text().trimmed();
 }
+QString ZTemplateInfoDia::ZGetSaveAsTemplateName()
+{
+    return this->m_leSaveAsTempalteName->text().trimmed();
+}
 void ZTemplateInfoDia::ZSetTemplateXmlData(QString templateXmlDta)
 {
     this->m_templateXmlData=templateXmlDta;
@@ -130,7 +152,7 @@ QString ZTemplateInfoDia::ZGetVarSourceName()
 }
 void ZTemplateInfoDia::ZParseAckNetFrmXmlData()
 {
-    qDebug()<<"ZTemplateInfoDia::ParseAckNetFrm:"<<this->m_ackNetFrmXmlData;
+    //qDebug()<<"ZTemplateInfoDia::ParseAckNetFrm:"<<this->m_ackNetFrmXmlData;
 
     QXmlStreamReader tXmlReader(this->m_ackNetFrmXmlData);
     while(!tXmlReader.atEnd())
@@ -152,7 +174,7 @@ void ZTemplateInfoDia::ZParseAckNetFrmXmlData()
                     QString templateName=tXmlReader.readElementText();
                     QStringList paraList;
                     paraList.append(templateName);
-                    paraList.append(creator);                   
+                    paraList.append(creator);
                     paraList.append(createTime);
                     paraList.append(errMsg);
                     this->ZGetAckNetFrmProcessWidget()->ZProcessAckNetFrm("template","add",paraList,retCode);
@@ -195,6 +217,25 @@ void ZTemplateInfoDia::ZParseAckNetFrmXmlData()
                     paraList.append(fileSize);
                     paraList.append(errMsg);
                     this->ZGetAckNetFrmProcessWidget()->ZProcessAckNetFrm("template","save",paraList,retCode);
+                }else if(cmd=="saveas")
+                {
+                    QString fileSize=attr.value(QString("filesize")).toString();
+                    QString creator=attr.value(QString("creator")).toString();
+                    QString createTime=attr.value(QString("createTime")).toString();
+                    qint32 retCode=attr.value(QString("retCode")).toInt();
+                    QString errMsg=attr.value(QString("errMsg")).toString();
+                    QString templateName=tXmlReader.readElementText();
+                    QStringList paraList;
+                    paraList.append(templateName);
+                    if(retCode<0)
+                    {
+                        paraList.append(errMsg);
+                    }else{
+                        paraList.append(fileSize);
+                        paraList.append(creator);
+                        paraList.append(createTime);
+                    }
+                    this->ZGetAckNetFrmProcessWidget()->ZProcessAckNetFrm("template","saveas",paraList,retCode);
                 }else if(cmd=="bind")
                 {
                     QString varSource=attr.value(QString("varsource")).toString();
@@ -238,6 +279,13 @@ void ZTemplateInfoDia::ZSlotOkay()
         QMessageBox::critical(this,tr("错误提示"),tr("模板名称不能为空!"));
         return;
     }
+
+    if(this->m_leSaveAsTempalteName->text().trimmed().isEmpty() && Type_SaveAsTemplate==this->m_diaType)
+    {
+        QMessageBox::critical(this,tr("错误提示"),tr("另存为模板名称不能为空!"));
+        return;
+    }
+
     PNetFrame_Template *netFrm=new PNetFrame_Template;
     switch(this->m_diaType)
     {
@@ -264,6 +312,10 @@ void ZTemplateInfoDia::ZSlotOkay()
     case Type_UnbindVarSource:
         netFrm->ZUnbindVarSource(this->ZGetTemplateName(),this->ZGetVarSourceName());
         this->m_waitDia->ZSetTipsMsg(tr("正在解除绑定变量源[%1]从模板[%2]").arg(this->ZGetVarSourceName()).arg(this->ZGetTemplateName()));
+        break;
+    case Type_SaveAsTemplate:
+        netFrm->ZSaveAsTemplate(this->ZGetSaveAsTemplateName(),this->m_templateXmlData);
+        this->m_waitDia->ZSetTipsMsg(tr("正在另存为新的模板[%1]").arg(this->ZGetSaveAsTemplateName()));
         break;
     default:
         break;

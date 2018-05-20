@@ -16,6 +16,7 @@ public:
         Type_SaveTemplate=3,
         Type_BindVarSource=4,
         Type_UnbindVarSource=5,
+        Type_SaveAsTemplate=6,
     }TemplateInfoDiaType;
     ZTemplateInfoDia(TemplateInfoDiaType type,QWidget *parent=0);
     ~ZTemplateInfoDia();
@@ -23,6 +24,8 @@ public:
     void ZSetTemplateName(QString name);
     QString ZGetTemplateName();
     void ZSetTemplateXmlData(QString templateXmlDta);
+
+    QString ZGetSaveAsTemplateName();
 
     void ZSetVarSourceName(QString name);
     QString ZGetVarSourceName();
@@ -36,6 +39,8 @@ private:
 
     QLabel *m_llTemplateName;
     QLineEdit *m_leTempalteName;
+    QLabel *m_llSaveAsTemplateName;
+    QLineEdit *m_leSaveAsTempalteName;
     QLabel *m_llVarSourcName;
     QLineEdit *m_leVarSourceName;
     QGridLayout *m_gridLayout;

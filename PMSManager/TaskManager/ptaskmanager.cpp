@@ -1407,7 +1407,7 @@ void ZProductLinePresetDialog::ZSlotClickFill()
 ZProductLinePresetDialogXYList::ZProductLinePresetDialogXYList(QString refTemplateName,QWidget *parent):QDialog(parent)
 {
     this->setWindowTitle(tr("自动填写单元格坐标列表"));
-    明天晚上从这里继续修改。
+    //明天晚上从这里继续修改。
     this->m_llNotes=new QLabel;
     this->m_llNotes->setText(tr("当创建基于模板 <%1> 的任务时，单击以下单元格时，将在单元格中自动填写 <生产机/机器号>。").arg(refTemplateName));
     this->m_lstXY=new QListWidget;

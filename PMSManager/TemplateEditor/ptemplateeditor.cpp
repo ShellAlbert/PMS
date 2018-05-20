@@ -667,6 +667,29 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                     }
                 }
             }
+        }else if(cmd=="saveas")
+        {
+            QString templateName=paraList.at(0);
+            if(ackNetRetCode<0)
+            {
+                QString errMsg=paraList.at(1);
+                this->ZAddLogMsg(tr("save as template [%1] failed:[%2].").arg(templateName).arg(errMsg));
+            }else{
+                QString fileSize=paraList.at(1);
+                QString creator=paraList.at(2);
+                QString createTime=paraList.at(3);
+
+                this->ZAddLogMsg(tr("save as template [%1] success.").arg(templateName));
+                QTreeWidgetItem *templateItem=new QTreeWidgetItem(0);//type=0 is template.type=1 is step.
+                templateItem->setIcon(0,QIcon(":/TemplateEditor/images/TemplateEditor/Template.png"));
+                templateItem->setText(0,templateName);//templateName.
+                templateItem->setText(1,QString(""));//bindVarSource.
+                templateItem->setText(2,fileSize);//template xml file size.
+                templateItem->setText(3,creator);
+                templateItem->setText(4,createTime);
+                this->m_templateWidget->m_treeWidget->addTopLevelItem(templateItem);
+                this->m_templateWidget->m_treeWidget->setCurrentItem(templateItem);
+            }
         }else if(cmd=="list")
         {
             QString templateName=paraList.at(0);
@@ -874,6 +897,9 @@ void PTemplateEditor::ZSlotNewTemplate()
     if(dia->exec()==QDialog::Accepted)
     {
         dia->ZShowWaitingDialog();
+    }else{
+        delete dia;
+        dia=NULL;
     }
 }
 void PTemplateEditor::ZSlotOpenTemplate()
@@ -918,12 +944,33 @@ void PTemplateEditor::ZSlotSaveTemplate()
         if(dia->exec()==QDialog::Accepted)
         {
             dia->ZShowWaitingDialog();
+        }else{
+            delete dia;
+            dia=NULL;
         }
     }
 }
 void PTemplateEditor::ZSlotSaveAsTemplate()
 {
-
+    if(this->m_tabWidget->currentIndex()==0)
+    {
+        //bypass tab0.
+    }
+    ZSheetWidget *sheetWidget=qobject_cast<ZSheetWidget*>(this->m_tabWidget->currentWidget());
+    if(sheetWidget)
+    {
+        ZTemplateInfoDia *dia=new ZTemplateInfoDia(ZTemplateInfoDia::Type_SaveAsTemplate,this);
+        dia->ZSetAckNetFrmProcessWidget(this);
+        dia->ZSetTemplateName(sheetWidget->m_sheet->ZGetTemplateName());
+        dia->ZSetTemplateXmlData(sheetWidget->ZGetTemplateXmlData());
+        if(dia->exec()==QDialog::Accepted)
+        {
+            dia->ZShowWaitingDialog();
+        }else{
+            delete dia;
+            dia=NULL;
+        }
+    }
 }
 void PTemplateEditor::ZSlotDelTemplate()
 {

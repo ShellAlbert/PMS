@@ -132,6 +132,9 @@ public:
     ZGrpInfoDia(GrpInfoDiaType type,QWidget *parent=0);
     ~ZGrpInfoDia();
 
+    QString ZGetParentName();
+    void ZSetParentName(QString name);
+
     QString ZGetGrpName();
     void ZSetGrpName(QString name);
 
@@ -146,7 +149,13 @@ private slots:
     void ZSlotOkay();
     void ZSlotCancel();
     void ZSlotShowParts(qint32 index);
+protected:
+    QSize sizeHint() const;
 private:
+
+    QLabel *m_lblParentName;
+    QLineEdit *m_letParentName;
+
     QLabel *m_lblGrpName;
     QLineEdit *m_letGrpName;
 

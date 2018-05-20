@@ -50,7 +50,7 @@ public:
 class PNetFrame_Role:public PNetFrame
 {
 public:
-    void ZAddRole(QString roleName,QString permBits,QString roleMemo);
+    void ZAddRole(QString roleName,QString parentName,QString permBits,QString roleMemo);
     void ZMdyRole(QString roleName,QString permBits,QString roleMemo);
     void ZDelRole(QString roleName);
     void ZGetRole(QString roleName);
@@ -62,6 +62,7 @@ public:
     void ZAddUser(QString userName,QString realName,QString roleName,QString password,QString sex,QString mobile);
     void ZMdyUser(QString userName,QString realName,QString roleName,QString password,QString sex,QString mobile);
     void ZDelUser(QString userName,QString roleName);
+    void ZDelUserList(QStringList userNameRoleNameList);
     void ZGetUser(QString userName);
 };
 class PNetFrame_Folder:public PNetFrame
@@ -110,6 +111,7 @@ public:
     void ZDelTemplate(QString templateName);
     void ZGetTemplate(QString templateName);
     void ZSaveTemplate(QString templateName,QString templateXmlData);
+    void ZSaveAsTemplate(QString templateName,QString templateXmlData);
     void ZBindVarSource(QString templateName,QString varSourceName);
     void ZUnbindVarSource(QString templateName,QString varSourceName);
     void ZListTemplate();

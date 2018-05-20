@@ -489,8 +489,13 @@ ZGrpInfoDia::ZGrpInfoDia(GrpInfoDiaType type,QWidget *parent):ZBaseInfoDia(ZBase
     this->setMinimumSize(500,300);
     this->setStyleSheet("QDialog{background-color:#cce5f9;}");
 
+    this->m_lblParentName=new QLabel(tr("父角色名称"));
+    this->m_letParentName=new QLineEdit;
+    this->m_letParentName->setFocusPolicy(Qt::NoFocus);
+
     this->m_lblGrpName=new QLabel(tr("角色名称"));
     this->m_letGrpName=new QLineEdit;
+    connect(this->m_letGrpName,SIGNAL(returnPressed()),this,SLOT(ZSlotOkay()));
 
     this->m_listWidget=new QListWidget;
     this->m_listWidget->setMinimumSize(150,100);
@@ -554,17 +559,21 @@ ZGrpInfoDia::ZGrpInfoDia(GrpInfoDiaType type,QWidget *parent):ZBaseInfoDia(ZBase
     this->m_btnCancel->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     this->m_gridLayout=new QGridLayout;
-    this->m_gridLayout->addWidget(this->m_lblGrpName,0,0,1,1);
-    this->m_gridLayout->addWidget(this->m_letGrpName,0,1,1,1);
 
-    this->m_gridLayout->addWidget(this->m_listWidget,1,0,1,1);
-    this->m_gridLayout->addWidget(this->m_stackedWidget,1,1,1,1);
+    this->m_gridLayout->addWidget(this->m_lblParentName,0,0,1,1);
+    this->m_gridLayout->addWidget(this->m_letParentName,0,1,1,1);
 
-    this->m_gridLayout->addWidget(this->m_lblGrpMemo,2,0,1,2);
-    this->m_gridLayout->addWidget(this->m_tetGrpMemo,3,0,1,2);
+    this->m_gridLayout->addWidget(this->m_lblGrpName,1,0,1,1);
+    this->m_gridLayout->addWidget(this->m_letGrpName,1,1,1,1);
 
-    this->m_gridLayout->addWidget(this->m_btnOKay,4,0,1,1);
-    this->m_gridLayout->addWidget(this->m_btnCancel,4,1,1,1);
+    this->m_gridLayout->addWidget(this->m_listWidget,2,0,1,1);
+    this->m_gridLayout->addWidget(this->m_stackedWidget,2,1,1,1);
+
+    this->m_gridLayout->addWidget(this->m_lblGrpMemo,3,0,1,2);
+    this->m_gridLayout->addWidget(this->m_tetGrpMemo,4,0,1,2);
+
+    this->m_gridLayout->addWidget(this->m_btnOKay,5,0,1,1);
+    this->m_gridLayout->addWidget(this->m_btnCancel,5,1,1,1);
     this->setLayout(this->m_gridLayout);
 
     connect(this->m_btnOKay,SIGNAL(clicked(bool)),this,SLOT(ZSlotOkay()));
@@ -592,6 +601,9 @@ ZGrpInfoDia::ZGrpInfoDia(GrpInfoDiaType type,QWidget *parent):ZBaseInfoDia(ZBase
 }
 ZGrpInfoDia::~ZGrpInfoDia()
 {
+    delete this->m_lblParentName;
+    delete this->m_letParentName;
+
     delete this->m_lblGrpName;
     delete this->m_letGrpName;
 
@@ -611,6 +623,10 @@ ZGrpInfoDia::~ZGrpInfoDia()
     delete this->m_btnCancel;
 
     delete this->m_gridLayout;
+}
+QSize ZGrpInfoDia::sizeHint() const
+{
+    return QSize(400,600);
 }
 void ZGrpInfoDia::ZParseAckNetFrmXmlData()
 {
@@ -638,10 +654,12 @@ void ZGrpInfoDia::ZParseAckNetFrmXmlData()
                         QString errMsg=attr.value(QString("errMsg")).toString();
                         paraList.append(errMsg);
                     }else{
+                        QString parentName=attr.value(QString("parentName")).toString();
                         QString permBits=attr.value(QString("permBits")).toString();
                         QString roleMemo=attr.value(QString("memo")).toString();
                         QString creator=attr.value(QString("creator")).toString();
                         QString createTime=attr.value(QString("createTime")).toString();
+                        paraList.append(parentName);
                         paraList.append(permBits);
                         paraList.append(roleMemo);
                         paraList.append(creator);
@@ -702,7 +720,7 @@ void ZGrpInfoDia::ZSlotOkay()
     switch(this->m_diaType)
     {
     case Type_NewGrp:
-        netFrm->ZAddRole(this->ZGetGrpName(),this->ZGetPermBits(),this->ZGetGrpMemo());
+        netFrm->ZAddRole(this->ZGetGrpName(),this->ZGetParentName(),this->ZGetPermBits(),this->ZGetGrpMemo());
         this->m_waitDia->ZSetTipsMsg(tr("正在添加新角色[%1]").arg(this->ZGetGrpName()));
         break;
     case Type_MdyGrp:
@@ -752,6 +770,14 @@ void ZGrpInfoDia::ZSlotShowParts(qint32 index)
     default:
         break;
     }
+}
+QString ZGrpInfoDia::ZGetParentName()
+{
+    return this->m_letParentName->text();
+}
+void ZGrpInfoDia::ZSetParentName(QString name)
+{
+    this->m_letParentName->setText(name);
 }
 QString ZGrpInfoDia::ZGetGrpName()
 {

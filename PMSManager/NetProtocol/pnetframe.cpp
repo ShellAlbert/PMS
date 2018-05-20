@@ -149,7 +149,7 @@ void PNetFrame_Role::ZListRole()
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
 }
-void PNetFrame_Role::ZAddRole(QString roleName,QString permBits,QString roleMemo)
+void PNetFrame_Role::ZAddRole(QString roleName,QString parentName,QString permBits,QString roleMemo)
 {
     QXmlStreamWriter  tXmlWriter(&this->m_frmXmlData);
     tXmlWriter.setAutoFormatting(true);
@@ -158,6 +158,7 @@ void PNetFrame_Role::ZAddRole(QString roleName,QString permBits,QString roleMemo
     tXmlWriter.writeAttribute(QString("dest"),QString("Role"));
     tXmlWriter.writeStartElement(QString("Role"));
     tXmlWriter.writeAttribute(QString("cmd"),QString("add"));
+    tXmlWriter.writeAttribute(QString("parentName"),parentName);
     tXmlWriter.writeAttribute(QString("permBits"),permBits);
     tXmlWriter.writeAttribute(QString("memo"),roleMemo);
     tXmlWriter.writeAttribute(QString("creator"),MyUserInfo::ZGetInstance()->m_UserInfo.m_userName);
@@ -262,6 +263,25 @@ void PNetFrame_User::ZDelUser(QString userName,QString roleName)
     tXmlWriter.writeAttribute(QString("cmd"),QString("del"));
     tXmlWriter.writeAttribute(QString("roleName"),roleName);
     tXmlWriter.writeCharacters(userName);
+    tXmlWriter.writeEndElement();//User.
+    tXmlWriter.writeEndElement();//NetPro
+    tXmlWriter.writeEndDocument();
+}
+void PNetFrame_User::ZDelUserList(QStringList userNameRoleNameList)
+{
+    QString userNameSet;
+    for(qint32 i=0;i<userNameRoleNameList.size();i++)
+    {
+        userNameSet.append(userNameRoleNameList.at(i)+"%%%");
+    }
+    QXmlStreamWriter  tXmlWriter(&this->m_frmXmlData);
+    tXmlWriter.setAutoFormatting(true);
+    tXmlWriter.writeStartDocument();
+    tXmlWriter.writeStartElement(QString("NetPro"));
+    tXmlWriter.writeAttribute(QString("dest"),QString("User"));
+    tXmlWriter.writeStartElement(QString("User"));
+    tXmlWriter.writeAttribute(QString("cmd"),QString("dellist"));
+    tXmlWriter.writeCharacters(userNameSet);
     tXmlWriter.writeEndElement();//User.
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
@@ -526,6 +546,22 @@ void PNetFrame_Template::ZSaveTemplate(QString templateName,QString templateXmlD
     tXmlWriter.writeAttribute(QString("dest"),QString("Template"));
     tXmlWriter.writeStartElement(QString("Template"));
     tXmlWriter.writeAttribute(QString("cmd"),QString("save"));
+    tXmlWriter.writeAttribute(QString("data"),QString(templateXmlData.toUtf8().toBase64()));
+    tXmlWriter.writeAttribute(QString("creator"),MyUserInfo::ZGetInstance()->m_UserInfo.m_userName);
+    tXmlWriter.writeCharacters(templateName);
+    tXmlWriter.writeEndElement();//Template.
+    tXmlWriter.writeEndElement();//NetPro.
+    tXmlWriter.writeEndDocument();
+}
+void PNetFrame_Template::ZSaveAsTemplate(QString templateName,QString templateXmlData)
+{
+    QXmlStreamWriter  tXmlWriter(&this->m_frmXmlData);
+    tXmlWriter.setAutoFormatting(true);
+    tXmlWriter.writeStartDocument();
+    tXmlWriter.writeStartElement(QString("NetPro"));
+    tXmlWriter.writeAttribute(QString("dest"),QString("Template"));
+    tXmlWriter.writeStartElement(QString("Template"));
+    tXmlWriter.writeAttribute(QString("cmd"),QString("saveas"));
     tXmlWriter.writeAttribute(QString("data"),QString(templateXmlData.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("creator"),MyUserInfo::ZGetInstance()->m_UserInfo.m_userName);
     tXmlWriter.writeCharacters(templateName);

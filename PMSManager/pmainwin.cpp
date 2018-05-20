@@ -84,37 +84,37 @@ ZShowUserInfoDia::ZShowUserInfoDia(QWidget *parent):QDialog(parent)
     this->setWindowTitle(tr("用户信息"));
     this->m_llUserName=new QLabel(tr("用户名:"));
     this->m_leUserName=new QLineEdit;
-    this->m_leUserName->setEnabled(false);
     this->m_leUserName->setText(MyUserInfo::ZGetInstance()->m_UserInfo.m_userName);
+    this->m_leUserName->setFocusPolicy(Qt::NoFocus);
 
     this->m_llRealName=new QLabel(tr("真实姓名:"));
     this->m_leRealName=new QLineEdit;
-    this->m_leRealName->setEnabled(false);
     this->m_leRealName->setText(MyUserInfo::ZGetInstance()->m_UserInfo.m_realName);
+    this->m_leRealName->setFocusPolicy(Qt::NoFocus);
 
     this->m_llSex=new QLabel(tr("性别:"));
     this->m_leSex=new QLineEdit;
-    this->m_leSex->setEnabled(false);
     this->m_leSex->setText(MyUserInfo::ZGetInstance()->m_UserInfo.m_sex);
+    this->m_leSex->setFocusPolicy(Qt::NoFocus);
 
     this->m_llRoleName=new QLabel(tr("所属角色:"));
     this->m_leRoleName=new QLineEdit;
-    this->m_leRoleName->setEnabled(false);
     this->m_leRoleName->setText(MyUserInfo::ZGetInstance()->m_UserInfo.m_roleName);
-
+    this->m_leRoleName->setFocusPolicy(Qt::NoFocus);
 
     this->m_llCreator=new QLabel(tr("创建者:"));
     this->m_leCreator=new QLineEdit;
     this->m_leCreator->setEnabled(false);
     this->m_leCreator->setText(MyUserInfo::ZGetInstance()->m_UserInfo.m_Creator);
+    this->m_leCreator->setFocusPolicy(Qt::NoFocus);
 
     this->m_llCreateTime=new QLabel(tr("创建时间:"));
     this->m_leCreateTime=new QLineEdit;
-    this->m_leCreateTime->setEnabled(false);
     this->m_leCreateTime->setText(MyUserInfo::ZGetInstance()->m_UserInfo.m_CreateTime);
+    this->m_leCreateTime->setFocusPolicy(Qt::NoFocus);
 
     this->m_tbClose=new QToolButton;
-    this->m_tbClose->setText(tr("Close"));
+    this->m_tbClose->setText(tr("确认"));
     connect(this->m_tbClose,SIGNAL(clicked(bool)),this,SLOT(accept()));
 
     this->m_gridLayout=new QGridLayout;

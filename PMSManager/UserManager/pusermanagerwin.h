@@ -37,6 +37,17 @@ private slots:
     void ZSlotAddUser();
     void ZSlotMdyUser();
     void ZSlotDelUser();
+    void ZSlotBatchSelectAll();
+    void ZSlotBatchUnSelectAll();
+    void ZSlotBatchDelUser();
+    void ZSlotExpandIn();
+    void ZSlotExpandOut();
+
+    void ZSlotImport();
+    void ZSlotExport();
+    void ZSlotSelectAll();
+    void ZSlotUnSelectAll();
+
     void ZSlotExpand();
     void ZSlotImportXML();
     void ZSlotImportExcel();
@@ -64,6 +75,9 @@ private:
     QAction *m_actAddUser;
     QAction *m_actMdyUser;
     QAction *m_actDelUser;
+    QAction *m_actBatchSelectAll;
+    QAction *m_actBatchUnSelectAll;
+    QAction *m_actBatchDelUser;
 
     QToolButton *m_btnDisplay;
     QMenu *m_menuDisplay;
@@ -101,6 +115,8 @@ private:
         QString roleMemo;
     }RolePrivateData;
     QMap<QString,RolePrivateData> m_roleMap;
+
+    QMap<QString,QTreeWidgetItem*> m_roleTreeItemMap;
 };
 
 #endif // PUSERMANAGERWIN_H

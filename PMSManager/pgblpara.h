@@ -77,6 +77,7 @@ class ZRoleInfo
 {
 public:
     QString m_roleName;
+    QString m_parentName;
     qint32 m_userManagerPerm;
     qint32 m_templateEditPerm;
     qint32 m_fileManagerPerm;

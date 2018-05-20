@@ -56,6 +56,7 @@ void ZListRoleUserInfoDia::ZParseAckNetFrmXmlData()
                     QString item=attr.value(QString("item")).toString();
                     if(item=="role")
                     {
+                        QString parentName=attr.value(QString("parentName")).toString();
                         QString permBits=attr.value(QString("permBits")).toString();
                         QString roleMemo=attr.value(QString("roleMemo")).toString();
                         QString creator=attr.value(QString("creator")).toString();
@@ -63,6 +64,7 @@ void ZListRoleUserInfoDia::ZParseAckNetFrmXmlData()
                         QString roleName=tXmlReader.readElementText();
                         QStringList paraList;
                         paraList.append(roleName);
+                        paraList.append(parentName);
                         paraList.append(permBits);
                         paraList.append(roleMemo);
                         paraList.append(creator);

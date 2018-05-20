@@ -137,8 +137,19 @@ PUserManagerWin::PUserManagerWin()
         this->m_actDelUser=new QAction(QIcon(":/UserManager/images/UserManager/DelUser.png"),tr("删除用户"));
         this->m_menuUsr->addAction(this->m_actDelUser);
         connect(this->m_actDelUser,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelUser()));
-    }
 
+        this->m_actBatchSelectAll=new QAction(QIcon(":/UserManager/images/UserManager/DelUser.png"),tr("全部选择"));
+        this->m_menuUsr->addAction(this->m_actBatchSelectAll);
+        connect(this->m_actBatchSelectAll,SIGNAL(triggered(bool)),this,SLOT(ZSlotBatchSelectAll()));
+
+        this->m_actBatchUnSelectAll=new QAction(QIcon(":/UserManager/images/UserManager/DelUser.png"),tr("取消全选"));
+        this->m_menuUsr->addAction(this->m_actBatchUnSelectAll);
+        connect(this->m_actBatchUnSelectAll,SIGNAL(triggered(bool)),this,SLOT(ZSlotBatchUnSelectAll()));
+
+        this->m_actBatchDelUser=new QAction(QIcon(":/UserManager/images/UserManager/DelUser.png"),tr("批量删除"));
+        this->m_menuUsr->addAction(this->m_actBatchDelUser);
+        connect(this->m_actBatchDelUser,SIGNAL(triggered(bool)),this,SLOT(ZSlotBatchDelUser()));
+    }
 
     this->m_btnDisplay=new QToolButton;
     this->m_btnDisplay->setToolTip(tr("显示功能"));
@@ -265,6 +276,9 @@ PUserManagerWin::~PUserManagerWin()
     if(MyUserInfo::ZGetInstance()->m_RoleInfo.m_userManagerPerm&PermBits_UserManager_DelUser)
     {
         delete this->m_actDelUser;
+        delete this->m_actBatchSelectAll;
+        delete this->m_actBatchUnSelectAll;
+        delete this->m_actBatchDelUser;
     }
     delete this->m_menuUsr;
     delete this->m_btnUsrOp;
@@ -317,18 +331,41 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 this->ZAddLogMsg(tr("add role [%1] failed:[%2].").arg(roleName).arg(errMsg));
             }else{
                 QString roleName=paraList.at(0);
-                QString permBits=paraList.at(1);
-                QString roleMemo=paraList.at(2);
-                QString creator=paraList.at(3);
-                QString createTime=paraList.at(4);
-                QTreeWidgetItem *roleItem=new QTreeWidgetItem(0);//type=0 is role.type=1 is user.
-                roleItem->setIcon(0,QIcon(":/UserManager/images/UserManager/MdyGrp.png"));
-                roleItem->setText(0,roleName);
-                roleItem->setText(4,creator);
-                roleItem->setIcon(5,QIcon(":/common/images/common/Calendar.png"));
-                roleItem->setText(5,createTime);
-                this->m_treeWidget->addTopLevelItem(roleItem);
-                this->m_treeWidget->setCurrentItem(roleItem);
+                QString parentName=paraList.at(1);
+                QString permBits=paraList.at(2);
+                QString roleMemo=paraList.at(3);
+                QString creator=paraList.at(4);
+                QString createTime=paraList.at(5);
+                if(parentName.isEmpty())
+                {
+                    QTreeWidgetItem *roleItem=new QTreeWidgetItem(0);//type=0 is role.type=1 is user.
+                    roleItem->setIcon(0,QIcon(":/UserManager/images/UserManager/MdyGrp.png"));
+                    roleItem->setText(0,roleName);
+                    roleItem->setText(4,creator);
+                    roleItem->setIcon(5,QIcon(":/common/images/common/Calendar.png"));
+                    roleItem->setText(5,createTime);
+                    this->m_treeWidget->addTopLevelItem(roleItem);
+                    this->m_treeWidget->setCurrentItem(roleItem);
+
+                    //add to map.
+                    this->m_roleTreeItemMap.insert(roleName,roleItem);
+                }else{
+                    if(this->m_roleTreeItemMap.contains(parentName))
+                    {
+                        QTreeWidgetItem *parentItem=this->m_roleTreeItemMap.value(parentName);
+                        QTreeWidgetItem *childItem=new QTreeWidgetItem(0);//type=0,role: type=1,user.
+                        childItem->setIcon(0,QIcon(":/UserManager/images/UserManager/MdyGrp.png"));
+                        childItem->setText(0,roleName);
+                        childItem->setText(4,creator);
+                        childItem->setIcon(5,QIcon(":/common/images/common/Calendar.png"));
+                        childItem->setText(5,createTime);
+                        parentItem->addChild(childItem);
+                        this->m_treeWidget->setCurrentItem(childItem);
+                        //add to map.
+                        this->m_roleTreeItemMap.insert(roleName,childItem);
+                    }
+                }
+
                 //save role private data in roleMap.
                 if(!this->m_roleMap.contains(roleName))
                 {
@@ -373,15 +410,12 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 //remove role from roleMap.
                 this->m_roleMap.remove(roleName);
                 //delete roleItem from treeWidget.
-                for(qint32 i=0;i<this->m_treeWidget->topLevelItemCount();i++)
+                if(this->m_roleTreeItemMap.contains(roleName))
                 {
-                    QTreeWidgetItem *roleItem=this->m_treeWidget->topLevelItem(i);
-                    if(roleItem->type()==0 && roleItem->text(0)==roleName)
-                    {
-                        this->m_treeWidget->takeTopLevelItem(i);
-                        delete roleItem;
-                        roleItem=NULL;
-                    }
+                    QTreeWidgetItem *item=this->m_roleTreeItemMap.value(roleName);
+                    this->m_roleTreeItemMap.remove(roleName);
+                    delete item;
+                    item=NULL;
                 }
                 this->ZAddLogMsg(tr("delete role [%1] success.").arg(roleName));
                 //update the summary info.
@@ -390,19 +424,42 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
         }else if(cmd=="list")
         {
             QString roleName=paraList.at(0);
-            QString permBits=paraList.at(1);
-            QString roleMemo=paraList.at(2);
-            QString creator=paraList.at(3);
-            QString createTime=paraList.at(4);
+            QString parentName=paraList.at(1);
+            QString permBits=paraList.at(2);
+            QString roleMemo=paraList.at(3);
+            QString creator=paraList.at(4);
+            QString createTime=paraList.at(5);
 
-            QTreeWidgetItem *roleItem=new QTreeWidgetItem(0);//type=0 is role.type=1 is user.
-            roleItem->setIcon(0,QIcon(":/UserManager/images/UserManager/MdyGrp.png"));
-            roleItem->setText(0,roleName);
-            roleItem->setText(4,creator);
-            roleItem->setText(5,createTime);
-            roleItem->setIcon(5,QIcon(":/common/images/common/Calendar.png"));
-            this->m_treeWidget->addTopLevelItem(roleItem);
-            this->m_treeWidget->setCurrentItem(roleItem);
+            if(parentName.isEmpty())
+            {
+                QTreeWidgetItem *roleItem=new QTreeWidgetItem(0);//type=0 is role.type=1 is user.
+                roleItem->setIcon(0,QIcon(":/UserManager/images/UserManager/MdyGrp.png"));
+                roleItem->setText(0,roleName);
+                roleItem->setText(4,creator);
+                roleItem->setText(5,createTime);
+                roleItem->setIcon(5,QIcon(":/common/images/common/Calendar.png"));
+                this->m_treeWidget->addTopLevelItem(roleItem);
+                this->m_treeWidget->setCurrentItem(roleItem);
+
+                //add to map.
+                this->m_roleTreeItemMap.insert(roleName,roleItem);
+            }else{
+                if(this->m_roleTreeItemMap.contains(parentName))
+                {
+                    QTreeWidgetItem *parentItem=this->m_roleTreeItemMap.value(parentName);
+                    QTreeWidgetItem *childItem=new QTreeWidgetItem(0);//type=0 is role.type=1 is user.
+                    childItem->setIcon(0,QIcon(":/UserManager/images/UserManager/MdyGrp.png"));
+                    childItem->setText(0,roleName);
+                    childItem->setText(4,creator);
+                    childItem->setText(5,createTime);
+                    childItem->setIcon(5,QIcon(":/common/images/common/Calendar.png"));
+                    parentItem->addChild(childItem);
+                    this->m_treeWidget->setCurrentItem(childItem);
+                    //add to map.
+                    this->m_roleTreeItemMap.insert(roleName,childItem);
+                }
+            }
+
             //save role private data in roleMap.
             if(!this->m_roleMap.contains(roleName))
             {
@@ -441,26 +498,24 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 if(sex=="female")
                 {
                     userItem->setIcon(2,QIcon(":/UserManager/images/UserManager/female.png"));
+                    userItem->setText(2,tr("女"));
                 }else if(sex=="male")
                 {
                     userItem->setIcon(2,QIcon(":/UserManager/images/UserManager/male.png"));
+                    userItem->setText(2,tr("男"));
                 }
-                userItem->setText(2,sex);
                 userItem->setIcon(3,QIcon(":/UserManager/images/UserManager/mobile.png"));
                 userItem->setText(3,mobile);
                 userItem->setText(4,creator);
                 userItem->setIcon(5,QIcon(":/common/images/common/Calendar.png"));
                 userItem->setText(5,createTime);
-                //add userItem to specify roleItem.
-                for(qint32 i=0;i<this->m_treeWidget->topLevelItemCount();i++)
+                //used to delete with multiple selection.
+                userItem->setCheckState(0,Qt::Unchecked);
+                //add to role item.
+                if(this->m_roleTreeItemMap.contains(roleName))
                 {
-                    QTreeWidgetItem *roleItem=this->m_treeWidget->topLevelItem(i);
-                    if(roleItem->text(0)==roleName)
-                    {
-                        roleItem->addChild(userItem);
-                        this->m_treeWidget->setCurrentItem(userItem);
-                        break;
-                    }
+                    QTreeWidgetItem *roleItem=this->m_roleTreeItemMap.value(roleName);
+                    roleItem->addChild(userItem);
                 }
                 this->ZAddLogMsg(tr("add user [%1] to role [%2] success.").arg(userName).arg(roleName));
                 //update the summary info.
@@ -482,36 +537,20 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 QString password=paraList.at(5);
                 QString creator=paraList.at(6);
 
-                //find userItem and change its value.
-                QTreeWidgetItem *userItem=new QTreeWidgetItem(1);//type=0 is role.type=1 is user.
-                userItem->setText(0,userName);
-                userItem->setText(1,realName);
-                userItem->setText(2,sex);
-                userItem->setText(3,mobile);
-                userItem->setText(4,creator);
-                for(qint32 i=0;i<this->m_treeWidget->topLevelItemCount();i++)
+                if(this->m_roleTreeItemMap.contains(roleName))
                 {
-                    bool bUpdateOk=false;
-                    QTreeWidgetItem *roleItem=this->m_treeWidget->topLevelItem(i);
-                    if(roleItem->text(0)==roleName)
+                    QTreeWidgetItem *roleItem=this->m_roleTreeItemMap.value(roleName);
+                    for(qint32 i=0;i<roleItem->childCount();i++)
                     {
-                        for(qint32 j=0;j<roleItem->childCount();j++)
+                        QTreeWidgetItem *userItem=roleItem->child(i);
+                        if(userItem->text(0)==userName)
                         {
-                            QTreeWidgetItem *userItem=roleItem->child(j);
-                            if(userItem->text(0)==userName)
-                            {
-                                userItem->setText(1,realName);
-                                userItem->setText(2,sex);
-                                userItem->setText(3,mobile);
-                                userItem->setText(4,creator);
-                                bUpdateOk=true;
-                                break;
-                            }
+                            userItem->setText(1,realName);
+                            userItem->setText(2,sex);
+                            userItem->setText(3,mobile);
+                            userItem->setText(4,creator);
+                            break;
                         }
-                    }
-                    if(bUpdateOk)
-                    {
-                        break;
                     }
                 }
                 this->ZAddLogMsg(tr("modify user [%1] success.").arg(userName));
@@ -527,32 +566,62 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 QString userName=paraList.at(0);
                 QString roleName=paraList.at(1);
 
-                //delete userItem form roleItem.
-                for(qint32 i=0;i<this->m_treeWidget->topLevelItemCount();i++)
+                //delete from tree item.
+                if(this->m_roleTreeItemMap.contains(roleName))
                 {
-                    bool bDeleteOk=false;
-                    QTreeWidgetItem *roleItem=this->m_treeWidget->topLevelItem(i);
-                    if(roleItem->text(0)==roleName)
+                    QTreeWidgetItem *roleItem=this->m_roleTreeItemMap.value(roleName);
+                    for(qint32 i=0;i<roleItem->childCount();i++)
                     {
-                        for(qint32 j=0;j<roleItem->childCount();j++)
+                        QTreeWidgetItem *userItem=roleItem->child(i);
+                        if(userItem->text(0)==userName)
                         {
-                            QTreeWidgetItem *userItem=roleItem->child(j);
-                            if(userItem->text(0)==userName)
-                            {
-                                roleItem->removeChild(userItem);
-                                delete userItem;
-                                userItem=NULL;
-                                bDeleteOk=true;
-                                break;
-                            }
+                            roleItem->removeChild(userItem);
+                            delete userItem;
+                            userItem=NULL;
+                            break;
                         }
-                    }
-                    if(bDeleteOk)
-                    {
-                        break;
                     }
                 }
                 this->ZAddLogMsg(tr("delete user [%1] success.").arg(userName));
+                //update the summary info.
+                this->ZUpdateGrpUserInfo();
+            }
+        }else if(cmd=="dellist"){
+            if(ackNetRetCode<0)
+            {
+                QString userNameRoleName=paraList.at(0);
+                QString errMsg=paraList.at(1);
+                this->ZAddLogMsg(tr("batch delete user list failed:[%1].").arg(errMsg));
+            }else{
+                QString userNameRoleName=paraList.at(0);
+                //delete from tree item.
+                QStringList userNameRoleNameList=userNameRoleName.split("%%%");
+                for(qint32 i=0;i<userNameRoleNameList.size();i++)
+                {
+                    QString userRoleName=userNameRoleNameList.at(i);
+                    QStringList userRoleList=userRoleName.split("@@@");
+                    if(2==userRoleList.size())
+                    {
+                        QString userName=userRoleList.at(0);
+                        QString roleName=userRoleList.at(1);
+                        if(this->m_roleTreeItemMap.contains(roleName))
+                        {
+                            QTreeWidgetItem *roleItem=this->m_roleTreeItemMap.value(roleName);
+                            for(qint32 i=0;i<roleItem->childCount();i++)
+                            {
+                                QTreeWidgetItem *userItem=roleItem->child(i);
+                                if(userItem->text(0)==userName)
+                                {
+                                    roleItem->removeChild(userItem);
+                                    delete userItem;
+                                    userItem=NULL;
+                                    this->ZAddLogMsg(tr("delete user [%1] success.").arg(userName));
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
                 //update the summary info.
                 this->ZUpdateGrpUserInfo();
             }
@@ -573,28 +642,28 @@ void PUserManagerWin::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
             if(sex=="female")
             {
                 userItem->setIcon(2,QIcon(":/UserManager/images/UserManager/female.png"));
+                userItem->setText(2,tr("女"));
             }else if(sex=="male")
             {
                 userItem->setIcon(2,QIcon(":/UserManager/images/UserManager/male.png"));
+                userItem->setText(2,tr("男"));
             }
-            userItem->setText(2,sex);
             userItem->setIcon(3,QIcon(":/UserManager/images/UserManager/mobile.png"));
             userItem->setText(3,mobile);
             userItem->setText(4,creator);
             userItem->setText(5,createTime);
             userItem->setIcon(5,QIcon(":/common/images/common/Calendar.png"));
             userItem->setText(6,lastLoginTime);
-            //add userItem to specify roleItem.
-            for(qint32 i=0;i<this->m_treeWidget->topLevelItemCount();i++)
+
+            userItem->setCheckState(0,Qt::Unchecked);
+
+            //add to role item.
+            if(this->m_roleTreeItemMap.contains(roleName))
             {
-                QTreeWidgetItem *roleItem=this->m_treeWidget->topLevelItem(i);
-                if(roleItem->text(0)==roleName)
-                {
-                    roleItem->addChild(userItem);
-                    this->m_treeWidget->setCurrentItem(userItem);
-                    break;
-                }
+                QTreeWidgetItem *roleItem=this->m_roleTreeItemMap.value(roleName);
+                roleItem->addChild(userItem);
             }
+
             for(qint32 i=0;i<this->m_treeWidget->columnCount();i++)
             {
                 this->m_treeWidget->resizeColumnToContents(i);
@@ -616,9 +685,26 @@ void PUserManagerWin::ZSlotAddGrp()
 {
     ZGrpInfoDia *dia=new ZGrpInfoDia(ZGrpInfoDia::Type_NewGrp,this);
     dia->ZSetAckNetFrmProcessWidget(this);
+    QTreeWidgetItem *item=this->m_treeWidget->currentItem();
+    if(item==NULL)
+    {
+        dia->ZSetParentName("");
+    }else{
+        if(item->type()==0)
+        {
+            dia->ZSetParentName(item->text(0));
+        }else if(item->type()==1)
+        {
+            dia->ZSetParentName(item->parent()->text(0));
+        }
+    }
     if(dia->exec()==QDialog::Accepted)
     {
         dia->ZShowWaitingDialog();
+        return;
+    }else{
+        delete dia;
+        dia=NULL;
     }
 }
 void PUserManagerWin::ZSlotMdyGrp()
@@ -638,12 +724,17 @@ void PUserManagerWin::ZSlotMdyGrp()
     RolePrivateData rdata=this->m_roleMap.value(grpItem->text(0));
     ZGrpInfoDia *dia=new ZGrpInfoDia(ZGrpInfoDia::Type_MdyGrp,this);
     dia->ZSetAckNetFrmProcessWidget(this);
+    dia->ZSetParentName(grpItem->parent()->text(0));
     dia->ZSetGrpName(grpItem->text(0));
     dia->ZSetPermBits(rdata.permBits);
     dia->ZSetGrpMemo(rdata.roleMemo);
     if(dia->exec()==QDialog::Accepted)
     {
         dia->ZShowWaitingDialog();
+        return;
+    }else{
+        delete dia;
+        dia=NULL;
     }
 }
 void PUserManagerWin::ZSlotDelGrp()
@@ -667,12 +758,17 @@ void PUserManagerWin::ZSlotDelGrp()
     RolePrivateData rdata=this->m_roleMap.value(tItem->text(0));
     ZGrpInfoDia *dia=new ZGrpInfoDia(ZGrpInfoDia::Type_DelGrp,this);
     dia->ZSetAckNetFrmProcessWidget(this);
+    dia->ZSetParentName(tItem->parent()->text(0));
     dia->ZSetGrpName(tItem->text(0));
     dia->ZSetPermBits(rdata.permBits);
     dia->ZSetGrpMemo(rdata.roleMemo);
     if(dia->exec()==QDialog::Accepted)
     {
         dia->ZShowWaitingDialog();
+        return;
+    }else{
+        delete dia;
+        dia=NULL;
     }
 }
 void PUserManagerWin::ZSlotAddUser()
@@ -694,6 +790,10 @@ void PUserManagerWin::ZSlotAddUser()
     if(dia->exec()==QDialog::Accepted)
     {
         dia->ZShowWaitingDialog();
+        return;
+    }else{
+        delete dia;
+        dia=NULL;
     }
 }
 void PUserManagerWin::ZSlotMdyUser()
@@ -720,6 +820,10 @@ void PUserManagerWin::ZSlotMdyUser()
     if(dia->exec()==QDialog::Accepted)
     {
         dia->ZShowWaitingDialog();
+        return;
+    }else{
+        delete dia;
+        dia=NULL;
     }
 }
 void PUserManagerWin::ZSlotDelUser()
@@ -747,6 +851,135 @@ void PUserManagerWin::ZSlotDelUser()
         if(dia->exec()==QDialog::Accepted)
         {
             dia->ZShowWaitingDialog();
+        }else{
+            delete dia;
+            dia=NULL;
+        }
+    }
+}
+void PUserManagerWin::ZSlotBatchSelectAll()
+{
+    QTreeWidgetItemIterator it(this->m_treeWidget);
+    while(*it)
+    {
+        if((*it)->type()==0) //role.
+        {
+            //.
+        }else if((*it)->type()==1)//user.
+        {
+            (*it)->setCheckState(0,Qt::Checked);
+        }
+        ++it;
+    }
+}
+void PUserManagerWin::ZSlotBatchUnSelectAll()
+{
+    QTreeWidgetItemIterator it(this->m_treeWidget);
+    while(*it)
+    {
+        if((*it)->type()==0) //role.
+        {
+            //.
+        }else if((*it)->type()==1)//user.
+        {
+            (*it)->setCheckState(0,Qt::Unchecked);
+        }
+        ++it;
+    }
+}
+void PUserManagerWin::ZSlotBatchDelUser()
+{
+    ZUserInfoDia *dia=new ZUserInfoDia(ZUserInfoDia::Type_DelUserList,this);
+    dia->ZSetAckNetFrmProcessWidget(this);
+    QTreeWidgetItemIterator it(this->m_treeWidget);
+    while(*it)
+    {
+        if((*it)->type()==0)//role
+        {
+            //...
+        }else if((*it)->type()==1) //user
+        {
+            if((*it)->checkState(0)==Qt::Checked)
+            {
+                dia->ZSetDelUserList((*it)->text(0),(*it)->parent()->text(0));
+            }
+        }
+        ++it;
+    }
+
+    if(dia->ZGetDelUserListCount()>0)
+    {
+        if(dia->exec()==QDialog::Accepted)
+        {
+            dia->ZShowWaitingDialog();
+            return;
+        }
+    }else{
+        delete dia;
+        dia=NULL;
+    }
+}
+void PUserManagerWin::ZSlotExpandIn()
+{
+    QTreeWidgetItem *item=this->m_treeWidget->currentItem();
+    if(item==NULL)
+    {
+        return;
+    }
+    if(item->type()==0) //0:role.
+    {
+        item->setExpanded(false);
+    }
+}
+void PUserManagerWin::ZSlotExpandOut()
+{
+    QTreeWidgetItem *item=this->m_treeWidget->currentItem();
+    if(item==NULL)
+    {
+        return;
+    }
+    if(item->type()==0) //0:role.
+    {
+        item->setExpanded(true);
+    }
+}
+void PUserManagerWin::ZSlotImport()
+{
+
+}
+void PUserManagerWin::ZSlotExport()
+{
+
+}
+void PUserManagerWin::ZSlotSelectAll()
+{
+    QTreeWidgetItem *item=this->m_treeWidget->currentItem();
+    if(NULL==item)
+    {
+        return;
+    }
+    for(qint32 i=0;i<item->childCount();i++)
+    {
+        QTreeWidgetItem *childItem=item->child(i);
+        if(childItem->type()==1) //0:role,1:user.
+        {
+            childItem->setCheckState(0,Qt::Checked);
+        }
+    }
+}
+void PUserManagerWin::ZSlotUnSelectAll()
+{
+    QTreeWidgetItem *item=this->m_treeWidget->currentItem();
+    if(NULL==item)
+    {
+        return;
+    }
+    for(qint32 i=0;i<item->childCount();i++)
+    {
+        QTreeWidgetItem *childItem=item->child(i);
+        if(childItem->type()==1) //0:role,1:user.
+        {
+            childItem->setCheckState(0,Qt::Unchecked);
         }
     }
 }
@@ -882,39 +1115,50 @@ void PUserManagerWin::ZSlotImportExcel()
     qint32 nRowIndex=3;
     for(qint32 i=0;i<nTotalRow;i++)
     {
-        ZUserInfo newUser;
-        newUser.m_userName=xlsx.read(nRowIndex,1).toString();
-        newUser.m_realName=xlsx.read(nRowIndex,2).toString();
-        newUser.m_sex=xlsx.read(nRowIndex,3).toString();
-        newUser.m_mobile=xlsx.read(nRowIndex,4).toString();
-        newUser.m_Creator=xlsx.read(nRowIndex,5).toString();
-        QString roleName=xlsx.read(nRowIndex,8).toString();
-        newUser.m_roleName=roleName;
-        newUser.m_password="123456";
-        userList.append(newUser);
+        QString itemType=xlsx.read(nRowIndex,1).toString();
+        if(itemType=="Role")
+        {
+            QString roleName=xlsx.read(nRowIndex,2).toString();
+            QString parentName=xlsx.read(nRowIndex,9).toString();
 
-        //add role to list.
-        bool bExist=false;
-        for(qint32 k=0;k<roleList.size();k++)
-        {
-            if(roleList.at(k).m_roleName==roleName)
+            //add role to list.
+            bool bExist=false;
+            for(qint32 k=0;k<roleList.size();k++)
             {
-                bExist=true;
-                break;
+                if(roleList.at(k).m_roleName==roleName)
+                {
+                    bExist=true;
+                    break;
+                }
             }
-        }
-        if(!bExist)
+            if(!bExist)
+            {
+                ZRoleInfo newRole;
+                newRole.m_roleName=roleName;
+                newRole.m_parentName=parentName;
+                newRole.m_userManagerPerm=0;
+                newRole.m_templateEditPerm=0;
+                newRole.m_fileManagerPerm=0;
+                newRole.m_processEditPerm=0;
+                newRole.m_taskManagerPerm=0;
+                newRole.m_formDesignerPerm=0;
+                newRole.m_roleMemo="";
+                roleList.append(newRole);
+            }
+        }else if(itemType=="User")
         {
-            ZRoleInfo newRole;
-            newRole.m_roleName=roleName;
-            newRole.m_userManagerPerm=0;
-            newRole.m_templateEditPerm=0;
-            newRole.m_fileManagerPerm=0;
-            newRole.m_processEditPerm=0;
-            newRole.m_taskManagerPerm=0;
-            newRole.m_formDesignerPerm=0;
-            newRole.m_roleMemo="";
-            roleList.append(newRole);
+            ZUserInfo newUser;
+            newUser.m_userName=xlsx.read(nRowIndex,2).toString();
+            newUser.m_realName=xlsx.read(nRowIndex,3).toString();
+            newUser.m_sex=xlsx.read(nRowIndex,4).toString();
+            newUser.m_mobile=xlsx.read(nRowIndex,5).toString();
+            newUser.m_Creator=xlsx.read(nRowIndex,6).toString();
+            QString roleName=xlsx.read(nRowIndex,9).toString();
+            newUser.m_roleName=roleName;
+            newUser.m_password="123456";
+            userList.append(newUser);
+        }else{
+            this->ZAddLogMsg(tr("Warning,unknown type:%1.").arg(itemType));
         }
         nRowIndex++;//next row.
     }
@@ -1015,20 +1259,22 @@ void PUserManagerWin::ZSlotExportExcel()
 
 
     //write header.
-    xlsx.write(nX+1,nY+1,tr("用户名"),fmt);//用户名
-    xlsx.write(nX+1,nY+2,tr("真实姓名"),fmt);//真实姓名
-    xlsx.write(nX+1,nY+3,tr("性别"),fmt);//性别
-    xlsx.write(nX+1,nY+4,tr("手机号码"),fmt);//手机号码
-    xlsx.write(nX+1,nY+5,tr("创建者"),fmt);//创建者
-    xlsx.write(nX+1,nY+6,tr("创建时间"),fmt);//末次登录时间
-    xlsx.write(nX+1,nY+7,tr("末次登录时间"),fmt);//末次登录时间
-    xlsx.write(nX+1,nY+8,tr("所属组"),fmt);//所属组
+    xlsx.write(nX+1,nY+1,tr("类型"),fmt);//角色还是用户?
+    xlsx.write(nX+1,nY+2,tr("用户名"),fmt);//用户名
+    xlsx.write(nX+1,nY+3,tr("真实姓名"),fmt);//真实姓名
+    xlsx.write(nX+1,nY+4,tr("性别"),fmt);//性别
+    xlsx.write(nX+1,nY+5,tr("手机号码"),fmt);//手机号码
+    xlsx.write(nX+1,nY+6,tr("创建者"),fmt);//创建者
+    xlsx.write(nX+1,nY+7,tr("创建时间"),fmt);//末次登录时间
+    xlsx.write(nX+1,nY+8,tr("末次登录时间"),fmt);//末次登录时间
+    xlsx.write(nX+1,nY+9,tr("所属组"),fmt);//所属组
     nX++;//next row.
 
     //total row counter.
     qint32 nRowCounter=0;
 
     //write data.
+#if 0
     for(qint32 i=0;i<this->m_treeWidget->topLevelItemCount();i++)
     {
         QTreeWidgetItem *grpItem=this->m_treeWidget->topLevelItem(i);
@@ -1050,6 +1296,45 @@ void PUserManagerWin::ZSlotExportExcel()
             nRowCounter++;//row counter.
         }
     }
+#endif
+    QTreeWidgetItemIterator it(this->m_treeWidget);
+    while(*it)
+    {
+        if((*it)->type()==0) //role.
+        {
+            xlsx.write(nX+1,nY+1,"Role",fmt);//角色还是用户?
+            xlsx.write(nX+1,nY+2,(*it)->text(0),fmt);//用户名
+            xlsx.write(nX+1,nY+3,"",fmt);//真实姓名
+            xlsx.write(nX+1,nY+4,"",fmt);//性别
+            xlsx.write(nX+1,nY+5,"",fmt);//手机号码
+            xlsx.write(nX+1,nY+6,"",fmt);//创建者
+            xlsx.write(nX+1,nY+7,"",fmt);//创建时间
+            xlsx.write(nX+1,nY+8,"",fmt);//末次登录时间
+            if((*it)->parent())
+            {
+                xlsx.write(nX+1,nY+9,(*it)->parent()->text(0),fmt);//所属组
+
+            }else{
+                xlsx.write(nX+1,nY+9,"",fmt);//所属组
+            }
+        }else if((*it)->type()==1) //user.
+        {
+            xlsx.write(nX+1,nY+1,"User",fmt);//角色还是用户?
+            xlsx.write(nX+1,nY+2,(*it)->text(0),fmt);//用户名
+            xlsx.write(nX+1,nY+3,(*it)->text(1),fmt);//真实姓名
+            xlsx.write(nX+1,nY+4,(*it)->text(2),fmt);//性别
+            xlsx.write(nX+1,nY+5,(*it)->text(3),fmt);//手机号码
+            xlsx.write(nX+1,nY+6,(*it)->text(4),fmt);//创建者
+            xlsx.write(nX+1,nY+7,(*it)->text(5),fmt);//创建时间
+            xlsx.write(nX+1,nY+8,(*it)->text(6),fmt);//末次登录时间
+            xlsx.write(nX+1,nY+9,(*it)->parent()->text(0),fmt);//所属组
+        }
+        ++it; //next tree item.
+        nX++;//next row.
+        nRowCounter++;//row counter.
+    }
+
+    //write total rows.
     xlsx.write(1,2,QString::number(nRowCounter,10),fmt);//数量
     if(!xlsx.saveAs(fileName))
     {
@@ -1259,23 +1544,49 @@ void PUserManagerWin::ZSlotPopupMenu(const QPoint &pt)
     QAction actDelUser(QIcon(":/UserManager/images/UserManager/DelUser.png"),tr("删除用户"));
     QAction actImport(QIcon(":/UserManager/images/UserManager/Import.png"),tr("导入..."));
     QAction actExport(QIcon(":/UserManager/images/UserManager/Export.png"),tr("导出..."));
+
+    QAction actSelectAll(QIcon(":/UserManager/images/UserManager/Import.png"),tr("全部选择"));
+    QAction actUnSelect(QIcon(":/UserManager/images/UserManager/Export.png"),tr("取消选择"));
+
+    QAction actExpandIn(QIcon(":/UserManager/images/UserManager/Import.png"),tr("折叠"));
+    QAction actExpandOut(QIcon(":/UserManager/images/UserManager/Export.png"),tr("展开"));
+
     connect(&actAddGrp,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddGrp()));
     connect(&actDelGrp,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelGrp()));
     connect(&actAddUser,SIGNAL(triggered(bool)),this,SLOT(ZSlotAddUser()));
     connect(&actDelUser,SIGNAL(triggered(bool)),this,SLOT(ZSlotDelUser()));
     connect(&actImport,SIGNAL(triggered(bool)),this,SLOT(ZSlotImport()));
     connect(&actExport,SIGNAL(triggered(bool)),this,SLOT(ZSlotExport()));
+
+    connect(&actSelectAll,SIGNAL(triggered(bool)),this,SLOT(ZSlotSelectAll()));
+    connect(&actUnSelect,SIGNAL(triggered(bool)),this,SLOT(ZSlotUnSelectAll()));
+
+    connect(&actExpandIn,SIGNAL(triggered(bool)),this,SLOT(ZSlotExpandIn()));
+    connect(&actExpandOut,SIGNAL(triggered(bool)),this,SLOT(ZSlotExpandOut()));
+
     if(item->type()==0)//group.
     {
         popMenu.addAction(&actAddGrp);
         popMenu.addAction(&actDelGrp);
+        popMenu.addSeparator();
+        if(item->isExpanded())
+        {
+            popMenu.addAction(&actExpandIn);
+        }else{
+            popMenu.addAction(&actExpandOut);
+        }
         popMenu.addSeparator();
     }else if(item->type()==1) //user.
     {
         popMenu.addAction(&actAddUser);
         popMenu.addAction(&actDelUser);
         popMenu.addSeparator();
+    }else{
+        popMenu.addSeparator();
     }
+    popMenu.addAction(&actSelectAll);
+    popMenu.addAction(&actUnSelect);
+    popMenu.addSeparator();
     popMenu.addAction(&actImport);
     popMenu.addAction(&actExport);
     popMenu.exec(QCursor::pos());

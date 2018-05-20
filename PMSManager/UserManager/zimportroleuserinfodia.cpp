@@ -31,7 +31,7 @@ void ZImportRoleUserInfoDia::ZExecuteImportOp(QList<ZRoleInfo> roleList,QList<ZU
     {
         PNetFrame_Role *netFrm=new PNetFrame_Role;
         QString permBits=QString("%1,%2,%3,%4,%5,%6").arg(roleList.at(i).m_userManagerPerm).arg(roleList.at(i).m_templateEditPerm).arg(roleList.at(i).m_fileManagerPerm).arg(roleList.at(i).m_processEditPerm).arg(roleList.at(i).m_taskManagerPerm).arg(roleList.at(i).m_formDesignerPerm);
-        netFrm->ZAddRole(roleList.at(i).m_roleName,permBits,roleList.at(i).m_roleMemo);
+        netFrm->ZAddRole(roleList.at(i).m_roleName,roleList.at(i).m_parentName,permBits,roleList.at(i).m_roleMemo);
         this->m_netFrmQueue.enqueue(netFrm);
     }
     //add user.
@@ -73,10 +73,12 @@ void ZImportRoleUserInfoDia::ZParseAckNetFrmXmlData()
                         QString errMsg=attr.value(QString("errMsg")).toString();
                         paraList.append(errMsg);
                     }else{
+                        QString parentName=attr.value(QString("parentName")).toString();
                         QString permBits=attr.value(QString("permBits")).toString();
                         QString roleMemo=attr.value(QString("memo")).toString();
                         QString creator=attr.value(QString("creator")).toString();
                         QString createTime=attr.value(QString("createTime")).toString();
+                        paraList.append(parentName);
                         paraList.append(permBits);
                         paraList.append(roleMemo);
                         paraList.append(creator);
