@@ -537,7 +537,7 @@ void PNetFrame_Template::ZGetTemplate(QString templateName)
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
 }
-void PNetFrame_Template::ZSaveTemplate(QString templateName,QString templateXmlData)
+void PNetFrame_Template::ZSaveTemplate(QString templateName,QString templateXmlData,QString destMinMaxPair)
 {
     QXmlStreamWriter  tXmlWriter(&this->m_frmXmlData);
     tXmlWriter.setAutoFormatting(true);
@@ -547,13 +547,14 @@ void PNetFrame_Template::ZSaveTemplate(QString templateName,QString templateXmlD
     tXmlWriter.writeStartElement(QString("Template"));
     tXmlWriter.writeAttribute(QString("cmd"),QString("save"));
     tXmlWriter.writeAttribute(QString("data"),QString(templateXmlData.toUtf8().toBase64()));
+    tXmlWriter.writeAttribute(QString("minMaxPair"),QString(destMinMaxPair.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("creator"),MyUserInfo::ZGetInstance()->m_UserInfo.m_userName);
     tXmlWriter.writeCharacters(templateName);
     tXmlWriter.writeEndElement();//Template.
     tXmlWriter.writeEndElement();//NetPro.
     tXmlWriter.writeEndDocument();
 }
-void PNetFrame_Template::ZSaveAsTemplate(QString templateName,QString templateXmlData)
+void PNetFrame_Template::ZSaveAsTemplate(QString templateName,QString templateXmlData,QString destMinMaxPair)
 {
     QXmlStreamWriter  tXmlWriter(&this->m_frmXmlData);
     tXmlWriter.setAutoFormatting(true);
@@ -563,6 +564,7 @@ void PNetFrame_Template::ZSaveAsTemplate(QString templateName,QString templateXm
     tXmlWriter.writeStartElement(QString("Template"));
     tXmlWriter.writeAttribute(QString("cmd"),QString("saveas"));
     tXmlWriter.writeAttribute(QString("data"),QString(templateXmlData.toUtf8().toBase64()));
+    tXmlWriter.writeAttribute(QString("minMaxPair"),QString(destMinMaxPair.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("creator"),MyUserInfo::ZGetInstance()->m_UserInfo.m_userName);
     tXmlWriter.writeCharacters(templateName);
     tXmlWriter.writeEndElement();//Template.

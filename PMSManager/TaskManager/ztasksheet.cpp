@@ -654,7 +654,7 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
     this->m_cbProductNo->setEditable(true);
     this->m_cbProductNo->setMinimumWidth(160);
     //载入产品号预置值供用户选择，减少操作键盘次数。
-    ZProductNoPresetDialog productNoDia;
+    ZProductNoPresetDialog productNoDia(this->m_refTemplate);
     QStringList lstProductNo=productNoDia.ZReadList();
     for(qint32 i=0;i<lstProductNo.size();i++)
     {
@@ -728,6 +728,8 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
 
     this->m_sheet->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this->m_sheet,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotPopupMenu(QPoint)));
+
+    connect(this->m_sheet,SIGNAL(cellClicked(int,int)),this,SLOT(ZSlotSheetDoubleClicked(qint32,qint32)));
 }
 ZTaskWidget::~ZTaskWidget()
 {
@@ -776,12 +778,15 @@ void ZTaskWidget::ZSlotPopupMenu(const QPoint &pt)
     QAction actBarChart(QIcon(":/TaskManager/images/TaskManager/barChart.png"),tr("柱状汇总图"));
     QAction actExportExcel(QIcon(":/UserManager/images/UserManager/Excel.png"),tr("导出Excel..."));
     QAction actReport(QIcon(":/common/images/common/print.png"),tr("导出报表..."));
+    QAction actAutoFillProductNo2XY(QIcon(":/common/images/common/print.png"),tr("复制订单号到单元格列表"));
     popMenu.addAction(&actLineChart);
     popMenu.addAction(&actBarChart);
     popMenu.addAction(&actExportExcel);
     popMenu.addAction(&actReport);
+    popMenu.addAction(&actAutoFillProductNo2XY);
     connect(&actLineChart,SIGNAL(triggered(bool)),this,SLOT(ZSlotShowLineChart()));
     connect(&actBarChart,SIGNAL(triggered(bool)),this,SLOT(ZSlotShowBarChart()));
+    connect(&actAutoFillProductNo2XY,SIGNAL(triggered(bool)),this,SLOT(ZSlotShowAutoFillProductNo2XY()));
     popMenu.exec(QCursor::pos());
 }
 void ZTaskWidget::ZSlotShowLineChart()
@@ -813,6 +818,37 @@ void ZTaskWidget::ZSlotShowBarChart()
     ZBarChartDialog dia(this);
     dia.ZSetVariableList(varList);
     dia.exec();
+}
+void ZTaskWidget::ZSlotShowAutoFillProductNo2XY()
+{
+    QString xyListInfo;
+    for(qint32 i=0;i<this->m_xyListAutoFillProductNo.size();i++)
+    {
+        xyListInfo+=this->m_xyListAutoFillProductNo.at(i);
+        xyListInfo+="\n";
+    }
+    QMessageBox::information(this,tr("信息提示"),tr("订单号被配置为右击复制到以下单元格中:\n%1\n").arg(xyListInfo));
+}
+void ZTaskWidget::ZSlotSheetDoubleClicked(qint32 x,qint32 y)
+{
+    qDebug()<<"sheet double clicked.";
+    for(qint32 i=0;i<this->m_xyListAutoFillProductNo.size();i++)
+    {
+        QString xy=this->m_xyListAutoFillProductNo.at(i);
+        QStringList xyList=xy.split(",");
+        qint32 xPre=xyList.at(0).toInt();
+        qint32 yPre=xyList.at(1).toInt();
+        if(x==xPre && y==yPre)
+        {
+            QTableWidgetItem *item=this->m_sheet->itemAt(x,y);
+            if(item)
+            {
+                item->setText(this->m_cbProductNo->currentText());
+                emit this->ZSignalLogMsg(tr("ProductNo auto fill xy occured,x=%1,y=%2.").arg(x).arg(y));
+                break;
+            }
+        }
+    }
 }
 void ZTaskWidget::ZSlotVarDblClicked(QModelIndex index)
 {
@@ -1215,6 +1251,14 @@ qint32 ZTaskWidget::ZGetTaskState()
 {
     return this->m_TaskState;
 }
+//自动填写订单号到配置的单元格中
+//自动复制到单元格。
+void ZTaskWidget::ZLoadAutoFillCellWithProductNo(QString relatedTemplate)
+{
+    ZProductNoPresetDialog dia(relatedTemplate);
+    this->m_xyListAutoFillProductNo=dia.ZGetXYList();
+}
+
 ZLineChartDialog::ZLineChartDialog(QWidget *parent):QDialog(parent)
 {
     this->setWindowTitle(tr("折线趋势图"));

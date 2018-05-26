@@ -51,6 +51,10 @@ public:
     QPixmap StringToPixMap(const QString&);
     //for print html.
     QString ZGetPrintHtml();
+
+    ///////////////////////////////////
+    QString ZGetDestMinMaxXmlData();
+    void ZSetDestMinMaxXmlData(QString pairXml);
 private slots:
     void ZSlotItemEntered();
     void ZSlotHAlignLeft();
@@ -64,10 +68,13 @@ private slots:
     void ZSlotFastRemoveWidget();
     void ZSlotRemoveWidget();
     void ZSlotMutexManager();
+    void ZSlotMinMaxDataCompare();
     void ZSlotDeleteRows();
     void ZSlotDeleteCols();
     void ZSlotInsertRows();
     void ZSlotInsertCols();
+
+    void ZSlotHighlightCell(QString destCell,QString minCell,QString maxCell);
 signals:
     void ZSignalSheetChanged(QString templateName);
     void ZSignalBindVar();
@@ -108,6 +115,7 @@ private:
     QAction *m_actRemoveWidget;
 
     QAction *m_actMutexManagr;
+    QAction *m_actMinMaxDataCompare;
 
     QMenu *m_subMenuRowCol;
     QAction *m_actDeleteRows;
@@ -115,6 +123,9 @@ private:
     QAction *m_actInsertRows;
     QAction *m_actInsertCols;
 
+private:
+    //for min/max data compare.
+    QStringList m_destMinMaxPair;
 };
 
 

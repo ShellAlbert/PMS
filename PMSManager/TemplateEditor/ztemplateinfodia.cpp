@@ -89,7 +89,9 @@ ZTemplateInfoDia::ZTemplateInfoDia(TemplateInfoDiaType type,QWidget *parent):ZBa
         break;
     case Type_SaveAsTemplate:
         this->setWindowTitle(tr("模板另存为"));
-        this->m_llOpTips->setText(tr("该模板将会被全新复制一份。"));
+        this->m_llOpTips->setText(tr("该模板将会被全新复制一份，请输入新的名称。"));
+        this->m_leTempalteName->setEnabled(false);
+        this->m_leVarSourceName->setEnabled(true);
         this->m_gridLayout->addWidget(this->m_llTemplateName,0,0,1,1);
         this->m_gridLayout->addWidget(this->m_leTempalteName,0,1,1,1);
         this->m_gridLayout->addWidget(this->m_llSaveAsTemplateName,1,0,1,1);
@@ -142,6 +144,10 @@ void ZTemplateInfoDia::ZSetTemplateXmlData(QString templateXmlDta)
 {
     this->m_templateXmlData=templateXmlDta;
 }
+void ZTemplateInfoDia::ZSetDestMinMaxCmpXmlData(QString destMinMaxXml)
+{
+    this->m_destMinMaxXmlData=destMinMaxXml;
+}
 void ZTemplateInfoDia::ZSetVarSourceName(QString name)
 {
     this->m_leVarSourceName->setText(name);
@@ -193,6 +199,7 @@ void ZTemplateInfoDia::ZParseAckNetFrmXmlData()
                 {
                     QString creator=attr.value(QString("creator")).toString();
                     QString data=attr.value(QString("data")).toString();
+                    QString minMaxPair=attr.value(QString("minMaxPair")).toString();
                     QString fileSize=attr.value(QString("filesize")).toString();
                     QString varSourceData=attr.value(QString("varsource")).toString();
                     qint32 retCode=attr.value(QString("retCode")).toInt();
@@ -202,6 +209,7 @@ void ZTemplateInfoDia::ZParseAckNetFrmXmlData()
                     paraList.append(templateName);
                     paraList.append(creator);
                     paraList.append(QString(QByteArray::fromBase64(data.toUtf8())));
+                    paraList.append(QString(QByteArray::fromBase64(minMaxPair.toUtf8())));
                     paraList.append(fileSize);
                     paraList.append(QString(QByteArray::fromBase64(varSourceData.toUtf8())));
                     paraList.append(errMsg);
@@ -302,7 +310,7 @@ void ZTemplateInfoDia::ZSlotOkay()
         this->m_waitDia->ZSetTipsMsg(tr("正在获取模板[%1]").arg(this->ZGetTemplateName()));
         break;
     case Type_SaveTemplate:
-        netFrm->ZSaveTemplate(this->ZGetTemplateName(),this->m_templateXmlData);
+        netFrm->ZSaveTemplate(this->ZGetTemplateName(),this->m_templateXmlData,this->m_destMinMaxXmlData);
         this->m_waitDia->ZSetTipsMsg(tr("正在保存模板[%1]").arg(this->ZGetTemplateName()));
         break;
     case Type_BindVarSource:
@@ -314,7 +322,7 @@ void ZTemplateInfoDia::ZSlotOkay()
         this->m_waitDia->ZSetTipsMsg(tr("正在解除绑定变量源[%1]从模板[%2]").arg(this->ZGetVarSourceName()).arg(this->ZGetTemplateName()));
         break;
     case Type_SaveAsTemplate:
-        netFrm->ZSaveAsTemplate(this->ZGetSaveAsTemplateName(),this->m_templateXmlData);
+        netFrm->ZSaveAsTemplate(this->ZGetSaveAsTemplateName(),this->m_templateXmlData,this->m_destMinMaxXmlData);
         this->m_waitDia->ZSetTipsMsg(tr("正在另存为新的模板[%1]").arg(this->ZGetSaveAsTemplateName()));
         break;
     default:

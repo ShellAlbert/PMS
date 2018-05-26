@@ -24,14 +24,15 @@ ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
     this->m_tbDelGeVar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     this->m_treeGeVar=new QTreeWidget;
-    this->m_treeGeVar->setColumnCount(4);
+    this->m_treeGeVar->setColumnCount(6);
     QStringList geVarHeaders;
     geVarHeaders<<tr("变量名称");
     geVarHeaders<<tr("数据类型");
     geVarHeaders<<tr("变量规则");
     geVarHeaders<<tr("参考值");
+    geVarHeaders<<tr("单元格坐标");
+    geVarHeaders<<tr("描述信息");
     this->m_treeGeVar->setHeaderLabels(geVarHeaders);
-
 
     this->m_llAutoVar=new QLabel(tr("自动变量列表"));
     this->m_tbAddAutoVar=new QToolButton;
@@ -58,9 +59,9 @@ ZVarInfoDia::ZVarInfoDia(QString varSourceName,QWidget *parent):QDialog(parent)
     this->m_tbImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("OKAY"));
+    this->m_tbOkay->setText(tr("确定"));
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("CANCEL"));
+    this->m_tbCancel->setText(tr("取消"));
     this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
     this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_tbCancel->setIcon(QIcon(":/common/images/common/cancel.png"));
@@ -138,6 +139,8 @@ void ZVarInfoDia::ZSlotAddGeneralVar()
         QString varType=dia.ZGetVarType();
         QString varRule=dia.ZGetVarRule();
         QString valRef=dia.ZGetRefValue();
+        QString varCell=dia.ZGetVarCell();
+        QString varDesc=dia.ZGetVarDesc();
         //search all exists varName to avoid the same name.
         for(qint32 i=0;i<this->m_treeGeVar->topLevelItemCount();i++)
         {
@@ -153,6 +156,14 @@ void ZVarInfoDia::ZSlotAddGeneralVar()
         item->setText(1,varType);
         item->setText(2,varRule);
         item->setText(3,valRef);
+        item->setText(4,varCell);
+        item->setText(5,varDesc);
+        item->setTextAlignment(0,Qt::AlignCenter);
+        item->setTextAlignment(1,Qt::AlignCenter);
+        item->setTextAlignment(2,Qt::AlignCenter);
+        item->setTextAlignment(3,Qt::AlignCenter);
+        item->setTextAlignment(4,Qt::AlignCenter);
+        item->setTextAlignment(5,Qt::AlignCenter);
         this->m_treeGeVar->addTopLevelItem(item);
     }
 }
@@ -208,6 +219,10 @@ void ZVarInfoDia::ZSlotDelAutoVar()
 }
 void ZVarInfoDia::ZSlotImport()
 {
+    if(QMessageBox::Cancel==QMessageBox::question(this,tr("重要提示"),tr("变量导入功能仅适用于从模板中导出变量源的Excel文件,随意导入其他格式文件将出现错乱!\n您确定要继续吗?"),QMessageBox::Ok,QMessageBox::Cancel))
+    {
+        return;
+    }
     QString fileName=QFileDialog::getOpenFileName(this,tr("导入Excel"),".",tr("Microsoft Excel(*.xlsx)"));
     if(fileName.isEmpty())
     {
@@ -235,6 +250,7 @@ void ZVarInfoDia::ZSlotImport()
         varInfo.m_rule=xlsx.read(nRowNo+i,3).toString();
         varInfo.m_refValue=xlsx.read(nRowNo+i,4).toString();
         varInfo.m_cell=xlsx.read(nRowNo+i,5).toString();
+        varInfo.m_varDesc=xlsx.read(nRowNo+i,6).toString();
         varList.append(varInfo);
     }
 
@@ -242,7 +258,7 @@ void ZVarInfoDia::ZSlotImport()
     {
         ZVarSourceInfo varInfo;
         varInfo=varList.at(i);
-        qDebug()<<varInfo.m_varName<<","<<varInfo.m_varType<<","<<varInfo.m_rule<<","<<varInfo.m_refValue<<","<<varInfo.m_cell;
+        qDebug()<<varInfo.m_varName<<","<<varInfo.m_varType<<","<<varInfo.m_rule<<","<<varInfo.m_refValue<<","<<varInfo.m_cell<<","<<varInfo.m_varDesc;
 
         //search all exists varName to avoid the same name.
         bool bExist=false;
@@ -271,6 +287,14 @@ void ZVarInfoDia::ZSlotImport()
         item->setText(1,varInfo.m_varType);
         item->setText(2,varInfo.m_rule);
         item->setText(3,varInfo.m_refValue);
+        item->setText(4,varInfo.m_cell);
+        item->setText(5,varInfo.m_varDesc);
+        item->setTextAlignment(0,Qt::AlignCenter);
+        item->setTextAlignment(1,Qt::AlignCenter);
+        item->setTextAlignment(2,Qt::AlignCenter);
+        item->setTextAlignment(3,Qt::AlignCenter);
+        item->setTextAlignment(4,Qt::AlignCenter);
+        item->setTextAlignment(5,Qt::AlignCenter);
         this->m_treeGeVar->addTopLevelItem(item);
     }
     QMessageBox::information(this,tr("成功提示"),tr("Excel变量源模板导入成功!\n共导入变量%1个.").arg(QString::number(varList.size(),10)));
@@ -298,12 +322,22 @@ void ZVarInfoDia::ZSetXmlData(QString xmlData)
                 QString type=attr.value(QString("type")).toString();
                 QString rule=attr.value(QString("rule")).toString();
                 QString refVal=attr.value(QString("refVal")).toString();
+                QString cell=attr.value(QString("cell")).toString();
+                QString desc=attr.value(QString("desc")).toString();
                 QString geVarName=tXmlReader.readElementText();
                 QTreeWidgetItem *item=new QTreeWidgetItem;
                 item->setText(0,geVarName);
                 item->setText(1,type);
                 item->setText(2,rule);
                 item->setText(3,refVal);
+                item->setText(4,cell);
+                item->setText(5,desc);
+                item->setTextAlignment(0,Qt::AlignCenter);
+                item->setTextAlignment(1,Qt::AlignCenter);
+                item->setTextAlignment(2,Qt::AlignCenter);
+                item->setTextAlignment(3,Qt::AlignCenter);
+                item->setTextAlignment(4,Qt::AlignCenter);
+                item->setTextAlignment(5,Qt::AlignCenter);
                 this->m_treeGeVar->addTopLevelItem(item);
             }else if(nodeName==QString("AutoVar"))
             {
@@ -337,10 +371,14 @@ QString ZVarInfoDia::ZGetXmlData()
         QString geVarType=item->text(1);
         QString geVarRule=item->text(2);
         QString geVarRefVal=item->text(3);
+        QString geVarCell=item->text(4);
+        QString geVarDesc=item->text(5);
         tXmlWriter.writeStartElement(QString("GeVar"));
         tXmlWriter.writeAttribute(QString("type"),geVarType);
         tXmlWriter.writeAttribute(QString("rule"),geVarRule);
         tXmlWriter.writeAttribute(QString("refVal"),geVarRefVal);
+        tXmlWriter.writeAttribute(QString("cell"),geVarCell);
+        tXmlWriter.writeAttribute(QString("desc"),geVarDesc);
         tXmlWriter.writeCharacters(geVarName);
         tXmlWriter.writeEndElement();//GeVar.
     }

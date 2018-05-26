@@ -110,8 +110,8 @@ public:
     void ZAddTemplate(QString templateName);
     void ZDelTemplate(QString templateName);
     void ZGetTemplate(QString templateName);
-    void ZSaveTemplate(QString templateName,QString templateXmlData);
-    void ZSaveAsTemplate(QString templateName,QString templateXmlData);
+    void ZSaveTemplate(QString templateName,QString templateXmlData,QString destMinMaxPair);
+    void ZSaveAsTemplate(QString templateName,QString templateXmlData,QString destMinMaxPair);
     void ZBindVarSource(QString templateName,QString varSourceName);
     void ZUnbindVarSource(QString templateName,QString varSourceName);
     void ZListTemplate();

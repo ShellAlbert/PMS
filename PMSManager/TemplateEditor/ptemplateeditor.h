@@ -93,6 +93,7 @@ private slots:
     void ZSlotBindCurrentCell();
     void ZSlotBindCell();
     void ZSlotRemoveBind();
+    void ZSlotAutoBindPreCell();
 public:
 
     ZSheet *m_sheet;

@@ -29,6 +29,9 @@
 #include <QPainter>
 #include <QtXlsx/QtXlsx>
 #include <QInputDialog>
+#define ICON_W  24
+#define ICON_H  24
+
 ZTemplateVarSrcView::ZTemplateVarSrcView(QWidget *parent):QFrame(parent)
 {
     this->setStyleSheet("QFrame{background-color:#3F93A8;}");
@@ -608,9 +611,10 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
             QString templateName=paraList.at(0);
             QString creator=paraList.at(1);
             QString data=paraList.at(2);
-            QString fileSize=paraList.at(3);
-            QString varSourceData=paraList.at(4);
-            QString errMsg=paraList.at(5);
+            QString minMaxPair=paraList.at(3);
+            QString fileSize=paraList.at(4);
+            QString varSourceData=paraList.at(5);
+            QString errMsg=paraList.at(6);
             if(ackNetRetCode<0)
             {
                 ZSheetWidget *sheetWidget=new ZSheetWidget;
@@ -627,6 +631,7 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 //because TemplateXmlData contains VarBindCell information.
                 sheetWidget->ZPutVarSourceXmlData(varSourceData);
                 sheetWidget->ZPutTemplateXmlData(data);
+                sheetWidget->m_sheet->ZSetDestMinMaxXmlData(minMaxPair);
                 this->m_tabWidget->addTab(sheetWidget,QIcon(":/TaskBar/images/Sheet.png"),templateName);
                 this->m_tabWidget->setCurrentWidget(sheetWidget);
                 connect(sheetWidget,SIGNAL(ZSignalDataChanged(QString)),this,SLOT(ZSlotSheetDataChanged(QString)));
@@ -743,9 +748,12 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 for(qint32 i=0;i<this->m_templateWidget->m_treeVarSource->topLevelItemCount();i++)
                 {
                     QTreeWidgetItem *item=this->m_templateWidget->m_treeVarSource->topLevelItem(i);
-                    qint32 refCount=item->text(1).toInt();
-                    item->setText(1,QString("%1").arg(refCount+1));
-                    break;
+                    if(item->text(0)==varSource)
+                    {
+                        qint32 refCount=item->text(1).toInt();
+                        item->setText(1,QString("%1").arg(refCount+1));
+                        break;
+                    }
                 }
             }
         }else if(cmd=="unbind")
@@ -941,6 +949,7 @@ void PTemplateEditor::ZSlotSaveTemplate()
         dia->ZSetAckNetFrmProcessWidget(this);
         dia->ZSetTemplateName(sheetWidget->m_sheet->ZGetTemplateName());
         dia->ZSetTemplateXmlData(sheetWidget->ZGetTemplateXmlData());
+        dia->ZSetDestMinMaxCmpXmlData(sheetWidget->m_sheet->ZGetDestMinMaxXmlData());
         if(dia->exec()==QDialog::Accepted)
         {
             dia->ZShowWaitingDialog();
@@ -2075,51 +2084,61 @@ void PTemplateEditor::ZSlotExportVarSourceTemplate()
     qint32 nExcelRows=1;
 
     //write var number info row 1.
-    xlsx.write(nExcelRows,1,"Examples",fmt);
+    xlsx.write(nExcelRows,1,tr("范例列表"),fmt);
+    xlsx.write(nExcelRows,2,tr("*请不要修改*"),fmt);
+    xlsx.write(nExcelRows,4,tr("变量列表总行数"),fmt);
     xlsx.write(nExcelRows,5,QString::number(varList.size(),10),fmt);
+    xlsx.write(nExcelRows,6,tr("*请按实际填写*"),fmt);
     nExcelRows++;
     //write Example data.
-    xlsx.write(nExcelRows,1,"VarName",fmt);
-    xlsx.write(nExcelRows,2,"Type",fmt);
-    xlsx.write(nExcelRows,3,"Rule",fmt);
-    xlsx.write(nExcelRows,4,"RefValue",fmt);
-    xlsx.write(nExcelRows,5,"Cell",fmt);
+    xlsx.write(nExcelRows,1,tr("变量名称"),fmt);
+    xlsx.write(nExcelRows,2,tr("数据类型"),fmt);
+    xlsx.write(nExcelRows,3,tr("规则"),fmt);
+    xlsx.write(nExcelRows,4,tr("参考值"),fmt);
+    xlsx.write(nExcelRows,5,tr("单元格坐标"),fmt);
+    xlsx.write(nExcelRows,6,tr("变量描述"),fmt);
     nExcelRows++;
     xlsx.write(nExcelRows,1,"@username",fmt);
     xlsx.write(nExcelRows,2,"String",fmt);
     xlsx.write(nExcelRows,3,"X",fmt);
     xlsx.write(nExcelRows,4,"zhangshaoyan",fmt);
     xlsx.write(nExcelRows,5,"1,1",fmt);
+    xlsx.write(nExcelRows,6,tr("姓名"),fmt);
     nExcelRows++;
     xlsx.write(nExcelRows,1,"@age",fmt);
     xlsx.write(nExcelRows,2,"Digital",fmt);
     xlsx.write(nExcelRows,3,"0-X-100",fmt);
     xlsx.write(nExcelRows,4,"32",fmt);
     xlsx.write(nExcelRows,5,"1,2",fmt);
+    xlsx.write(nExcelRows,6,tr("年龄"),fmt);
     nExcelRows++;
     xlsx.write(nExcelRows,1,"@birth",fmt);
     xlsx.write(nExcelRows,2,"Datetime",fmt);
     xlsx.write(nExcelRows,3,"20170903080901-X-20200901120023",fmt);
     xlsx.write(nExcelRows,4,"20180306121023",fmt);
     xlsx.write(nExcelRows,5,"1,3",fmt);
+    xlsx.write(nExcelRows,6,tr("出生日期"),fmt);
     nExcelRows++;
     xlsx.write(nExcelRows,1,"@marrage",fmt);
     xlsx.write(nExcelRows,2,"Boolean",fmt);
     xlsx.write(nExcelRows,3,"X",fmt);
     xlsx.write(nExcelRows,4,"true/false",fmt);
     xlsx.write(nExcelRows,5,"1,4",fmt);
+    xlsx.write(nExcelRows,6,tr("婚否"),fmt);
     nExcelRows++;
 
     //write real data.
-    xlsx.write(nExcelRows,1,"Data",fmt);
+    xlsx.write(nExcelRows,1,tr("变量列表"),fmt);
+    xlsx.write(nExcelRows,2,tr("*请手工修改*"),fmt);
     nExcelRows++;
 
     //write excel head in row 7.
-    xlsx.write(nExcelRows,1,"VarName",fmt);
-    xlsx.write(nExcelRows,2,"Type",fmt);
-    xlsx.write(nExcelRows,3,"Rule",fmt);
-    xlsx.write(nExcelRows,4,"RefValue",fmt);
-    xlsx.write(nExcelRows,5,"Cell",fmt);
+    xlsx.write(nExcelRows,1,tr("变量名称"),fmt);
+    xlsx.write(nExcelRows,2,tr("数据类型"),fmt);
+    xlsx.write(nExcelRows,3,tr("规则"),fmt);
+    xlsx.write(nExcelRows,4,tr("参考值"),fmt);
+    xlsx.write(nExcelRows,5,tr("单元格坐标"),fmt);
+    xlsx.write(nExcelRows,6,tr("变量描述"),fmt);
     nExcelRows++;
 
     //write excel data.
@@ -2131,6 +2150,7 @@ void PTemplateEditor::ZSlotExportVarSourceTemplate()
         xlsx.write(nExcelRows,3,varInfo.m_rule,fmt);
         xlsx.write(nExcelRows,4,varInfo.m_refValue,fmt);
         xlsx.write(nExcelRows,5,varInfo.m_cell,fmt);
+        xlsx.write(nExcelRows,6,tr(""),fmt);
         nExcelRows++;
     }
     //save.
@@ -2139,7 +2159,7 @@ void PTemplateEditor::ZSlotExportVarSourceTemplate()
         QMessageBox::information(this,tr("失败提示"),tr("导出变量源模板文件%1失败!").arg(fileName));
         return;
     }
-    QMessageBox::information(this,tr("成功提示"),tr("变量源模板导出Excel文件成功!\n%1").arg(fileName));
+    QMessageBox::information(this,tr("成功提示"),tr("变量源模板导出Excel文件成功!\n%1\n请打开Excel文件手工修改后，再执行导入变量源!").arg(fileName));
 }
 void PTemplateEditor::ZSlotImportVarSource()
 {
@@ -2491,7 +2511,7 @@ ZSheetWidget::ZSheetWidget()
     this->m_sheet=new ZSheet;
     this->m_treeWidget=new QTreeWidget;
 
-    this->m_treeWidget->setColumnCount(5);
+    this->m_treeWidget->setColumnCount(7);
     this->m_treeWidget->setStyleSheet("QTreeView::item:hover{background-color:rgb(0,255,0,50)}"
                                       "QTreeView::item:selected{background-color:rgb(255,0,0,100)}"
                                       "");
@@ -2501,6 +2521,8 @@ ZSheetWidget::ZSheetWidget()
     this->m_generalVarItem->setText(2,tr("变量类型"));
     this->m_generalVarItem->setText(3,tr("变量规则"));
     this->m_generalVarItem->setText(4,tr("参考值"));
+    this->m_generalVarItem->setText(5,tr("预定义坐标"));
+    this->m_generalVarItem->setText(6,tr("描述信息"));
     this->m_autoVarItem=new QTreeWidgetItem;
     this->m_autoVarItem->setText(0,tr("自动变量"));
     this->m_autoVarItem->setText(1,tr("绑定单元格"));
@@ -2511,9 +2533,6 @@ ZSheetWidget::ZSheetWidget()
     this->m_treeWidget->addTopLevelItem(this->m_autoVarItem);
     this->m_treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this->m_treeWidget,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotPopMenu(QPoint)));
-
-#define ICON_W  24
-#define ICON_H  24
 
     //line2.
     this->m_tbAlignLeft=new QToolButton;
@@ -3281,12 +3300,17 @@ void ZSheetWidget::ZPutVarSourceXmlData(QString xmlData)
                 QString type=attr.value(QString("type")).toString();
                 QString rule=attr.value(QString("rule")).toString();
                 QString refVal=attr.value(QString("refVal")).toString();
+                QString cell=attr.value(QString("cell")).toString();
+                QString desc=attr.value(QString("desc")).toString();
                 QString name=tXmlReader.readElementText();
                 QTreeWidgetItem *item=new QTreeWidgetItem;
                 item->setText(0,name);
+                //col 1 is reserved for bind cell.
                 item->setText(2,type);
                 item->setText(3,rule);
                 item->setText(4,refVal);
+                item->setText(5,cell);
+                item->setText(6,desc);
                 this->m_generalVarItem->addChild(item);
                 this->m_treeWidget->expandAll();
             }else if(nodeName=="AutoVar")
@@ -3336,12 +3360,15 @@ void ZSheetWidget::ZSlotPopMenu(const QPoint &pt)
     QAction actBindCurrentCell(QIcon(":/TemplateEditor/images/TemplateEditor/BindVar.png"),tr("绑定当前单元格"));
     QAction actBindCell(QIcon(":/TemplateEditor/images/TemplateEditor/BindVar.png"),tr("绑定单元格..."));
     QAction actRemoveBind(QIcon(":/TemplateEditor/images/TemplateEditor/UnbindVar.png"),tr("移除绑定"));
+    QAction actAutoBindPreCell(QIcon(":/TemplateEditor/images/TemplateEditor/BindVar.png"),tr("自动绑定预定义单元格"));
     popMenu.addAction(&actBindCurrentCell);
     popMenu.addAction(&actBindCell);
     popMenu.addAction(&actRemoveBind);
+    popMenu.addAction(&actAutoBindPreCell);
     connect(&actBindCurrentCell,SIGNAL(triggered(bool)),this,SLOT(ZSlotBindCurrentCell()));
     connect(&actBindCell,SIGNAL(triggered(bool)),this,SLOT(ZSlotBindCell()));
     connect(&actRemoveBind,SIGNAL(triggered(bool)),this,SLOT(ZSlotRemoveBind()));
+    connect(&actAutoBindPreCell,SIGNAL(triggered(bool)),this,SLOT(ZSlotAutoBindPreCell()));
     popMenu.exec(QCursor::pos());
 }
 void ZSheetWidget::ZSlotBindCurrentCell()
@@ -3396,4 +3423,16 @@ void ZSheetWidget::ZSlotRemoveBind()
         return;
     }
     itemVar->setText(1,"");
+}
+void ZSheetWidget::ZSlotAutoBindPreCell()
+{
+    if(QMessageBox::Cancel==QMessageBox::question(this,tr("操作确认"),tr("您确定要执行自动绑定预定义单元格操作吗?\n该操作将打乱当前已绑定的单元格坐标!"),QMessageBox::Ok,QMessageBox::Cancel))
+    {
+        return;
+    }
+    for(qint32 i=0;i<this->m_generalVarItem->childCount();i++)
+    {
+        QTreeWidgetItem *item=this->m_generalVarItem->child(i);
+        item->setText(1,item->text(5));
+    }
 }

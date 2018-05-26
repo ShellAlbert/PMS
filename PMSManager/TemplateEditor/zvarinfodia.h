@@ -9,11 +9,12 @@
 class ZVarSourceInfo
 {
 public:
-    QString m_varName;
-    QString m_varType;
-    QString m_rule;
-    QString m_refValue;
-    QString m_cell;
+    QString m_varName;//变量名称
+    QString m_varType;//数据类型
+    QString m_rule; //规则
+    QString m_refValue;//参考值
+    QString m_cell;//绑定单元格
+    QString m_varDesc;//变量描述信息
 };
 class ZVarInfoDia : public QDialog
 {

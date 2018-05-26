@@ -8,6 +8,13 @@ ZGeneralVarInfoDia::ZGeneralVarInfoDia(QWidget *parent):QDialog(parent)
     this->m_lblVarName=new QLabel(tr("变量名称(*)"));
     this->m_letVarName=new QLineEdit;
 
+    this->m_lblVarCell=new QLabel(tr("单元格坐标"));
+    this->m_letVarCell=new QLineEdit;
+
+    this->m_lblVarDesc=new QLabel(tr("描述信息"));
+    this->m_letVarDesc=new QLineEdit;
+
+
     this->m_lblVarType=new QLabel(tr("变量类型"));
     this->m_cbbVarType=new QComboBox;
     QStringList varTypes;
@@ -69,32 +76,37 @@ ZGeneralVarInfoDia::ZGeneralVarInfoDia(QWidget *parent):QDialog(parent)
     this->m_gridLayout->addWidget(this->m_lblVarType,1,0,1,1);
     this->m_gridLayout->addWidget(this->m_cbbVarType,1,1,1,1);
 
-    //for Digital.
-    this->m_gridLayout->addWidget(this->m_lblVarRange,2,0,1,1);
-    this->m_gridLayout->addWidget(this->m_lblVarMin,3,0,1,1);
-    this->m_gridLayout->addWidget(this->m_letVarMin,3,1,1,1);
-    this->m_gridLayout->addWidget(this->m_lblVarMax,3,2,1,1);
-    this->m_gridLayout->addWidget(this->m_letVarMax,3,3,1,1);
-    this->m_gridLayout->addWidget(this->m_lblDigitalRefVal,4,0,1,1);
-    this->m_gridLayout->addWidget(this->m_leDigitalRefVal,4,1,1,1);
+    this->m_gridLayout->addWidget(this->m_lblVarCell,2,0,1,1);
+    this->m_gridLayout->addWidget(this->m_letVarCell,2,1,1,1);
 
+    this->m_gridLayout->addWidget(this->m_lblVarDesc,3,0,1,1);
+    this->m_gridLayout->addWidget(this->m_letVarDesc,3,1,1,1);
+
+    //for Digital.
+    this->m_gridLayout->addWidget(this->m_lblVarRange,4,0,1,1);
+    this->m_gridLayout->addWidget(this->m_lblVarMin,5,0,1,1);
+    this->m_gridLayout->addWidget(this->m_letVarMin,5,1,1,1);
+    this->m_gridLayout->addWidget(this->m_lblVarMax,5,2,1,1);
+    this->m_gridLayout->addWidget(this->m_letVarMax,5,3,1,1);
+    this->m_gridLayout->addWidget(this->m_lblDigitalRefVal,6,0,1,1);
+    this->m_gridLayout->addWidget(this->m_leDigitalRefVal,6,1,1,1);
 
     //for String.
-    this->m_gridLayout->addWidget(this->m_lblRefValue,5,0,1,1);
-    this->m_gridLayout->addWidget(this->m_leRefValue,5,1,1,3);
+    this->m_gridLayout->addWidget(this->m_lblRefValue,7,0,1,1);
+    this->m_gridLayout->addWidget(this->m_leRefValue,7,1,1,3);
 
     //for Datetime.
-    this->m_gridLayout->addWidget(this->m_lblStartTime,6,0,1,1);
-    this->m_gridLayout->addWidget(this->m_dtStart,6,1,1,1);
-    this->m_gridLayout->addWidget(this->m_lblEndTime,6,2,1,1);
-    this->m_gridLayout->addWidget(this->m_dtEnd,6,3,1,1);
+    this->m_gridLayout->addWidget(this->m_lblStartTime,8,0,1,1);
+    this->m_gridLayout->addWidget(this->m_dtStart,8,1,1,1);
+    this->m_gridLayout->addWidget(this->m_lblEndTime,8,2,1,1);
+    this->m_gridLayout->addWidget(this->m_dtEnd,8,3,1,1);
 
     //for boolean.
-    this->m_gridLayout->addWidget(this->m_lblBoolean,7,0,1,1);
-    this->m_gridLayout->addWidget(this->m_cbBoolean,7,1,1,1);
+    this->m_gridLayout->addWidget(this->m_lblBoolean,9,0,1,1);
+    this->m_gridLayout->addWidget(this->m_cbBoolean,9,1,1,1);
 
-    this->m_gridLayout->addWidget(this->m_btnOkay,8,2,1,1);
-    this->m_gridLayout->addWidget(this->m_btnCancel,8,3,1,1);
+    this->m_gridLayout->addWidget(this->m_btnOkay,10,2,1,1);
+    this->m_gridLayout->addWidget(this->m_btnCancel,10,3,1,1);
     this->setLayout(this->m_gridLayout);
 
     connect(this->m_btnOkay,SIGNAL(clicked(bool)),this,SLOT(ZSlotOkay()));
@@ -109,6 +121,12 @@ ZGeneralVarInfoDia::~ZGeneralVarInfoDia()
 
     delete this->m_lblVarType;
     delete this->m_cbbVarType;
+
+    delete this->m_lblVarCell;
+    delete this->m_letVarCell;
+
+    delete this->m_lblVarDesc;
+    delete this->m_letVarDesc;
 
     //for Digitial.
     delete this->m_lblVarRange;
@@ -239,10 +257,19 @@ void ZGeneralVarInfoDia::ZSlotDataTypeChanged(QString type)
 }
 void ZGeneralVarInfoDia::ZSlotOkay()
 {
-    if(this->m_letVarName->text().isEmpty())
+    if(this->m_letVarName->text().trimmed().isEmpty())
     {
         QMessageBox::critical(this,tr("错误提示"),tr("变量名称不能为空!"));
         return;
+    }
+    QString varCell=this->m_letVarCell->text().trimmed();
+    if(!varCell.isEmpty())
+    {
+        if(varCell.split(",").size()!=2)
+        {
+            QMessageBox::critical(this,tr("错误提示"),tr("单元格坐标格式不对!\n例如:   2,2"));
+            return;
+        }
     }
     this->accept();
 }
@@ -354,4 +381,20 @@ void ZGeneralVarInfoDia::ZSetRefValue(QString val)
     }
 }
 
+QString ZGeneralVarInfoDia::ZGetVarCell()
+{
+    return this->m_letVarCell->text().trimmed();
+}
+void ZGeneralVarInfoDia::ZSetVarCell(QString cell)
+{
+    this->m_letVarCell->setText(cell);
+}
 
+QString ZGeneralVarInfoDia::ZGetVarDesc()
+{
+    return this->m_letVarDesc->text().trimmed();
+}
+void ZGeneralVarInfoDia::ZSetVarDesc(QString desc)
+{
+    this->m_letVarDesc->setText(desc);
+}

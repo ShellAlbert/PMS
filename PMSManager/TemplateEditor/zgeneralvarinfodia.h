@@ -26,6 +26,12 @@ public:
 
     QString ZGetRefValue();
     void ZSetRefValue(QString val);
+
+    QString ZGetVarCell();
+    void ZSetVarCell(QString cell);
+
+    QString ZGetVarDesc();
+    void ZSetVarDesc(QString desc);
 private slots:
     void ZSlotDataTypeChanged(QString type);
     void ZSlotOkay();
@@ -36,6 +42,12 @@ private:
 
     QLabel *m_lblVarType;
     QComboBox *m_cbbVarType;
+
+    QLabel *m_lblVarCell;
+    QLineEdit *m_letVarCell;
+
+    QLabel *m_lblVarDesc;
+    QLineEdit *m_letVarDesc;
 
     //for String.
     QLabel *m_lblRefValue;

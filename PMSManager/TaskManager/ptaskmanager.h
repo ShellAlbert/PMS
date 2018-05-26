@@ -13,6 +13,7 @@
 #include <QMenu>
 #include <QListWidget>
 #include <QAction>
+#include <QGroupBox>
 #include "pgblpara.h"
 class PTaskList:public QFrame
 {
@@ -236,11 +237,14 @@ class ZProductNoPresetDialog:public QDialog
 {
     Q_OBJECT
 public:
-    ZProductNoPresetDialog(QWidget *parent=0);
+    ZProductNoPresetDialog(QString templateName,QWidget *parent=0);
     ~ZProductNoPresetDialog();
 
     QStringList ZReadList();
     QStringList ZGetList();
+
+    QStringList ZReadXYList();
+    QStringList ZGetXYList();
 protected:
     QSize sizeHint() const;
     void closeEvent(QCloseEvent *e);
@@ -250,7 +254,12 @@ private slots:
     void ZSlotReset();
     void ZSlotImport();
     void ZSlotExport();
+
+    void ZSlotAddXY();
+    void ZSlotDelXY();
+    void ZSlotResetXY();
 private:
+    QGroupBox *m_grpPreVal;
     QListWidget *m_list;
     QToolButton *m_tbAdd;
     QToolButton *m_tbDel;
@@ -258,6 +267,18 @@ private:
     QToolButton *m_tbImport;
     QToolButton *m_tbExport;
     QVBoxLayout *m_vLayoutBtn;
+    QHBoxLayout *m_hLayoutGrp;
+
+    QGroupBox *m_grpFillXY;
+    QListWidget *m_xyList;
+    QToolButton *m_tbAddXY;
+    QToolButton *m_tbDelXY;
+    QToolButton *m_tbResetXY;
+    QVBoxLayout *m_vLayoutBtnXY;
+    QHBoxLayout *m_hLayoutGrpXY;
+
     QHBoxLayout *m_hLayout;
+private:
+    QString m_relatedTemplate;
 };
 #endif // PTASKMANAGER_H

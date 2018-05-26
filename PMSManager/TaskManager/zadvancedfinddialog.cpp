@@ -136,7 +136,7 @@ void ZAdvancedFindDialog::ZSlotLoadPresetValues()
         this->m_cbOrderNo->addItem(QIcon(":/TaskManager/images/TaskManager/OrderNo.png"),lstOrderNo.at(i));
     }
     //载入预置输入项，减少用户操作键盘。
-    ZProductNoPresetDialog productNoDia;
+    ZProductNoPresetDialog productNoDia(QString(""));
     QStringList lstProductNo=productNoDia.ZReadList();
     for(qint32 i=0;i<lstProductNo.size();i++)
     {

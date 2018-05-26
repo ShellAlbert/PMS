@@ -4,6 +4,7 @@
 #include <QPixmap>
 #include <QInputDialog>
 #include <QMessageBox>
+#include "zdatacomparedialog.h"
 ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
 {
     this->m_cellDelegate=new ZCellDelegate;
@@ -64,6 +65,9 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
     this->m_actMutexManagr=new QAction(QIcon(":/common/images/common/del.png"),tr("复选框互斥"),this);
     connect(this->m_actMutexManagr,SIGNAL(triggered(bool)),this,SLOT(ZSlotMutexManager()));
 
+    this->m_actMinMaxDataCompare=new QAction(QIcon(":/common/images/common/del.png"),tr("最小/最大值比对"),this);
+    connect(this->m_actMinMaxDataCompare,SIGNAL(triggered(bool)),this,SLOT(ZSlotMinMaxDataCompare()));
+
     this->m_actDeleteRows=new QAction(QIcon(":/common/images/common/del.png"),tr("删除行"),this);
     connect(this->m_actDeleteRows,SIGNAL(triggered(bool)),this,SLOT(ZSlotDeleteRows()));
 
@@ -106,6 +110,7 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
 
     this->m_popupMenu->addMenu(this->m_subMenuRowCol);
     this->m_popupMenu->addAction(this->m_actMutexManagr);
+    this->m_popupMenu->addAction(this->m_actMinMaxDataCompare);
 }
 
 ZSheet::~ZSheet()
@@ -125,6 +130,7 @@ ZSheet::~ZSheet()
     delete this->m_actFastRemoveWidget;
     delete this->m_actRemoveWidget;
     delete this->m_actMutexManagr;
+    delete this->m_actMinMaxDataCompare;
     delete this->m_actDeleteRows;
     delete this->m_actDeleteCols;
     delete this->m_actInsertRows;
@@ -375,11 +381,44 @@ void ZSheet::ZSlotMutexManager()
 {
 
 }
+void ZSheet::ZSlotMinMaxDataCompare()
+{
+    ZMinMaxCompareDialog diaMinMaxCompare(this);
+    connect(&diaMinMaxCompare,SIGNAL(ZSigHighlightCell(QString,QString,QString)),this,SLOT(ZSlotHighlightCell(QString,QString,QString)));
+    diaMinMaxCompare.ZSetDestMinMaxPair(this->m_destMinMaxPair);
+    if(diaMinMaxCompare.exec()==QDialog::Accepted)
+    {
+        this->m_destMinMaxPair=diaMinMaxCompare.ZGetDestMinMaxPair();
+        emit this->ZSignalSheetChanged(this->m_templateName);
+    }
+    disconnect(&diaMinMaxCompare,SIGNAL(ZSigHighlightCell(QString,QString,QString)),this,SLOT(ZSlotHighlightCell(QString,QString,QString)));
+}
+void ZSheet::ZSlotHighlightCell(QString destCell,QString minCell,QString maxCell)
+{
+    QStringList destXYList=destCell.split(",");
+    qint32 destX=destXYList.at(0).toInt();
+    qint32 destY=destXYList.at(1).toInt();
+    this->setSelection(QRect(destX,destY,1,1),QItemSelectionModel::Select);
+}
+QString ZSheet::ZGetDestMinMaxXmlData()
+{
+    QString xmlData;
+    for(qint32 i=0;i<this->m_destMinMaxPair.size();i++)
+    {
+        xmlData+=this->m_destMinMaxPair.at(0)+"@";
+    }
+    return xmlData;
+}
+void ZSheet::ZSetDestMinMaxXmlData(QString pairXml)
+{
+    this->m_destMinMaxPair=pairXml.split("@");
+}
 void ZSheet::ZSlotDeleteRows()
 {
     qint32 rowNo=this->currentRow();
     if(rowNo!=-1)
     {
+        this->selectRow(rowNo);
         if(QMessageBox::Ok==QMessageBox::question(this,tr("操作确认"),tr("您确认要删除该行吗?\n行号%1.").arg(rowNo+1),QMessageBox::Ok,QMessageBox::Cancel))
         {
             this->removeRow(rowNo);
@@ -391,6 +430,7 @@ void ZSheet::ZSlotDeleteCols()
     qint32 colNo=this->currentColumn();
     if(colNo!=-1)
     {
+        this->selectColumn(colNo);
         if(QMessageBox::Ok==QMessageBox::question(this,tr("操作确认"),tr("您确认要删除该列吗?\n列号%1.").arg(colNo+1),QMessageBox::Ok,QMessageBox::Cancel))
         {
             this->removeColumn(colNo);

@@ -24,6 +24,7 @@ public:
     void ZSetTemplateName(QString name);
     QString ZGetTemplateName();
     void ZSetTemplateXmlData(QString templateXmlDta);
+    void ZSetDestMinMaxCmpXmlData(QString destMinMaxXml);
 
     QString ZGetSaveAsTemplateName();
 
@@ -53,6 +54,7 @@ private:
     //dialog type.
     TemplateInfoDiaType m_diaType;
     QString m_templateXmlData;
+    QString m_destMinMaxXmlData;
 };
 
 #endif // ZTEMPLATEINFODIA_H

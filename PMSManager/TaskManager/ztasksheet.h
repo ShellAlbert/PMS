@@ -114,6 +114,10 @@ public:
 
     qint32 ZGetTaskState();
     void ZSetTaskState(qint32 state);
+
+    //自动填写订单号到配置的单元格中
+    //自动复制到单元格。
+    void ZLoadAutoFillCellWithProductNo(QString relatedTemplate);
 signals:
     void ZSignalLogMsg(QString logMsg);
     void ZSignalDataChanged(QString taskName);
@@ -123,6 +127,9 @@ private slots:
     void ZSlotShowLineChart();
     void ZSlotShowBarChart();
     void ZSlotHideVarTree();
+    void ZSlotShowAutoFillProductNo2XY();
+
+    void ZSlotSheetDoubleClicked(qint32 x,qint32 y);
 public:
     ///////////////////////////
     QHBoxLayout *m_hLayoutTop;
@@ -162,6 +169,11 @@ public:
     QString m_checkTime;
 private:
     bool m_bHideVarTree;
+
+    //自动填写订单号到配置的单元格中
+    //自动复制到单元格。
+private:
+    QStringList m_xyListAutoFillProductNo;
 };
 #include <QComboBox>
 #include <QDateTimeEdit>

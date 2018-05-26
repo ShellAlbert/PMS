@@ -141,7 +141,8 @@ HEADERS += \
     pgblpara.h \
     pmainwin.h \
     pwaitingdia.h \
-    TaskManager/zadvancedfinddialog.h
+    TaskManager/zadvancedfinddialog.h \
+    Sheet/zdatacomparedialog.h
 
 SOURCES += \
     BackupManager/zbackupinfodia.cpp \
@@ -246,7 +247,8 @@ SOURCES += \
     pgblpara.cpp \
     pmainwin.cpp \
     pwaitingdia.cpp \
-    TaskManager/zadvancedfinddialog.cpp
+    TaskManager/zadvancedfinddialog.cpp \
+    Sheet/zdatacomparedialog.cpp
 
 
 RESOURCES += \
