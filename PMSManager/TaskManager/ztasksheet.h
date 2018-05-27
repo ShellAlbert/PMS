@@ -45,6 +45,11 @@ public:
     void ZSetTaskState(qint32 state);
     qint32 ZGetTaskState();
 
+    void ZClearBindVarCell(void);
+    //check destination&min&max cell.
+    void ZSetDestMinMaxPair(QString minMaxPair);
+    QString ZGetDestMinMaxPair();
+
     void ZMakeProxyWidgetUnEditable(bool bEditable);
 signals:
     void ZSignalLogMsg(QString logMsg);
@@ -75,6 +80,7 @@ private:
     QMap<QString,VarInfo> m_varMap;
 
     qint32 m_taskState;
+    QString m_minMaxPair;
 };
 class ZCellDataCheckReportDialog:public QDialog
 {
@@ -96,7 +102,7 @@ class ZTaskWidget:public QFrame
 {
     Q_OBJECT
 public:
-    ZTaskWidget(QWidget *parent=0);
+    ZTaskWidget(QString refTemplate,QWidget *parent=0);
     ~ZTaskWidget();
 
 
@@ -115,9 +121,8 @@ public:
     qint32 ZGetTaskState();
     void ZSetTaskState(qint32 state);
 
-    //自动填写订单号到配置的单元格中
-    //自动复制到单元格。
-    void ZLoadAutoFillCellWithProductNo(QString relatedTemplate);
+    void ZSetPreSetProductNo(QString preSetProductNo);
+    void ZSetAutoFillProductNo(QString autoFillXY);
 signals:
     void ZSignalLogMsg(QString logMsg);
     void ZSignalDataChanged(QString taskName);
@@ -127,9 +132,12 @@ private slots:
     void ZSlotShowLineChart();
     void ZSlotShowBarChart();
     void ZSlotHideVarTree();
+    //auto copy product no to cells.
+    void ZSlotAutoFillProductNo2Cells(QString newProductNo);
     void ZSlotShowAutoFillProductNo2XY();
-
-    void ZSlotSheetDoubleClicked(qint32 x,qint32 y);
+    //auto copy order no to cells.
+    void ZSlotAutoFillOrderNo2Cells(QString newProductNo);
+    void ZSlotShowAutoFillOrderNo2XY();
 public:
     ///////////////////////////
     QHBoxLayout *m_hLayoutTop;
@@ -174,6 +182,7 @@ private:
     //自动复制到单元格。
 private:
     QStringList m_xyListAutoFillProductNo;
+    QStringList m_xyListAutoFillOrderNo;
 };
 #include <QComboBox>
 #include <QDateTimeEdit>

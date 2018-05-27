@@ -1,6 +1,7 @@
 #include "ztaskinfodia.h"
 #include <QXmlStreamReader>
 #include <QMessageBox>
+#include <QDebug>
 ZTaskInfoDia::ZTaskInfoDia(ZTaskInfoDia::TaskInfoDiaType type,QWidget *parent):ZBaseInfoDia(ZBaseInfoDia::Dialog_End_By_Calling_Close,parent)
 {
     this->setMinimumSize(400,200);
@@ -23,9 +24,9 @@ ZTaskInfoDia::ZTaskInfoDia(ZTaskInfoDia::TaskInfoDiaType type,QWidget *parent):Z
     this->m_leStepName->setEnabled(false);
 
     this->m_tbOkay=new QToolButton;
-    this->m_tbOkay->setText(tr("OKAY"));
+    this->m_tbOkay->setText(tr("确定"));
     this->m_tbCancel=new QToolButton;
-    this->m_tbCancel->setText(tr("CANCEL"));
+    this->m_tbCancel->setText(tr("取消"));
     this->m_tbOkay->setIcon(QIcon(":/common/images/common/okay.png"));
     this->m_tbOkay->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     this->m_tbCancel->setIcon(QIcon(":/common/images/common/cancel.png"));
@@ -124,6 +125,7 @@ ZTaskInfoDia::~ZTaskInfoDia()
 }
 void ZTaskInfoDia::ZParseAckNetFrmXmlData()
 {
+    qDebug()<<"ZTaskInfoDia:"<<this->m_ackNetFrmXmlData;
     QXmlStreamReader tXmlReader(this->m_ackNetFrmXmlData);
     while(!tXmlReader.atEnd())
     {
@@ -135,6 +137,7 @@ void ZTaskInfoDia::ZParseAckNetFrmXmlData()
             {
                 QXmlStreamAttributes attr=tXmlReader.attributes();
                 QString cmd=attr.value(QString("cmd")).toString();
+                qDebug()<<"Parse out cmd="<<cmd;
                 if(cmd=="add")
                 {
                     qint32 retCode=attr.value(QString("retCode")).toInt();
@@ -164,34 +167,66 @@ void ZTaskInfoDia::ZParseAckNetFrmXmlData()
                         paraList.append(checkTime);
                     }
                     this->ZGetAckNetFrmProcessWidget()->ZProcessAckNetFrm("task","add",paraList,retCode);
-                }else if(cmd=="get")
+                }else if(cmd=="open")
                 {
-                    QString refTemplate=attr.value(QString("refTemplate")).toString();
-                    QString refProcess=attr.value(QString("refProcess")).toString();
-                    QString refStep=attr.value(QString("refStep")).toString();
-                    QString machineNo=attr.value(QString("machineNo")).toString();
-                    QString classNo=attr.value(QString("classNo")).toString();
-                    QString orderNo=attr.value(QString("orderNo")).toString();
-                    QString productNo=attr.value(QString("productNo")).toString();
-                    QString templatedata=attr.value(QString("templatedata")).toString();
-                    QString varsrcdata=attr.value(QString("varsrcdata")).toString();
-                    QString vardata=attr.value(QString("vardata")).toString();
-                    QString taskState=attr.value(QString("taskState")).toString();
-                    QString taskName=tXmlReader.readElementText();
+                    qDebug()<<"open command here!";
+                    qint32 retCode=attr.value(QString("retCode")).toInt();
+                    QString taskName=attr.value(QString("taskName")).toString();
                     QStringList paraList;
                     paraList.append(taskName);
-                    paraList.append(refTemplate);
-                    paraList.append(refProcess);
-                    paraList.append(refStep);
-                    paraList.append(machineNo);
-                    paraList.append(classNo);
-                    paraList.append(orderNo);
-                    paraList.append(productNo);
-                    paraList.append(templatedata);
-                    paraList.append(varsrcdata);
-                    paraList.append(vardata);
-                    paraList.append(taskState);
-                    this->ZGetAckNetFrmProcessWidget()->ZProcessAckNetFrm("task","get",paraList,0);
+                    if(retCode<0)
+                    {
+                        QString errMsg=attr.value(QString("errMsg")).toString();
+                        paraList.append(errMsg);
+                    }else{
+                        QString refTemplate=attr.value(QString("refTemplate")).toString();
+                        QString refProcess=attr.value(QString("refProcess")).toString();
+                        QString refStep=attr.value(QString("refStep")).toString();
+                        QString machineNo=attr.value(QString("machineNo")).toString();
+                        QString classNo=attr.value(QString("classNo")).toString();
+                        QString orderNo=attr.value(QString("orderNo")).toString();
+                        QString productNo=attr.value(QString("productNo")).toString();
+                        QString taskState=attr.value(QString("taskState")).toString();
+                        QString packData=tXmlReader.readElementText();
+                        QStringList packDataList=packData.split(",");
+                        QString templatedata;
+                        QString minMaxPair;
+                        QString productNoData;
+                        QString productNoXYData;
+                        QString varsrcdata;
+                        QString vardata;
+                        if(packDataList.size()==6)
+                        {
+                            templatedata=packDataList.at(0);
+                            minMaxPair=packDataList.at(1);
+                            productNoData=packDataList.at(2);
+                            productNoXYData=packDataList.at(3);
+                            varsrcdata=packDataList.at(4);
+                            vardata=packDataList.at(5);
+                        }
+//                        QString templatedata=attr.value(QString("templatedata")).toString();
+//                        QString minMaxPair=attr.value(QString("minMaxPair")).toString();
+//                        QString productNoData=attr.value(QString("productNo")).toString();
+//                        QString productNoXYData=attr.value(QString("productNoXY")).toString();
+//                        QString varsrcdata=attr.value(QString("varsrcdata")).toString();
+//                        QString vardata=attr.value(QString("vardata")).toString();
+                        paraList.append(refTemplate);
+                        paraList.append(refProcess);
+                        paraList.append(refStep);
+                        paraList.append(machineNo);
+                        paraList.append(classNo);
+                        paraList.append(orderNo);
+                        paraList.append(productNo);
+                        paraList.append(templatedata);
+                        paraList.append(minMaxPair);
+                        paraList.append(productNoData);
+                        paraList.append(productNoXYData);
+                        paraList.append(varsrcdata);
+                        paraList.append(vardata);
+                        paraList.append(taskState);
+                    }
+                    //qDebug()<<"gettask:"<<paraList;
+                    this->ZGetAckNetFrmProcessWidget()->ZProcessAckNetFrm("task","open",paraList,retCode);
                 }else if(cmd=="del")
                 {
                     qint32 retCode=attr.value(QString("retCode")).toInt();

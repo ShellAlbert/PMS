@@ -6,10 +6,10 @@
 PNetProtocol::PNetProtocol(QObject *parent) : QObject(parent)
 {
     this->m_sendBuffer=new QByteArray;
-    this->m_sendBuffer->resize(2*1024*1024);
+    this->m_sendBuffer->resize(4*1024*1024);
 
     this->m_recvBuffer=new QByteArray;
-    this->m_recvBuffer->resize(2*1024*1024);
+    this->m_recvBuffer->resize(4*1024*1024);
     this->m_recvDataSize=0;
 }
 PNetProtocol::~PNetProtocol()
@@ -276,15 +276,12 @@ PNetProcessor::PNetProcessor()
     connect(this->m_thread,SIGNAL(started()),this->m_netProtocol,SLOT(ZSlotStart()),Qt::DirectConnection);
     connect(this->m_netProtocol,SIGNAL(ZSignalTxNetFrm(qint32)),this,SLOT(ZSlotTxNetFrm(qint32)));
 
-
-
     this->m_timeoutThread=new QThread;
     this->m_netTimeout=new PNetProTimeout;
     this->m_netTimeout->moveToThread(this->m_timeoutThread);
 
     connect(this->m_timeoutThread,SIGNAL(started()),this->m_netTimeout,SLOT(ZSlotStart()),Qt::DirectConnection);
     connect(this->m_netTimeout,SIGNAL(ZSignalTxNetFrmTimeout(qint32)),this,SLOT(ZSlotTxNetFrmTimeout(qint32)));
-
 
     this->m_thread->start();
     this->m_timeoutThread->start();

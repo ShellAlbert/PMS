@@ -55,6 +55,14 @@ public:
     ///////////////////////////////////
     QString ZGetDestMinMaxXmlData();
     void ZSetDestMinMaxXmlData(QString pairXml);
+
+    ///////////////////////////////////////////////
+    QString ZGetPreSetProductNo();
+    void ZSetPreSetProductNo(QString productNo);
+
+    QString ZGetXYAutoFillProductNo();
+    void ZSetXYAutoFillProductNo(QString productNo);
+
 private slots:
     void ZSlotItemEntered();
     void ZSlotHAlignLeft();
@@ -69,6 +77,7 @@ private slots:
     void ZSlotRemoveWidget();
     void ZSlotMutexManager();
     void ZSlotMinMaxDataCompare();
+    void ZSlotAutoFillProductNo();
     void ZSlotDeleteRows();
     void ZSlotDeleteCols();
     void ZSlotInsertRows();
@@ -116,6 +125,7 @@ private:
 
     QAction *m_actMutexManagr;
     QAction *m_actMinMaxDataCompare;
+    QAction *m_actAutoFillProductNo;
 
     QMenu *m_subMenuRowCol;
     QAction *m_actDeleteRows;
@@ -126,6 +136,10 @@ private:
 private:
     //for min/max data compare.
     QStringList m_destMinMaxPair;
+
+private:
+    QStringList m_xyAutoFillProductNoList;
+    QStringList m_preSetProductNoList;
 };
 
 

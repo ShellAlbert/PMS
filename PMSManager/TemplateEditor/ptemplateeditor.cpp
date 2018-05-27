@@ -612,9 +612,11 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
             QString creator=paraList.at(1);
             QString data=paraList.at(2);
             QString minMaxPair=paraList.at(3);
-            QString fileSize=paraList.at(4);
-            QString varSourceData=paraList.at(5);
-            QString errMsg=paraList.at(6);
+            QString productNo=paraList.at(4);
+            QString productNoXY=paraList.at(5);
+            QString fileSize=paraList.at(6);
+            QString varSourceData=paraList.at(7);
+            QString errMsg=paraList.at(8);
             if(ackNetRetCode<0)
             {
                 ZSheetWidget *sheetWidget=new ZSheetWidget;
@@ -627,6 +629,8 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 //add template in tab.
                 ZSheetWidget *sheetWidget=new ZSheetWidget;
                 sheetWidget->m_sheet->ZSetTemplateName(templateName);
+                sheetWidget->m_sheet->ZSetPreSetProductNo(productNo);
+                sheetWidget->m_sheet->ZSetXYAutoFillProductNo(productNoXY);
                 //here must put VarSourceXmlData first.
                 //because TemplateXmlData contains VarBindCell information.
                 sheetWidget->ZPutVarSourceXmlData(varSourceData);
@@ -781,9 +785,12 @@ void PTemplateEditor::ZProcessAckNetFrm(QString item,QString cmd,QStringList par
                 for(qint32 i=0;i<this->m_templateWidget->m_treeVarSource->topLevelItemCount();i++)
                 {
                     QTreeWidgetItem *item=this->m_templateWidget->m_treeVarSource->topLevelItem(i);
-                    qint32 refCount=item->text(1).toInt();
-                    item->setText(1,QString("%1").arg(refCount-1));
-                    break;
+                    if(item->text(0)==varSource)
+                    {
+                        qint32 refCount=item->text(1).toInt();
+                        item->setText(1,QString("%1").arg(refCount-1));
+                        break;
+                    }
                 }
             }
         }
@@ -950,6 +957,8 @@ void PTemplateEditor::ZSlotSaveTemplate()
         dia->ZSetTemplateName(sheetWidget->m_sheet->ZGetTemplateName());
         dia->ZSetTemplateXmlData(sheetWidget->ZGetTemplateXmlData());
         dia->ZSetDestMinMaxCmpXmlData(sheetWidget->m_sheet->ZGetDestMinMaxXmlData());
+        dia->ZSetPreSetProductNo(sheetWidget->m_sheet->ZGetPreSetProductNo());
+        dia->ZSetAutoFillProductNo(sheetWidget->m_sheet->ZGetXYAutoFillProductNo());
         if(dia->exec()==QDialog::Accepted)
         {
             dia->ZShowWaitingDialog();

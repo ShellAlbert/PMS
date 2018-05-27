@@ -114,6 +114,7 @@ ZAdvancedFindDialog::~ZAdvancedFindDialog()
 }
 void ZAdvancedFindDialog::ZSlotLoadPresetValues()
 {
+#if 0
     //载入预置输入项，减少用户操作键盘。
     ZProductLinePresetDialog PLDia("");
     QStringList lstPL=PLDia.ZReadList();
@@ -129,7 +130,7 @@ void ZAdvancedFindDialog::ZSlotLoadPresetValues()
         this->m_cbClass->addItem(QIcon(":/TaskManager/images/TaskManager/Class.png"),lstClass.at(i));
     }
     //载入预置输入项，减少用户操作键盘。
-    ZOrderNoPresetDialog orderNoDia;
+    ZOrderNoPresetDialog orderNoDia(QString(""));
     QStringList lstOrderNo=orderNoDia.ZReadList();
     for(qint32 i=0;i<lstOrderNo.size();i++)
     {
@@ -142,6 +143,7 @@ void ZAdvancedFindDialog::ZSlotLoadPresetValues()
     {
         this->m_cbProductNo->addItem(QIcon(":/TaskManager/images/TaskManager/ProductNo.png"),lstProductNo.at(i));
     }
+#endif
 }
 QSize ZAdvancedFindDialog::sizeHint() const
 {

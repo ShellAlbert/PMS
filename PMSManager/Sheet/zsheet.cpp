@@ -5,6 +5,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include "zdatacomparedialog.h"
+#include <TaskManager/zpresetdialogs.h>
 ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
 {
     this->m_cellDelegate=new ZCellDelegate;
@@ -68,6 +69,9 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
     this->m_actMinMaxDataCompare=new QAction(QIcon(":/common/images/common/del.png"),tr("最小/最大值比对"),this);
     connect(this->m_actMinMaxDataCompare,SIGNAL(triggered(bool)),this,SLOT(ZSlotMinMaxDataCompare()));
 
+    this->m_actAutoFillProductNo=new QAction(QIcon(":/common/images/common/del.png"),tr("产品号自动填充"),this);
+    connect(this->m_actAutoFillProductNo,SIGNAL(triggered(bool)),this,SLOT(ZSlotAutoFillProductNo()));
+
     this->m_actDeleteRows=new QAction(QIcon(":/common/images/common/del.png"),tr("删除行"),this);
     connect(this->m_actDeleteRows,SIGNAL(triggered(bool)),this,SLOT(ZSlotDeleteRows()));
 
@@ -111,6 +115,7 @@ ZSheet::ZSheet(QWidget *parent):QTableWidget(parent)
     this->m_popupMenu->addMenu(this->m_subMenuRowCol);
     this->m_popupMenu->addAction(this->m_actMutexManagr);
     this->m_popupMenu->addAction(this->m_actMinMaxDataCompare);
+    this->m_popupMenu->addAction(this->m_actAutoFillProductNo);
 }
 
 ZSheet::~ZSheet()
@@ -131,6 +136,7 @@ ZSheet::~ZSheet()
     delete this->m_actRemoveWidget;
     delete this->m_actMutexManagr;
     delete this->m_actMinMaxDataCompare;
+    delete this->m_actAutoFillProductNo;
     delete this->m_actDeleteRows;
     delete this->m_actDeleteCols;
     delete this->m_actInsertRows;
@@ -393,12 +399,32 @@ void ZSheet::ZSlotMinMaxDataCompare()
     }
     disconnect(&diaMinMaxCompare,SIGNAL(ZSigHighlightCell(QString,QString,QString)),this,SLOT(ZSlotHighlightCell(QString,QString,QString)));
 }
+void ZSheet::ZSlotAutoFillProductNo()
+{
+    ZProductNoPresetDialog productDia(this->m_templateName,this);
+    productDia.ZSetPreVal_XY_List(this->m_preSetProductNoList,this->m_xyAutoFillProductNoList);
+    productDia.exec();
+    //update local list.
+    productDia.ZGetPreVal_XY_List(this->m_preSetProductNoList,this->m_xyAutoFillProductNoList);
+    //maybe is changed.
+    emit this->ZSignalSheetChanged(this->m_templateName);
+}
 void ZSheet::ZSlotHighlightCell(QString destCell,QString minCell,QString maxCell)
 {
     QStringList destXYList=destCell.split(",");
-    qint32 destX=destXYList.at(0).toInt();
-    qint32 destY=destXYList.at(1).toInt();
+    qint32 destX=destXYList.at(0).toInt()-1;
+    qint32 destY=destXYList.at(1).toInt()-1;
     this->setSelection(QRect(destX,destY,1,1),QItemSelectionModel::Select);
+
+    QStringList minXYList=minCell.split(",");
+    qint32 minX=minXYList.at(0).toInt()-1;
+    qint32 minY=minXYList.at(1).toInt()-1;
+    this->setSelection(QRect(minX,minY,1,1),QItemSelectionModel::Select);
+
+    QStringList maxXYList=maxCell.split(",");
+    qint32 maxX=maxXYList.at(0).toInt()-1;
+    qint32 maxY=maxXYList.at(1).toInt()-1;
+    this->setSelection(QRect(maxX,maxY,1,1),QItemSelectionModel::Select);
 }
 QString ZSheet::ZGetDestMinMaxXmlData()
 {
@@ -412,6 +438,46 @@ QString ZSheet::ZGetDestMinMaxXmlData()
 void ZSheet::ZSetDestMinMaxXmlData(QString pairXml)
 {
     this->m_destMinMaxPair=pairXml.split("@");
+}
+QString ZSheet::ZGetPreSetProductNo()
+{
+    QString productNo;
+    for(qint32 i=0;i<this->m_preSetProductNoList.size();i++)
+    {
+        productNo.append(this->m_preSetProductNoList.at(i)+"@");
+    }
+    return productNo;
+}
+void ZSheet::ZSetPreSetProductNo(QString productNo)
+{
+    qDebug()<<productNo;
+    this->m_preSetProductNoList.clear();
+
+    QStringList productNoList=productNo.split("@");
+    for(qint32 i=0;i<productNoList.size();i++)
+    {
+        this->m_preSetProductNoList.append(productNoList.at(i));
+    }
+}
+QString ZSheet::ZGetXYAutoFillProductNo()
+{
+    QString xyProductNo;
+    for(qint32 i=0;i<this->m_xyAutoFillProductNoList.size();i++)
+    {
+        xyProductNo.append(this->m_xyAutoFillProductNoList.at(i)+"@");
+    }
+    return xyProductNo;
+}
+void ZSheet::ZSetXYAutoFillProductNo(QString xyProductNo)
+{
+    qDebug()<<xyProductNo;
+    this->m_xyAutoFillProductNoList.clear();
+
+    QStringList xyProductNoList=xyProductNo.split("@");
+    for(qint32 i=0;i<xyProductNoList.size();i++)
+    {
+        this->m_xyAutoFillProductNoList.append(xyProductNoList.at(i));
+    }
 }
 void ZSheet::ZSlotDeleteRows()
 {

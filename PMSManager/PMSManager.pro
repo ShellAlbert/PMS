@@ -142,7 +142,8 @@ HEADERS += \
     pmainwin.h \
     pwaitingdia.h \
     TaskManager/zadvancedfinddialog.h \
-    Sheet/zdatacomparedialog.h
+    Sheet/zdatacomparedialog.h \
+    TaskManager/zpresetdialogs.h
 
 SOURCES += \
     BackupManager/zbackupinfodia.cpp \
@@ -218,6 +219,7 @@ SOURCES += \
     Sheet/zsheet.cpp \
     SoftInfo/zsoftinfodia.cpp \
     SysSetup/zsyssetupdia.cpp \
+    TaskManager/zpresetdialogs.cpp \
     TaskManager/ptaskmanager.cpp \
     TaskManager/zlistprocesssteplinktemplatedia.cpp \
     TaskManager/zlisttaskdia.cpp \

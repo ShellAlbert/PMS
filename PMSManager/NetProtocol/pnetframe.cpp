@@ -537,7 +537,8 @@ void PNetFrame_Template::ZGetTemplate(QString templateName)
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
 }
-void PNetFrame_Template::ZSaveTemplate(QString templateName,QString templateXmlData,QString destMinMaxPair)
+void PNetFrame_Template::ZSaveTemplate(QString templateName,QString templateXmlData,QString destMinMaxPair,///<
+                                       QString productNo,QString productNoAutoFillXY)
 {
     QXmlStreamWriter  tXmlWriter(&this->m_frmXmlData);
     tXmlWriter.setAutoFormatting(true);
@@ -548,13 +549,16 @@ void PNetFrame_Template::ZSaveTemplate(QString templateName,QString templateXmlD
     tXmlWriter.writeAttribute(QString("cmd"),QString("save"));
     tXmlWriter.writeAttribute(QString("data"),QString(templateXmlData.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("minMaxPair"),QString(destMinMaxPair.toUtf8().toBase64()));
+    tXmlWriter.writeAttribute(QString("productNo"),QString(productNo.toUtf8().toBase64()));
+    tXmlWriter.writeAttribute(QString("productNoXY"),QString(productNoAutoFillXY.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("creator"),MyUserInfo::ZGetInstance()->m_UserInfo.m_userName);
     tXmlWriter.writeCharacters(templateName);
     tXmlWriter.writeEndElement();//Template.
     tXmlWriter.writeEndElement();//NetPro.
     tXmlWriter.writeEndDocument();
 }
-void PNetFrame_Template::ZSaveAsTemplate(QString templateName,QString templateXmlData,QString destMinMaxPair)
+void PNetFrame_Template::ZSaveAsTemplate(QString templateName,QString templateXmlData,QString destMinMaxPair,///<
+                                         QString productNo,QString productNoAutoFillXY)
 {
     QXmlStreamWriter  tXmlWriter(&this->m_frmXmlData);
     tXmlWriter.setAutoFormatting(true);
@@ -565,6 +569,8 @@ void PNetFrame_Template::ZSaveAsTemplate(QString templateName,QString templateXm
     tXmlWriter.writeAttribute(QString("cmd"),QString("saveas"));
     tXmlWriter.writeAttribute(QString("data"),QString(templateXmlData.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("minMaxPair"),QString(destMinMaxPair.toUtf8().toBase64()));
+    tXmlWriter.writeAttribute(QString("productNo"),QString(productNo.toUtf8().toBase64()));
+    tXmlWriter.writeAttribute(QString("productNoXY"),QString(productNoAutoFillXY.toUtf8().toBase64()));
     tXmlWriter.writeAttribute(QString("creator"),MyUserInfo::ZGetInstance()->m_UserInfo.m_userName);
     tXmlWriter.writeCharacters(templateName);
     tXmlWriter.writeEndElement();//Template.
@@ -810,12 +816,13 @@ void PNetFrame_Task::ZOpenTask(QString taskName,QString refTemplateName)
     tXmlWriter.writeStartElement(QString("NetPro"));
     tXmlWriter.writeAttribute(QString("dest"),QString("Task"));
     tXmlWriter.writeStartElement(QString("Task"));
-    tXmlWriter.writeAttribute(QString("cmd"),QString("get"));
+    tXmlWriter.writeAttribute(QString("cmd"),QString("open"));
     tXmlWriter.writeAttribute(QString("refTemplate"),refTemplateName);
     tXmlWriter.writeCharacters(taskName);
     tXmlWriter.writeEndElement();//Task.
     tXmlWriter.writeEndElement();//NetPro
     tXmlWriter.writeEndDocument();
+    //qDebug()<<this->m_frmXmlData;
 }
 void PNetFrame_Task::ZSaveTask(QString taskName,QString refTemplateName,QString taskValueXmlData,QStringList auxList)
 {

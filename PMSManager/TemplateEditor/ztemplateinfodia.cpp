@@ -148,6 +148,14 @@ void ZTemplateInfoDia::ZSetDestMinMaxCmpXmlData(QString destMinMaxXml)
 {
     this->m_destMinMaxXmlData=destMinMaxXml;
 }
+void ZTemplateInfoDia::ZSetPreSetProductNo(QString productNoXml)
+{
+    this->m_productNoXmlData=productNoXml;
+}
+void ZTemplateInfoDia::ZSetAutoFillProductNo(QString productNoXml)
+{
+    this->m_productNoAutoFill=productNoXml;
+}
 void ZTemplateInfoDia::ZSetVarSourceName(QString name)
 {
     this->m_leVarSourceName->setText(name);
@@ -200,6 +208,8 @@ void ZTemplateInfoDia::ZParseAckNetFrmXmlData()
                     QString creator=attr.value(QString("creator")).toString();
                     QString data=attr.value(QString("data")).toString();
                     QString minMaxPair=attr.value(QString("minMaxPair")).toString();
+                    QString productNo=attr.value(QString("productNo")).toString();
+                    QString productNoXY=attr.value(QString("productNoXY")).toString();
                     QString fileSize=attr.value(QString("filesize")).toString();
                     QString varSourceData=attr.value(QString("varsource")).toString();
                     qint32 retCode=attr.value(QString("retCode")).toInt();
@@ -210,6 +220,8 @@ void ZTemplateInfoDia::ZParseAckNetFrmXmlData()
                     paraList.append(creator);
                     paraList.append(QString(QByteArray::fromBase64(data.toUtf8())));
                     paraList.append(QString(QByteArray::fromBase64(minMaxPair.toUtf8())));
+                    paraList.append(QString(QByteArray::fromBase64(productNo.toUtf8())));
+                    paraList.append(QString(QByteArray::fromBase64(productNoXY.toUtf8())));
                     paraList.append(fileSize);
                     paraList.append(QString(QByteArray::fromBase64(varSourceData.toUtf8())));
                     paraList.append(errMsg);
@@ -310,7 +322,8 @@ void ZTemplateInfoDia::ZSlotOkay()
         this->m_waitDia->ZSetTipsMsg(tr("正在获取模板[%1]").arg(this->ZGetTemplateName()));
         break;
     case Type_SaveTemplate:
-        netFrm->ZSaveTemplate(this->ZGetTemplateName(),this->m_templateXmlData,this->m_destMinMaxXmlData);
+        netFrm->ZSaveTemplate(this->ZGetTemplateName(),this->m_templateXmlData,this->m_destMinMaxXmlData,///<
+                              this->m_productNoXmlData,this->m_productNoAutoFill);
         this->m_waitDia->ZSetTipsMsg(tr("正在保存模板[%1]").arg(this->ZGetTemplateName()));
         break;
     case Type_BindVarSource:
@@ -322,7 +335,8 @@ void ZTemplateInfoDia::ZSlotOkay()
         this->m_waitDia->ZSetTipsMsg(tr("正在解除绑定变量源[%1]从模板[%2]").arg(this->ZGetVarSourceName()).arg(this->ZGetTemplateName()));
         break;
     case Type_SaveAsTemplate:
-        netFrm->ZSaveAsTemplate(this->ZGetSaveAsTemplateName(),this->m_templateXmlData,this->m_destMinMaxXmlData);
+        netFrm->ZSaveAsTemplate(this->ZGetSaveAsTemplateName(),this->m_templateXmlData,this->m_destMinMaxXmlData,///<
+                                this->m_productNoXmlData,this->m_productNoAutoFill);
         this->m_waitDia->ZSetTipsMsg(tr("正在另存为新的模板[%1]").arg(this->ZGetSaveAsTemplateName()));
         break;
     default:

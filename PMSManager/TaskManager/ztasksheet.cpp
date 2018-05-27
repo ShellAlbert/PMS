@@ -429,6 +429,49 @@ void ZTaskSheet::ZSetTaskState(qint32 state)
 {
     this->m_taskState=state;
 }
+void ZTaskSheet::ZClearBindVarCell(void)
+{
+    //add by zhangshaoyan@2018/5/27
+    //when load finished,clear the bind var cell to wait for user fill.
+    if(this->m_taskState==Task_Type_New)
+    {
+        //        qDebug()<<"auto clean action!";
+        for(qint32 i=0;i<this->m_varTree->topLevelItem(0)->childCount();i++)
+        {
+            QTreeWidgetItem *item=this->m_varTree->topLevelItem(0)->child(i);
+            if(item)
+            {
+                QString xy=item->text(0);
+                //                qDebug()<<"auto clean xy:"<<xy;
+                QStringList xyList=xy.split(",");
+                if(xyList.size()!=2)
+                {
+                    continue;
+                }
+                qint32 x=xyList.at(0).toInt()-1;
+                qint32 y=xyList.at(1).toInt()-1;
+                //                qDebug()<<x<<","<<y;
+                ZCell *cell=static_cast<ZCell*>(this->item(x,y));
+                if(cell)
+                {
+                    cell->ZSetCellData("");
+                    emit this->ZSignalLogMsg(tr("auto clear (%1,%2) for new task.").arg(x).arg(y));
+                }else{
+                    emit this->ZSignalLogMsg(tr("convert cell failed when auto clear action!"));
+                }
+            }
+        }
+    }
+}
+//check destination&min&max cell.
+void ZTaskSheet::ZSetDestMinMaxPair(QString minMaxPair)
+{
+    this->m_minMaxPair=minMaxPair;
+}
+QString ZTaskSheet::ZGetDestMinMaxPair()
+{
+    return this->m_minMaxPair;
+}
 qint32 ZTaskSheet::ZGetTaskState()
 {
     return this->m_taskState;
@@ -607,20 +650,22 @@ void ZCellDataCheckReportDialog::ZSlotCopy2Clipboard()
     cb->setText(this->m_te->toPlainText());
     QMessageBox::information(this,tr("复制成功"),tr("已经复制到系统剪贴板中."));
 }
-ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
+ZTaskWidget::ZTaskWidget(QString refTemplate,QWidget *parent):QFrame(parent)
 {
+    this->m_refTemplate=refTemplate;
+
     this->m_llProductLine=new QLabel(tr("生产线/机器号"));
     this->m_llProductLine->setAlignment(Qt::AlignCenter);
     this->m_cbProuctLine=new QComboBox;
     this->m_cbProuctLine->setEditable(true);
     this->m_cbProuctLine->setMinimumWidth(160);
     //载入生产线预置值供用户选择，减少操作键盘次数。
-    ZProductLinePresetDialog PLDia(this->m_refTemplate);
-    QStringList lstPL=PLDia.ZReadList();
-    for(qint32 i=0;i<lstPL.size();i++)
-    {
-        this->m_cbProuctLine->addItem(QIcon(":/TaskManager/images/TaskManager/ProductLine.png"),lstPL.at(i));
-    }
+    //    ZProductLinePresetDialog PLDia(this->m_refTemplate);
+    //    QStringList lstPL=PLDia.ZReadList();
+    //    for(qint32 i=0;i<lstPL.size();i++)
+    //    {
+    //        this->m_cbProuctLine->addItem(QIcon(":/TaskManager/images/TaskManager/ProductLine.png"),lstPL.at(i));
+    //    }
 
     this->m_llClass=new QLabel(tr("班组"));
     this->m_llClass->setAlignment(Qt::AlignCenter);
@@ -628,12 +673,12 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
     this->m_cbClass->setEditable(true);
     this->m_cbClass->setMinimumWidth(160);
     //载入班组预置值供用户选择，减少操作键盘次数。
-    ZClassPresetDialog classDia;
-    QStringList lstClass=classDia.ZReadList();
-    for(qint32 i=0;i<lstClass.size();i++)
-    {
-        this->m_cbClass->addItem(QIcon(":/TaskManager/images/TaskManager/Class.png"),lstClass.at(i));
-    }
+    //    ZClassPresetDialog classDia;
+    //    QStringList lstClass=classDia.ZReadList();
+    //    for(qint32 i=0;i<lstClass.size();i++)
+    //    {
+    //        this->m_cbClass->addItem(QIcon(":/TaskManager/images/TaskManager/Class.png"),lstClass.at(i));
+    //    }
 
     this->m_llOrderNo=new QLabel(tr("订单号"));
     this->m_llOrderNo->setAlignment(Qt::AlignCenter);
@@ -641,12 +686,15 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
     this->m_cbOrderNo->setEditable(true);
     this->m_cbOrderNo->setMinimumWidth(160);
     //载入订单号预置值供用户选择，减少操作键盘次数。
-    ZOrderNoPresetDialog orderNoDia;
-    QStringList lstOrderNo=orderNoDia.ZReadList();
-    for(qint32 i=0;i<lstOrderNo.size();i++)
-    {
-        this->m_cbOrderNo->addItem(QIcon(":/TaskManager/images/TaskManager/OrderNo.png"),lstOrderNo.at(i));
-    }
+    //    ZOrderNoPresetDialog orderNoDia(this->m_refTemplate);
+    //    //here we read auto xy fill list.
+    //    this->m_xyListAutoFillOrderNo=orderNoDia.ZReadXYList();
+    //    QStringList lstOrderNo=orderNoDia.ZReadList();
+    //    for(qint32 i=0;i<lstOrderNo.size();i++)
+    //    {
+    //        this->m_cbOrderNo->addItem(QIcon(":/TaskManager/images/TaskManager/OrderNo.png"),lstOrderNo.at(i));
+    //    }
+    //    connect(this->m_cbOrderNo,SIGNAL(currentTextChanged(QString)),this,SLOT(ZSlotAutoFillOrderNo2Cells(QString)));
 
     this->m_llProductNo=new QLabel(tr("产品号"));
     this->m_llProductNo->setAlignment(Qt::AlignCenter);
@@ -654,13 +702,17 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
     this->m_cbProductNo->setEditable(true);
     this->m_cbProductNo->setMinimumWidth(160);
     //载入产品号预置值供用户选择，减少操作键盘次数。
-    ZProductNoPresetDialog productNoDia(this->m_refTemplate);
-    QStringList lstProductNo=productNoDia.ZReadList();
-    for(qint32 i=0;i<lstProductNo.size();i++)
-    {
-        this->m_cbProductNo->addItem(QIcon(":/TaskManager/images/TaskManager/ProductNo.png"),lstProductNo.at(i));
-    }
+    //    ZProductNoPresetDialog productNoDia(this->m_refTemplate);
+    //    //here we read auto xy fill list.
+    //    this->m_xyListAutoFillProductNo=productNoDia.ZReadXYList();
+    //    QStringList lstProductNo=productNoDia.ZReadList();
+    //    for(qint32 i=0;i<lstProductNo.size();i++)
+    //    {
+    //        this->m_cbProductNo->addItem(QIcon(":/TaskManager/images/TaskManager/ProductNo.png"),lstProductNo.at(i));
+    //    }
+    connect(this->m_cbProductNo,SIGNAL(currentTextChanged(QString)),this,SLOT(ZSlotAutoFillProductNo2Cells(QString)));
 
+    ///////////////////////////////////////////////////////
     this->m_tbHideVarList=new QToolButton;
     this->m_tbHideVarList->setIcon(QIcon(":/TaskManager/images/TaskManager/arrow_right.png"));
     this->m_tbHideVarList->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -728,8 +780,6 @@ ZTaskWidget::ZTaskWidget(QWidget *parent):QFrame(parent)
 
     this->m_sheet->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this->m_sheet,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(ZSlotPopupMenu(QPoint)));
-
-    connect(this->m_sheet,SIGNAL(cellClicked(int,int)),this,SLOT(ZSlotSheetDoubleClicked(qint32,qint32)));
 }
 ZTaskWidget::~ZTaskWidget()
 {
@@ -778,14 +828,17 @@ void ZTaskWidget::ZSlotPopupMenu(const QPoint &pt)
     QAction actBarChart(QIcon(":/TaskManager/images/TaskManager/barChart.png"),tr("柱状汇总图"));
     QAction actExportExcel(QIcon(":/UserManager/images/UserManager/Excel.png"),tr("导出Excel..."));
     QAction actReport(QIcon(":/common/images/common/print.png"),tr("导出报表..."));
-    QAction actAutoFillProductNo2XY(QIcon(":/common/images/common/print.png"),tr("复制订单号到单元格列表"));
+    QAction actAutoFillOrderNo2XY(QIcon(":/common/images/common/print.png"),tr("自动复制订单号到单元格列表"));
+    QAction actAutoFillProductNo2XY(QIcon(":/common/images/common/print.png"),tr("自动复制产品号到单元格列表"));
     popMenu.addAction(&actLineChart);
     popMenu.addAction(&actBarChart);
     popMenu.addAction(&actExportExcel);
     popMenu.addAction(&actReport);
+    popMenu.addAction(&actAutoFillOrderNo2XY);
     popMenu.addAction(&actAutoFillProductNo2XY);
     connect(&actLineChart,SIGNAL(triggered(bool)),this,SLOT(ZSlotShowLineChart()));
     connect(&actBarChart,SIGNAL(triggered(bool)),this,SLOT(ZSlotShowBarChart()));
+    connect(&actAutoFillOrderNo2XY,SIGNAL(triggered(bool)),this,SLOT(ZSlotShowAutoFillOrderNo2XY()));
     connect(&actAutoFillProductNo2XY,SIGNAL(triggered(bool)),this,SLOT(ZSlotShowAutoFillProductNo2XY()));
     popMenu.exec(QCursor::pos());
 }
@@ -827,28 +880,17 @@ void ZTaskWidget::ZSlotShowAutoFillProductNo2XY()
         xyListInfo+=this->m_xyListAutoFillProductNo.at(i);
         xyListInfo+="\n";
     }
-    QMessageBox::information(this,tr("信息提示"),tr("订单号被配置为右击复制到以下单元格中:\n%1\n").arg(xyListInfo));
+    QMessageBox::information(this,tr("信息提示"),tr("产品号被配置为自动复制到以下单元格中:\n%1\n").arg(xyListInfo));
 }
-void ZTaskWidget::ZSlotSheetDoubleClicked(qint32 x,qint32 y)
+void ZTaskWidget::ZSlotShowAutoFillOrderNo2XY()
 {
-    qDebug()<<"sheet double clicked.";
-    for(qint32 i=0;i<this->m_xyListAutoFillProductNo.size();i++)
+    QString xyListInfo;
+    for(qint32 i=0;i<this->m_xyListAutoFillOrderNo.size();i++)
     {
-        QString xy=this->m_xyListAutoFillProductNo.at(i);
-        QStringList xyList=xy.split(",");
-        qint32 xPre=xyList.at(0).toInt();
-        qint32 yPre=xyList.at(1).toInt();
-        if(x==xPre && y==yPre)
-        {
-            QTableWidgetItem *item=this->m_sheet->itemAt(x,y);
-            if(item)
-            {
-                item->setText(this->m_cbProductNo->currentText());
-                emit this->ZSignalLogMsg(tr("ProductNo auto fill xy occured,x=%1,y=%2.").arg(x).arg(y));
-                break;
-            }
-        }
+        xyListInfo+=this->m_xyListAutoFillOrderNo.at(i);
+        xyListInfo+="\n";
     }
+    QMessageBox::information(this,tr("信息提示"),tr("订单号被配置为自动复制到以下单元格中:\n%1\n").arg(xyListInfo));
 }
 void ZTaskWidget::ZSlotVarDblClicked(QModelIndex index)
 {
@@ -1207,6 +1249,58 @@ bool ZTaskWidget::ZCheckCellDataValidation()
             }
         }
     }
+
+    //check destination&min&max pair data compare.
+    QString minMaxPair=this->m_sheet->ZGetDestMinMaxPair();
+    QStringList minMaxPairList=minMaxPair.split("@");
+    for(qint32 i=0;i<minMaxPairList.size();i++)
+    {
+        QStringList destMinMax=minMaxPairList.at(i).split("/");
+        if(destMinMax.size()!=3)//dest/min/max
+        {
+            continue;
+        }
+        //parse out dest x,y.
+        QStringList destList=destMinMax.at(0).split(",");
+        if(destList.size()!=2)
+        {
+            continue;
+        }
+        qint32 xDest=destList.at(0).toInt()-1;
+        qint32 yDest=destList.at(1).toInt()-1;
+        //parse out min x,y.
+        QStringList minList=destMinMax.at(1).split(",");
+        if(minList.size()!=2)
+        {
+            continue;
+        }
+        qint32 xMin=minList.at(0).toInt()-1;
+        qint32 yMin=minList.at(1).toInt()-1;
+        //parse out max x,y.
+        QStringList maxList=destMinMax.at(2).split(",");
+        qint32 xMax=maxList.at(0).toInt()-1;
+        qint32 yMax=maxList.at(1).toInt()-1;
+
+        //check.
+        ZCell *destCell=static_cast<ZCell*>(this->m_sheet->item(xDest,yDest));
+        ZCell *minCell=static_cast<ZCell*>(this->m_sheet->item(xMin,yMin));
+        ZCell *maxCell=static_cast<ZCell*>(this->m_sheet->item(xMax,yMax));
+        float fDest=destCell->ZGetCellData().toFloat();
+        float fMin=minCell->ZGetCellData().toFloat();
+        float fMax=maxCell->ZGetCellData().toFloat();
+        if(!(fMin<=fDest && fDest<=fMax))
+        {
+            QString errLog(tr("最小/最大值比对失败,(%1,%2)=%3,(%4,%5)=%6,(%7,%8)=%9\n")///<
+                           .arg(xDest).arg(yDest).arg(QString::number(fDest,'f'))///<
+                           .arg(xMin).arg(yMin).arg(QString::number(fMin,'f'))///<
+                           .arg(xMax).arg(yMax).arg(QString::number(fMax,'f')));
+            emit this->ZSignalLogMsg(errLog);
+            checkLog.append(errLog);
+            bCheckOkay=false;
+        }
+    }
+
+
     //show cell data check report dialog.
     if(!checkLog.isEmpty())
     {
@@ -1251,14 +1345,68 @@ qint32 ZTaskWidget::ZGetTaskState()
 {
     return this->m_TaskState;
 }
-//自动填写订单号到配置的单元格中
-//自动复制到单元格。
-void ZTaskWidget::ZLoadAutoFillCellWithProductNo(QString relatedTemplate)
+void ZTaskWidget::ZSetPreSetProductNo(QString preSetProductNo)
 {
-    ZProductNoPresetDialog dia(relatedTemplate);
-    this->m_xyListAutoFillProductNo=dia.ZGetXYList();
+    this->m_cbProductNo->clear();
+    QStringList productNoList=preSetProductNo.split("@");
+    for(qint32 i=0;i<productNoList.size();i++)
+    {
+        QString productNo=productNoList.at(i);
+        if(!productNo.isEmpty())
+        {
+            this->m_cbProductNo->addItem(productNo);
+        }
+    }
 }
+void ZTaskWidget::ZSetAutoFillProductNo(QString autoFillXY)
+{
+    //qDebug()<<autoFillXY;
+    this->m_xyListAutoFillProductNo.clear();
 
+    QStringList xyList=autoFillXY.split("@");
+    for(qint32 i=0;i<xyList.size();i++)
+    {
+        QString xy=xyList.at(i);
+        if(!xy.isEmpty())
+        {
+            this->m_xyListAutoFillProductNo.append(xy);
+        }
+    }
+}
+//auto copy product no to cells.
+void ZTaskWidget::ZSlotAutoFillProductNo2Cells(QString newProductNo)
+{
+    for(qint32 i=0;i<this->m_xyListAutoFillProductNo.size();i++)
+    {
+        QString xy=this->m_xyListAutoFillProductNo.at(i);
+        QStringList xyList=xy.split(",");
+        qint32 x=xyList.at(0).toInt()-1;
+        qint32 y=xyList.at(1).toInt()-1;
+        ZCell *cell=static_cast<ZCell*>(this->m_sheet->item(x,y));
+        if(cell)
+        {
+            cell->ZSetCellData(newProductNo);
+            emit this->ZSignalLogMsg(tr("ProductNo auto fill xy occured,x=%1,y=%2.").arg(x).arg(y));
+        }
+    }
+}
+//auto copy order no to cells.
+void ZTaskWidget::ZSlotAutoFillOrderNo2Cells(QString newOrerNo)
+{
+    for(qint32 i=0;i<this->m_xyListAutoFillOrderNo.size();i++)
+    {
+        QString xy=this->m_xyListAutoFillOrderNo.at(i);
+        QStringList xyList=xy.split(",");
+        qint32 x=xyList.at(0).toInt()-1;
+        qint32 y=xyList.at(1).toInt()-1;
+        ZCell *cell=static_cast<ZCell*>(this->m_sheet->item(x,y));
+        if(cell)
+        {
+            cell->ZSetCellData(newOrerNo);
+            emit this->ZSignalLogMsg(tr("OrderNo auto fill xy occured,x=%1,y=%2.").arg(x).arg(y));
+        }
+    }
+}
 ZLineChartDialog::ZLineChartDialog(QWidget *parent):QDialog(parent)
 {
     this->setWindowTitle(tr("折线趋势图"));

@@ -21,6 +21,7 @@ ZCell::ZCell()
     this->ZSetTextAlignment(Qt::AlignVCenter|Qt::AlignHCenter);
 
     this->m_cellWidgetType=CellWidget_No;
+
 }
 void ZCell::ZSetFont(QFont tFont)
 {
@@ -54,6 +55,7 @@ void ZCell::ZSetDataType(QString dataType)
         this->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
         this->setCheckState(Qt::Unchecked);
     }else{
+        this->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled);
         this->setData(Qt::CheckStateRole, QVariant());
     }
     this->m_dataType=dataType;
