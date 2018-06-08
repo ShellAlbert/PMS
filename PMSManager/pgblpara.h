@@ -145,7 +145,8 @@ public:
         //read ini file.
         QSettings iniFile(iniFileName,QSettings::IniFormat);
         iniFile.beginGroup("Server");
-        this->m_appVersion=QString("3.0.0");
+        //this->m_appVersion=QString("3.0.0");
+        this->m_appVersion=QString("3.0.1");
         this->m_PMSIp=iniFile.value("IP","127.0.0.1").toString();
         this->m_PMSPort=iniFile.value("PORT",6800).toInt();
         iniFile.endGroup();

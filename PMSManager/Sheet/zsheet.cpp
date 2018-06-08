@@ -488,6 +488,8 @@ void ZSheet::ZSlotDeleteRows()
         if(QMessageBox::Ok==QMessageBox::question(this,tr("操作确认"),tr("您确认要删除该行吗?\n行号%1.").arg(rowNo+1),QMessageBox::Ok,QMessageBox::Cancel))
         {
             this->removeRow(rowNo);
+            emit this->ZSigDecBindXWhenDelRow(rowNo);
+            emit this->ZSignalSheetChanged(this->m_templateName);
         }
     }
 }
@@ -500,6 +502,8 @@ void ZSheet::ZSlotDeleteCols()
         if(QMessageBox::Ok==QMessageBox::question(this,tr("操作确认"),tr("您确认要删除该列吗?\n列号%1.").arg(colNo+1),QMessageBox::Ok,QMessageBox::Cancel))
         {
             this->removeColumn(colNo);
+            emit this->ZSigDecBindYWhenDelCol(colNo);
+            emit this->ZSignalSheetChanged(this->m_templateName);
         }
     }
 }
@@ -513,6 +517,9 @@ void ZSheet::ZSlotInsertRows()
         tCell->ZSetCellWidgetType(ZCell::CellWidget_No);
         this->setItem(rowNo,i,tCell);
     }
+    //adjust (x,y)'s x.
+    emit this->ZSigIncBindXWhenAddRow(rowNo);
+    emit this->ZSignalSheetChanged(this->m_templateName);
 }
 void ZSheet::ZSlotInsertCols()
 {
@@ -524,6 +531,9 @@ void ZSheet::ZSlotInsertCols()
         tCell->ZSetCellWidgetType(ZCell::CellWidget_No);
         this->setItem(i,colNo,tCell);
     }
+    //adjust (x,y)'s y.
+    emit this->ZSigIncBindYWhenAddCol(colNo);
+    emit this->ZSignalSheetChanged(this->m_templateName);
 }
 //for print html.
 QString ZSheet::ZGetPrintHtml()

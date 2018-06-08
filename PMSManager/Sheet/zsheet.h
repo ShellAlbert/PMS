@@ -88,6 +88,12 @@ signals:
     void ZSignalSheetChanged(QString templateName);
     void ZSignalBindVar();
     void ZSignalUnbindVar();
+
+    void ZSigIncBindXWhenAddRow(qint32 nX);
+    void ZSigIncBindYWhenAddCol(qint32 nY);
+
+    void ZSigDecBindXWhenDelRow(qint32 nX);
+    void ZSigDecBindYWhenDelCol(qint32 nY);
 protected:
     void mousePressEvent(QMouseEvent *event);
 private:

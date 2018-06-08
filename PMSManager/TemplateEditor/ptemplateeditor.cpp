@@ -2665,6 +2665,11 @@ ZSheetWidget::ZSheetWidget()
     connect(this->m_sheet,SIGNAL(cellClicked(int,int)),this,SLOT(ZSlotCellActivated(qint32,qint32)));
     connect(this->m_treeWidget,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(ZSlotVarDblClicked(QTreeWidgetItem*,int)));
 
+    //////////////////////////////////
+    connect(this->m_sheet,SIGNAL(ZSigIncBindXWhenAddRow(qint32)),this,SLOT(ZSlotIncXWhenAddRow(qint32)));
+    connect(this->m_sheet,SIGNAL(ZSigIncBindYWhenAddCol(qint32)),this,SLOT(ZSlotIncYWhenAddCol(qint32)));
+    connect(this->m_sheet,SIGNAL(ZSigDecBindXWhenDelRow(qint32)),this,SLOT(ZSlotDecXWhenDelRow(qint32)));
+    connect(this->m_sheet,SIGNAL(ZSigDecBindYWhenDelCol(qint32)),this,SLOT(ZSlotDecYWhenDelCol(qint32)));
 }
 ZSheetWidget::~ZSheetWidget()
 {
@@ -3352,6 +3357,7 @@ void ZSheetWidget::ZSlotCellAutoAdjust(void)
 }
 void ZSheetWidget::ZSlotPopMenu(const QPoint &pt)
 {
+    Q_UNUSED(pt);
     if(NULL==this->m_treeWidget->currentItem())
     {
         QMessageBox::critical(this,tr("错误提示"),tr("未选择变量,无法完成绑定!"));
@@ -3443,5 +3449,66 @@ void ZSheetWidget::ZSlotAutoBindPreCell()
     {
         QTreeWidgetItem *item=this->m_generalVarItem->child(i);
         item->setText(1,item->text(5));
+    }
+}
+//adjust (x,y) when add col/add row/del col/del row actions occured.
+void ZSheetWidget::ZSlotIncXWhenAddRow(qint32 rowNo)
+{
+    for(qint32 i=0;i<this->m_generalVarItem->childCount();i++)
+    {
+        QTreeWidgetItem *item=this->m_generalVarItem->child(i);
+        QStringList xyList=item->text(1).split(",");
+        qint32 nX=xyList.at(0).toInt();
+        qint32 nY=xyList.at(1).toInt();
+        if(nX>=rowNo)
+        {
+            nX++;
+            item->setText(1,QString("%1,%2").arg(nX).arg(nY));
+        }
+    }
+}
+void ZSheetWidget::ZSlotIncYWhenAddCol(qint32 colNo)
+{
+    for(qint32 i=0;i<this->m_generalVarItem->childCount();i++)
+    {
+        QTreeWidgetItem *item=this->m_generalVarItem->child(i);
+        QStringList xyList=item->text(1).split(",");
+        qint32 nX=xyList.at(0).toInt();
+        qint32 nY=xyList.at(1).toInt();
+        if(nY>=colNo)
+        {
+            nY++;
+            item->setText(1,QString("%1,%2").arg(nX).arg(nY));
+        }
+    }
+}
+void ZSheetWidget::ZSlotDecXWhenDelRow(qint32 rowNo)
+{
+    for(qint32 i=0;i<this->m_generalVarItem->childCount();i++)
+    {
+        QTreeWidgetItem *item=this->m_generalVarItem->child(i);
+        QStringList xyList=item->text(1).split(",");
+        qint32 nX=xyList.at(0).toInt();
+        qint32 nY=xyList.at(1).toInt();
+        if(nX>=rowNo)
+        {
+            nX--;
+            item->setText(1,QString("%1,%2").arg(nX).arg(nY));
+        }
+    }
+}
+void ZSheetWidget::ZSlotDecYWhenDelCol(qint32 colNo)
+{
+    for(qint32 i=0;i<this->m_generalVarItem->childCount();i++)
+    {
+        QTreeWidgetItem *item=this->m_generalVarItem->child(i);
+        QStringList xyList=item->text(1).split(",");
+        qint32 nX=xyList.at(0).toInt();
+        qint32 nY=xyList.at(1).toInt();
+        if(nY>=colNo)
+        {
+            nY--;
+            item->setText(1,QString("%1,%2").arg(nX).arg(nY));
+        }
     }
 }

@@ -94,6 +94,13 @@ private slots:
     void ZSlotBindCell();
     void ZSlotRemoveBind();
     void ZSlotAutoBindPreCell();
+
+private slots:
+    //adjust (x,y) when add col/add row/del col/del row actions occured.
+    void ZSlotIncXWhenAddRow(qint32 rowNo);
+    void ZSlotIncYWhenAddCol(qint32 colNo);
+    void ZSlotDecXWhenDelRow(qint32 rowNo);
+    void ZSlotDecYWhenDelCol(qint32 colNo);
 public:
 
     ZSheet *m_sheet;
